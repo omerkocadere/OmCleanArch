@@ -1,0 +1,605 @@
+[
+  {
+    "Title": "Personal Tasks",
+    "Colour": "#FFFFFF",
+    "UserId": 1,
+    "Items": [
+      {
+        "Title": "Buy groceries",
+        "Note": "Remember to check for discounts",
+        "Priority": 1,
+        "Reminder": "2025-06-26T09:00:00",
+        "Description": "Purchase weekly groceries",
+        "DueDate": "2025-06-27T18:00:00",
+        "Labels": ["shopping", "home"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 1
+      },
+      {
+        "Title": "Call plumber",
+        "Note": "Ask about kitchen sink",
+        "Priority": 2,
+        "Reminder": "2025-06-26T14:00:00",
+        "Description": "Fix the leaking sink",
+        "DueDate": "2025-06-28T12:00:00",
+        "Labels": ["urgent", "home"],
+        "CompletedAt": "2025-06-26T15:00:00",
+        "Done": true,
+        "UserId": 1
+      },
+      {
+        "Title": "Read a book",
+        "Note": "Start with chapter 1",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Read 'Atomic Habits'",
+        "DueDate": "2025-07-01T20:00:00",
+        "Labels": ["leisure", "personal"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 1
+      },
+      {
+        "Title": "Pay electricity bill",
+        "Note": "Due this week",
+        "Priority": 2,
+        "Reminder": "2025-06-27T10:00:00",
+        "Description": "Pay via online banking",
+        "DueDate": "2025-06-28T23:59:00",
+        "Labels": ["finance", "urgent"],
+        "CompletedAt": "2025-06-27T11:00:00",
+        "Done": true,
+        "UserId": 1
+      },
+      {
+        "Title": "Walk the dog",
+        "Note": "Evening walk",
+        "Priority": 0,
+        "Reminder": "2025-06-25T19:00:00",
+        "Description": "30-minute walk in the park",
+        "DueDate": "2025-06-25T20:00:00",
+        "Labels": ["pets", "health"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 1
+      }
+    ]
+  },
+  {
+    "Title": "Work Projects",
+    "Colour": "#6666FF",
+    "UserId": 1,
+    "Items": [
+      {
+        "Title": "Team meeting",
+        "Note": "Prepare agenda",
+        "Priority": 1,
+        "Reminder": "2025-06-26T10:00:00",
+        "Description": "Weekly sync with team",
+        "DueDate": "2025-06-26T10:30:00",
+        "Labels": ["work", "meeting"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 1
+      },
+      {
+        "Title": "Send report",
+        "Note": "Attach latest figures",
+        "Priority": 2,
+        "Reminder": "2025-06-26T16:00:00",
+        "Description": "Send Q2 report to manager",
+        "DueDate": "2025-06-26T17:00:00",
+        "Labels": ["work", "urgent"],
+        "CompletedAt": "2025-06-26T16:30:00",
+        "Done": true,
+        "UserId": 1
+      },
+      {
+        "Title": "Update resume",
+        "Note": "Add recent projects",
+        "Priority": 1,
+        "Reminder": null,
+        "Description": "Update with new skills",
+        "DueDate": "2025-07-05T18:00:00",
+        "Labels": ["career", "personal"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 1
+      },
+      {
+        "Title": "Book dentist",
+        "Note": "Annual checkup",
+        "Priority": 0,
+        "Reminder": "2025-06-28T09:00:00",
+        "Description": "Call to schedule appointment",
+        "DueDate": "2025-07-02T09:00:00",
+        "Labels": ["health"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 1
+      },
+      {
+        "Title": "Plan vacation",
+        "Note": "Research destinations",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Look for summer trips",
+        "DueDate": "2025-07-10T12:00:00",
+        "Labels": ["travel", "leisure"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 1
+      }
+    ]
+  },
+  {
+    "Title": "Shopping List",
+    "Colour": "#CCFF99",
+    "UserId": 1,
+    "Items": [
+      {
+        "Title": "Car service",
+        "Note": "Check brakes",
+        "Priority": 1,
+        "Reminder": "2025-06-29T08:00:00",
+        "Description": "Annual maintenance",
+        "DueDate": "2025-06-30T10:00:00",
+        "Labels": ["car", "maintenance"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 1
+      },
+      {
+        "Title": "Buy birthday gift",
+        "Note": "For Sarah",
+        "Priority": 1,
+        "Reminder": null,
+        "Description": "Gift for Sarah's birthday",
+        "DueDate": "2025-07-03T18:00:00",
+        "Labels": ["shopping", "gift"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 1
+      },
+      {
+        "Title": "Organize files",
+        "Note": "Sort documents",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Arrange digital files",
+        "DueDate": "2025-07-01T21:00:00",
+        "Labels": ["personal", "work"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 1
+      },
+      {
+        "Title": "Water plants",
+        "Note": "Use fertilizer",
+        "Priority": 0,
+        "Reminder": "2025-06-26T07:00:00",
+        "Description": "Water all indoor plants",
+        "DueDate": "2025-06-26T08:00:00",
+        "Labels": ["home", "garden"],
+        "CompletedAt": "2025-06-26T08:10:00",
+        "Done": true,
+        "UserId": 1
+      },
+      {
+        "Title": "Renew insurance",
+        "Note": "Check offers",
+        "Priority": 2,
+        "Reminder": "2025-06-30T11:00:00",
+        "Description": "Renew car insurance",
+        "DueDate": "2025-07-05T23:59:00",
+        "Labels": ["finance", "car"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 1
+      }
+    ]
+  },
+  {
+    "Title": "Home Maintenance",
+    "Colour": "#FF5733",
+    "UserId": 2,
+    "Items": [
+      {
+        "Title": "Fix leaky faucet",
+        "Note": "Kitchen sink dripping",
+        "Priority": 2,
+        "Reminder": "2025-06-28T09:00:00",
+        "Description": "Replace washer in kitchen faucet",
+        "DueDate": "2025-06-29T12:00:00",
+        "Labels": ["plumbing", "urgent"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      },
+      {
+        "Title": "Clean gutters",
+        "Note": "Before next rain",
+        "Priority": 1,
+        "Reminder": null,
+        "Description": "Remove leaves from roof gutters",
+        "DueDate": "2025-07-01T18:00:00",
+        "Labels": ["maintenance"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      },
+      {
+        "Title": "Test smoke alarms",
+        "Note": "Replace batteries if needed",
+        "Priority": 1,
+        "Reminder": null,
+        "Description": "Check all alarms in house",
+        "DueDate": "2025-07-02T20:00:00",
+        "Labels": ["safety"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      },
+      {
+        "Title": "Paint fence",
+        "Note": "Use weatherproof paint",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Repaint backyard fence",
+        "DueDate": "2025-07-10T15:00:00",
+        "Labels": ["outdoor"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      },
+      {
+        "Title": "Service HVAC",
+        "Note": "Annual checkup",
+        "Priority": 2,
+        "Reminder": "2025-07-05T10:00:00",
+        "Description": "Call technician for maintenance",
+        "DueDate": "2025-07-06T12:00:00",
+        "Labels": ["maintenance", "hvac"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      }
+    ]
+  },
+  {
+    "Title": "Travel Plans",
+    "Colour": "#FFFF66",
+    "UserId": 2,
+    "Items": [
+      {
+        "Title": "Book flights",
+        "Note": "Compare prices online",
+        "Priority": 2,
+        "Reminder": null,
+        "Description": "Find best deals for summer trip",
+        "DueDate": "2025-07-15T23:59:00",
+        "Labels": ["travel", "booking"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      },
+      {
+        "Title": "Renew passport",
+        "Note": "Check expiration date",
+        "Priority": 1,
+        "Reminder": null,
+        "Description": "Apply for renewal if needed",
+        "DueDate": "2025-07-05T12:00:00",
+        "Labels": ["documents"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      },
+      {
+        "Title": "Reserve hotel",
+        "Note": "Downtown area preferred",
+        "Priority": 1,
+        "Reminder": null,
+        "Description": "Book accommodation for 5 nights",
+        "DueDate": "2025-07-10T18:00:00",
+        "Labels": ["travel", "hotel"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      },
+      {
+        "Title": "Plan itinerary",
+        "Note": "Include museums and parks",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Draft daily schedule",
+        "DueDate": "2025-07-12T10:00:00",
+        "Labels": ["planning"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      },
+      {
+        "Title": "Buy travel insurance",
+        "Note": "Compare coverage options",
+        "Priority": 2,
+        "Reminder": null,
+        "Description": "Purchase before departure",
+        "DueDate": "2025-07-13T16:00:00",
+        "Labels": ["insurance"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      }
+    ]
+  },
+  {
+    "Title": "Books to Read",
+    "Colour": "#FFFFFF",
+    "UserId": 2,
+    "Items": [
+      {
+        "Title": "Read '1984'",
+        "Note": "George Orwell",
+        "Priority": 1,
+        "Reminder": null,
+        "Description": "Finish by end of July",
+        "DueDate": "2025-07-31T20:00:00",
+        "Labels": ["reading", "fiction"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      },
+      {
+        "Title": "Start 'Sapiens'",
+        "Note": "Yuval Noah Harari",
+        "Priority": 1,
+        "Reminder": null,
+        "Description": "Read at least 2 chapters",
+        "DueDate": "2025-07-10T21:00:00",
+        "Labels": ["reading", "nonfiction"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      },
+      {
+        "Title": "Finish 'Atomic Habits'",
+        "Note": "James Clear",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Apply key lessons",
+        "DueDate": "2025-07-15T22:00:00",
+        "Labels": ["reading", "selfhelp"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      },
+      {
+        "Title": "Review 'Clean Code'",
+        "Note": "Robert C. Martin",
+        "Priority": 2,
+        "Reminder": null,
+        "Description": "Summarize main points",
+        "DueDate": "2025-07-20T19:00:00",
+        "Labels": ["reading", "tech"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      },
+      {
+        "Title": "Explore 'The Pragmatic Programmer'",
+        "Note": "Andrew Hunt",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Read selected chapters",
+        "DueDate": "2025-07-25T18:00:00",
+        "Labels": ["reading", "tech"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 2
+      }
+    ]
+  },
+  {
+    "Title": "Health Goals",
+    "Colour": "#6666FF",
+    "UserId": 3,
+    "Items": [
+      {
+        "Title": "Morning jog",
+        "Note": "30 minutes in the park",
+        "Priority": 1,
+        "Reminder": "2025-06-26T07:00:00",
+        "Description": "Jog to improve stamina",
+        "DueDate": "2025-06-26T08:00:00",
+        "Labels": ["exercise", "health"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      },
+      {
+        "Title": "Drink water",
+        "Note": "At least 2 liters",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Stay hydrated",
+        "DueDate": "2025-06-26T20:00:00",
+        "Labels": ["health"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      },
+      {
+        "Title": "Prepare healthy lunch",
+        "Note": "Include vegetables",
+        "Priority": 1,
+        "Reminder": null,
+        "Description": "Cook a balanced meal",
+        "DueDate": "2025-06-27T12:00:00",
+        "Labels": ["diet", "health"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      },
+      {
+        "Title": "Meditation",
+        "Note": "10 minutes before bed",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Practice mindfulness",
+        "DueDate": "2025-06-27T22:00:00",
+        "Labels": ["wellness"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      },
+      {
+        "Title": "Track sleep",
+        "Note": "Log hours slept",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Monitor sleep quality",
+        "DueDate": "2025-06-28T08:00:00",
+        "Labels": ["health", "sleep"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      }
+    ]
+  },
+  {
+    "Title": "Family Events",
+    "Colour": "#CCFF99",
+    "UserId": 3,
+    "Items": [
+      {
+        "Title": "Family dinner",
+        "Note": "Book restaurant",
+        "Priority": 1,
+        "Reminder": "2025-06-28T18:00:00",
+        "Description": "Dinner with family",
+        "DueDate": "2025-06-28T20:00:00",
+        "Labels": ["family", "event"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      },
+      {
+        "Title": "Call parents",
+        "Note": "Weekly check-in",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Catch up with parents",
+        "DueDate": "2025-06-29T19:00:00",
+        "Labels": ["family"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      },
+      {
+        "Title": "Plan birthday party",
+        "Note": "For Alex",
+        "Priority": 2,
+        "Reminder": null,
+        "Description": "Organize party details",
+        "DueDate": "2025-07-05T17:00:00",
+        "Labels": ["family", "birthday"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      },
+      {
+        "Title": "Visit grandparents",
+        "Note": "Bring flowers",
+        "Priority": 1,
+        "Reminder": null,
+        "Description": "Weekend visit",
+        "DueDate": "2025-07-06T15:00:00",
+        "Labels": ["family", "visit"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      },
+      {
+        "Title": "Game night",
+        "Note": "Board games at home",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Family fun night",
+        "DueDate": "2025-07-10T20:00:00",
+        "Labels": ["family", "fun"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      }
+    ]
+  },
+  {
+    "Title": "Finance",
+    "Colour": "#FF5733",
+    "UserId": 3,
+    "Items": [
+      {
+        "Title": "Review budget",
+        "Note": "Check monthly expenses",
+        "Priority": 2,
+        "Reminder": null,
+        "Description": "Analyze spending",
+        "DueDate": "2025-06-30T21:00:00",
+        "Labels": ["finance", "budget"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      },
+      {
+        "Title": "Pay credit card",
+        "Note": "Due this week",
+        "Priority": 1,
+        "Reminder": "2025-06-27T10:00:00",
+        "Description": "Pay online",
+        "DueDate": "2025-06-28T23:59:00",
+        "Labels": ["finance", "urgent"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      },
+      {
+        "Title": "Check investments",
+        "Note": "Review portfolio",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Monitor stocks and funds",
+        "DueDate": "2025-07-01T18:00:00",
+        "Labels": ["finance", "investments"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      },
+      {
+        "Title": "File taxes",
+        "Note": "Gather documents",
+        "Priority": 2,
+        "Reminder": null,
+        "Description": "Prepare for tax filing",
+        "DueDate": "2025-07-10T12:00:00",
+        "Labels": ["finance", "taxes"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      },
+      {
+        "Title": "Set savings goal",
+        "Note": "Plan for vacation",
+        "Priority": 0,
+        "Reminder": null,
+        "Description": "Decide on savings amount",
+        "DueDate": "2025-07-15T20:00:00",
+        "Labels": ["finance", "savings"],
+        "CompletedAt": null,
+        "Done": false,
+        "UserId": 3
+      }
+    ]
+  }
+]

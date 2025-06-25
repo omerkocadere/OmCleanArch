@@ -1,0 +1,76 @@
+Id,ListId,Title,Note,Priority,Reminder,UserId,Description,DueDate,Labels,CompletedAt,Done
+1,1,Buy groceries,Remember to check for discounts,1,2025-06-26T09:00:00,1,Purchase weekly groceries,2025-06-27T18:00:00,"shopping,home",,false
+2,1,Call plumber,Ask about kitchen sink,2,2025-06-26T14:00:00,1,Fix the leaking sink,2025-06-28T12:00:00,"urgent,home",2025-06-26T15:00:00,true
+3,1,Read a book,Start with chapter 1,0,,1,Read 'Atomic Habits',2025-07-01T20:00:00,"leisure,personal",,false
+4,1,Pay electricity bill,Due this week,2,2025-06-27T10:00:00,1,Pay via online banking,2025-06-28T23:59:00,"finance,urgent",2025-06-27T11:00:00,true
+5,1,Walk the dog,Evening walk,0,2025-06-25T19:00:00,1,30-minute walk in the park,2025-06-25T20:00:00,"pets,health",,false
+6,2,Team meeting,Prepare agenda,1,2025-06-26T10:00:00,1,Weekly sync with team,2025-06-26T10:30:00,"work,meeting",,false
+7,2,Send report,Attach latest figures,2,2025-06-26T16:00:00,1,Send Q2 report to manager,2025-06-26T17:00:00,"work,urgent",2025-06-26T16:30:00,true
+8,2,Update resume,Add recent projects,1,,1,Update with new skills,2025-07-05T18:00:00,"career,personal",,false
+9,2,Book dentist,Annual checkup,0,2025-06-28T09:00:00,1,Call to schedule appointment,2025-07-02T09:00:00,"health",,false
+10,2,Plan vacation,Research destinations,0,,1,Look for summer trips,2025-07-10T12:00:00,"travel,leisure",,false
+11,3,Car service,Check brakes,1,2025-06-29T08:00:00,1,Annual maintenance,2025-06-30T10:00:00,"car,maintenance",,false
+12,3,Buy birthday gift,For Sarah,1,,1,Gift for Sarah's birthday,2025-07-03T18:00:00,"shopping,gift",,false
+13,3,Organize files,Sort documents,0,,1,Arrange digital files,2025-07-01T21:00:00,"personal,work",,false
+14,3,Water plants,Use fertilizer,0,2025-06-26T07:00:00,1,Water all indoor plants,2025-06-26T08:00:00,"home,garden",2025-06-26T08:10:00,true
+15,3,Renew insurance,Check offers,2,2025-06-30T11:00:00,1,Renew car insurance,2025-07-05T23:59:00,"finance,car",,false
+16,4,Review code,Check PR #42,1,2025-06-26T11:00:00,2,Review teammate's code,2025-06-26T12:00:00,"work,code",,false
+17,4,Write documentation,Update API docs,1,,2,Document new endpoints,2025-06-30T17:00:00,"work,documentation",,false
+18,4,Fix bug,Null reference error,2,2025-06-26T13:00:00,2,Resolve production bug,2025-06-26T15:00:00,"work,urgent,bug",2025-06-26T14:00:00,true
+19,4,Order office supplies,Check inventory,0,,2,Order pens and paper,2025-07-02T10:00:00,"work,office",,false
+20,4,Schedule 1:1,With manager,1,2025-06-27T09:00:00,2,Monthly check-in,2025-06-27T10:00:00,"work,meeting",,false
+21,5,Prepare slides,For presentation,1,2025-06-28T08:00:00,2,Slides for Monday's meeting,2025-06-30T09:00:00,"work,presentation",,false
+22,5,Backup laptop,Use external drive,0,,2,Backup all files,2025-07-01T20:00:00,"personal,tech",,false
+23,5,Read industry news,Focus on AI,0,,2,Stay updated,2025-06-29T21:00:00,"work,learning",,false
+24,5,Update LinkedIn,Add new role,1,,2,Update profile,2025-07-03T18:00:00,"career,personal",,false
+25,5,Buy coffee beans,Try new brand,0,2025-06-27T18:00:00,2,For home and office,2025-06-28T10:00:00,"shopping,home",,false
+26,6,Plan team lunch,Pick restaurant,1,2025-06-28T12:00:00,2,Team lunch on Friday,2025-06-28T13:00:00,"work,team",,false
+27,6,Submit expenses,Upload receipts,2,2025-06-27T17:00:00,2,Submit June expenses,2025-06-28T23:59:00,"finance,work",2025-06-27T18:00:00,true
+28,6,Read book summary,Choose next read,0,,2,Decide on next book,2025-07-04T20:00:00,"leisure,personal",,false
+29,6,Organize desk,Clean workspace,0,,2,Declutter office desk,2025-06-29T18:00:00,"work,office",,false
+30,6,Check emails,Respond to clients,1,2025-06-26T09:30:00,2,Inbox zero,2025-06-26T10:00:00,"work,communication",2025-06-26T10:05:00,true
+31,7,Buy groceries,For the week,1,2025-06-27T09:00:00,3,Weekly shopping,2025-06-28T18:00:00,"shopping,home",,false
+32,7,Call mom,Check in,0,2025-06-26T20:00:00,3,Weekly call,2025-06-26T20:30:00,"family,personal",2025-06-26T20:35:00,true
+33,7,Go jogging,Morning run,1,2025-06-27T07:00:00,3,Run 5km,2025-06-27T08:00:00,"health,fitness",,false
+34,7,Pay rent,Due soon,2,2025-06-28T10:00:00,3,Pay via bank app,2025-06-30T23:59:00,"finance,urgent",,false
+35,7,Read news,Focus on tech,0,,3,Stay informed,2025-06-29T21:00:00,"learning,tech",,false
+36,8,Organize closet,Sort clothes,0,,3,Donate old clothes,2025-07-01T19:00:00,"home,personal",,false
+37,8,Book flight,For vacation,1,2025-06-30T15:00:00,3,Book tickets to Paris,2025-07-10T12:00:00,"travel,leisure",,false
+38,8,Finish project,Final review,2,2025-06-28T17:00:00,3,Complete all tasks,2025-06-29T18:00:00,"work,urgent",2025-06-28T18:00:00,true
+39,8,Buy new shoes,Look for sales,0,,3,For summer,2025-07-05T18:00:00,"shopping,personal",,false
+40,8,Water garden,Every morning,0,2025-06-26T07:30:00,3,Water outdoor plants,2025-06-26T08:00:00,"home,garden",,false
+41,9,Write blog post,Topic: productivity,1,,3,Share tips online,2025-07-02T20:00:00,"work,writing",,false
+42,9,Fix bike,Flat tire,2,2025-06-27T16:00:00,3,Repair before weekend,2025-06-28T10:00:00,"personal,urgent",2025-06-27T17:00:00,true
+43,9,Plan birthday party,Invite friends,1,2025-07-01T18:00:00,3,Organize for Alex,2025-07-05T20:00:00,"family,party",,false
+44,9,Read emails,Clear inbox,0,,3,Check all unread,2025-06-26T10:00:00,"work,communication",,false
+45,9,Buy milk,Check expiry date,0,2025-06-26T18:00:00,3,For breakfast,2025-06-27T08:00:00,"shopping,home",,false
+46,10,Prepare report,For Q3,2,2025-06-27T15:00:00,4,Collect all data,2025-06-28T17:00:00,"work,urgent",,false
+47,10,Call John,Discuss project,1,2025-06-26T13:00:00,4,Project update,2025-06-26T14:00:00,"work,communication",2025-06-26T14:10:00,true
+48,10,Buy groceries,Snacks for office,0,,4,For Friday meeting,2025-06-28T09:00:00,"shopping,work",,false
+49,10,Update software,Install patches,1,2025-06-27T11:00:00,4,Security updates,2025-06-27T12:00:00,"tech,security",,false
+50,10,Book hotel,For conference,1,2025-06-29T10:00:00,4,Reserve room,2025-07-03T18:00:00,"travel,work",,false
+51,11,Organize files,Sort by date,0,,4,Arrange folders,2025-07-01T21:00:00,"work,personal",,false
+52,11,Pay credit card,Due soon,2,2025-06-28T09:00:00,4,Pay via app,2025-06-28T23:59:00,"finance,urgent",2025-06-28T10:00:00,true
+53,11,Read book,Start new novel,0,,4,Read '1984',2025-07-05T20:00:00,"leisure,personal",,false
+54,11,Buy printer ink,Check model,1,2025-06-27T17:00:00,4,For office printer,2025-06-28T10:00:00,"office,shopping",,false
+55,11,Plan weekend trip,Choose location,1,,4,Short getaway,2025-07-06T12:00:00,"travel,leisure",,false
+56,12,Attend webinar,Topic: cloud,1,2025-06-26T16:00:00,4,Join online event,2025-06-26T17:00:00,"work,learning",,false
+57,12,Buy vegetables,For dinner,0,2025-06-26T18:00:00,4,Fresh produce,2025-06-26T19:00:00,"shopping,home",,false
+58,12,Fix door handle,Loose screw,1,,4,Repair kitchen door,2025-06-27T12:00:00,"home,maintenance",2025-06-27T13:00:00,true
+59,12,Write feedback,For service,0,,4,Review online,2025-06-28T20:00:00,"personal,review",,false
+60,12,Call bank,Ask about charges,2,2025-06-27T09:00:00,4,Clarify statement,2025-06-27T10:00:00,"finance,urgent",,false
+61,13,Buy bread,Whole grain,0,2025-06-26T08:00:00,5,For breakfast,2025-06-26T09:00:00,"shopping,home",,false
+62,13,Go swimming,Morning exercise,1,2025-06-27T07:00:00,5,Swim 20 laps,2025-06-27T08:00:00,"health,fitness",,false
+63,13,Read magazine,Tech trends,0,,5,Latest issue,2025-06-29T21:00:00,"leisure,tech",,false
+64,13,Pay phone bill,Due soon,2,2025-06-28T10:00:00,5,Pay online,2025-06-30T23:59:00,"finance,urgent",2025-06-28T11:00:00,true
+65,13,Organize bookshelf,Sort by genre,0,,5,Arrange books,2025-07-01T20:00:00,"home,personal",,false
+66,14,Plan birthday dinner,Book restaurant,1,2025-06-29T18:00:00,5,For Emma,2025-07-02T20:00:00,"family,party",,false
+67,14,Buy movie tickets,For Friday,0,2025-06-27T19:00:00,5,Book online,2025-06-28T20:00:00,"leisure,entertainment",,false
+68,14,Fix laptop,Screen issue,2,2025-06-26T15:00:00,5,Repair at service center,2025-06-27T12:00:00,"tech,urgent",2025-06-26T16:00:00,true
+69,14,Read emails,Clear inbox,0,,5,Check all unread,2025-06-26T10:00:00,"work,communication",,false
+70,14,Buy flowers,For home,0,2025-06-27T17:00:00,5,Decorate living room,2025-06-28T10:00:00,"home,shopping",,false
+71,15,Write thank you note,For gift,1,,5,Send to Anna,2025-06-27T18:00:00,"personal,gratitude",,false
+72,15,Go hiking,Saturday morning,1,2025-06-28T07:00:00,5,Trail with friends,2025-06-28T12:00:00,"health,leisure",,false
+73,15,Buy dog food,Check brand,0,2025-06-26T18:00:00,5,For Max,2025-06-27T09:00:00,"pets,shopping",,false
+74,15,Plan study session,Math revision,1,2025-06-27T16:00:00,5,Prepare for exam,2025-06-28T10:00:00,"study,personal",,false
+75,15,Read article,On productivity,0,,5,Share with team,2025-06-29T21:00:00,"work,learning",,false
