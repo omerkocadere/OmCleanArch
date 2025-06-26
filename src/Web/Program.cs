@@ -12,17 +12,21 @@ builder.Host.UseSerilog(
     (context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration)
 );
 
-builder
-    .Services.AddApplicationServices()
-    .AddInfrastructureServices(builder.Configuration)
+var services = builder.Services;
+services
+    .AddApplicationServices()
+    .AddInfrastructureServices(builder.Configuration, builder.Environment)
     .AddWebServices();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     await app.InitialiseDatabaseAsync();
+    app.UseSwaggerWithUi();
 }
 else
 {
@@ -32,19 +36,14 @@ else
 
 app.MapHealthChecks("/health");
 
-app.UseRequestContextLogging();
+app.UseHttpsRedirection();
 
+app.UseRequestContextLogging();
 app.UseSerilogRequestLogging();
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseSwaggerWithUi();
-
-app.UseExceptionHandler();
-
 app.Map("/", () => Results.Redirect("/api"));
-
 app.MapEndpoints();
 app.MapControllers();
 

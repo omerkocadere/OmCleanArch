@@ -1,7 +1,5 @@
 ﻿using CleanArch.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
-using NSwag;
-using NSwag.Generation.Processors.Security;
 
 namespace CleanArch.Web;
 
@@ -9,10 +7,9 @@ public static class DependencyInjection
 {
     public static void AddWebServices(this IServiceCollection services)
     {
-        services.AddDatabaseDeveloperPageExceptionFilter();
-
-        services.AddHttpContextAccessor();
         services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>();
+
+        // REMARK: If you want to use Controllers, you'll need this.
         services.AddControllers();
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
