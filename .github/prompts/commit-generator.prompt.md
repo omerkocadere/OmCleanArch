@@ -1,16 +1,26 @@
-Please analyze the Git changes and generate a clear and detailed commit message following these guidelines:
+Analyze the code changes and generate a commit message in the following format:
 
-- Use the conventional commit format: `type(scope): description`
-- Begin with one of these types: feat, fix, docs, style, refactor, test, chore
-- Keep the first line under 50 characters
-- Use present tense imperative mood (e.g. "add" not "added")
-- Include relevant ticket/issue numbers if applicable
-- Follow with an optional detailed description if needed, wrapped at 72 characters
-- Every commit message MUST include at least one emoji. This is mandatory."
+1. Use the Conventional Commit style: `<type>(<scope>): <short summary>`
 
-Examples:
-feat(auth): implement OAuth2 login flow
-fix(api): resolve null pointer in user service
-docs(readme): update deployment instructions
+- Use `feat`, `fix`, `refactor`, `docs`, `test`, `style`, `chore`, or `perf` as `<type>`
+- Use a relevant `<scope>` based on the file(s) or feature(s) changed
+- The short summary must be clear, concise, and in imperative mood (e.g., "add support", "fix bug", "refactor handler")
 
-Please provide the staged changes or code diff to generate an appropriate commit message.
+2. Include a detailed body below the title:
+
+- Summarize the key changes
+- Mention any reasoning behind the change (e.g., performance, bug fix, clarity, separation of concerns)
+- Explain how the changes affect behavior (if applicable)
+- Avoid repeating the title verbatim
+
+3. Do not include breaking changes or footer unless explicitly stated.
+
+Generate the full message now.
+
+## Sample
+
+refactor(auth): extract JWT validation logic into a separate service
+
+- Moved JWT parsing and validation from the middleware into a dedicated AuthService
+- Improves testability and adheres to single responsibility principle
+- No change to existing API behavior or authentication flow
