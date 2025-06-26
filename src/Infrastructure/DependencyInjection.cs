@@ -15,13 +15,11 @@ public static class DependencyInjection
         IConfiguration configuration
     )
     {
-        return services.AddServices().AddDatabase(configuration);
+        return services.AddServices().AddDatabase(configuration).AddAuthenticationInternal();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
-        services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
         services.AddSingleton(TimeProvider.System);
         return services;
     }
@@ -31,11 +29,10 @@ public static class DependencyInjection
         IConfiguration configuration
     )
     {
-        var connectionString = configuration.GetConnectionString("CleanArchDb");
-
         services.AddDbContext<ApplicationDbContext>(
             (sp, options) =>
             {
+                var connectionString = configuration.GetConnectionString("CleanArchDb");
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
                 options.UseSqlite(connectionString);
             }
@@ -45,6 +42,15 @@ public static class DependencyInjection
             provider.GetRequiredService<ApplicationDbContext>()
         );
 
+        services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+        services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services)
+    {
+        services.AddHttpContextAccessor();
         return services;
     }
 }
