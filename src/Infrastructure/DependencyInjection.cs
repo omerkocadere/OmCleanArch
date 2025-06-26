@@ -1,13 +1,11 @@
 ﻿using CleanArch.Application.Common.Interfaces;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Data.Interceptors;
-using CleanArch.Infrastructure.Data.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 
 namespace CleanArch.Infrastructure;
 
@@ -34,15 +32,13 @@ public static class DependencyInjection
         IHostEnvironment env
     )
     {
-        services.ConfigureOptions<DatabaseOptionsSetup>();
-
         services.AddDbContext<ApplicationDbContext>(
             (sp, options) =>
             {
-                var databaseOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+                var connectionString = configuration.GetConnectionString("CleanArchDb");
 
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-                options.UseSqlite(databaseOptions.ConnectionString);
+                options.UseSqlite(connectionString);
 
                 if (env.IsDevelopment())
                 {
