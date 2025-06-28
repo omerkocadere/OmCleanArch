@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CleanArch.Infrastructure;
@@ -37,6 +38,11 @@ public static class DependencyInjection
             (sp, options) =>
             {
                 var databaseOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+                var logger = sp.GetRequiredService<ILogger<ApplicationDbContext>>();
+                logger.LogInformation(
+                    "Selected database provider: {Provider}",
+                    databaseOptions.Provider
+                );
 
                 switch (databaseOptions.Provider)
                 {
@@ -59,6 +65,8 @@ public static class DependencyInjection
                             $"Unsupported database provider: {databaseOptions.Provider}"
                         );
                 }
+
+                options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
 
                 if (env.IsDevelopment())
                 {
