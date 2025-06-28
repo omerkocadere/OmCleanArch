@@ -2,7 +2,7 @@
 
 namespace CleanArch.Domain.TodoItems;
 
-public class TodoItem : BaseAuditableEntity
+public sealed class TodoItem : BaseAuditableEntity
 {
     public int ListId { get; set; }
     public required string Title { get; set; }
