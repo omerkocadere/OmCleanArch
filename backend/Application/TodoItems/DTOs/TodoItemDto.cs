@@ -1,6 +1,4 @@
-﻿using CleanArch.Domain.TodoItems;
-
-namespace CleanArch.Application.TodoItems.GetTodoItemById;
+﻿namespace CleanArch.Application.TodoItems.DTOs;
 
 public class TodoItemDto
 {
@@ -15,12 +13,4 @@ public class TodoItemDto
     public DateTime? DueDate { get; set; }
     public List<string> Labels { get; set; } = [];
     public DateTime? CompletedAt { get; set; }
-
-    private class Mapping : Profile
-    {
-        public Mapping()
-        {
-            CreateMap<TodoItem, TodoItemDto>();
-        }
-    }
 }

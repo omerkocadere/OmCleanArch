@@ -2,6 +2,7 @@
 using CleanArch.Application.Common.Models;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.Users;
+using AutoMapper;
 
 namespace CleanArch.Application.TodoItems.CreateTodoItem;
 
@@ -17,15 +18,23 @@ public record CreateTodoItemCommand() : IRequest<Result<int>>
     public List<string> Labels { get; set; } = [];
 }
 
-public class CreateTodoItemCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateTodoItemCommand, Result<int>>
+public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemCommand, Result<int>>
 {
+    private readonly IApplicationDbContext _context;
+    private readonly IMapper _mapper;
+
+    public CreateTodoItemCommandHandler(IApplicationDbContext context, IMapper mapper)
+    {
+        _context = context;
+        _mapper = mapper;
+    }
+
     public async Task<Result<int>> Handle(
         CreateTodoItemCommand request,
         CancellationToken cancellationToken
     )
     {
-        User? user = await context
+        User? user = await _context
             .Users.AsNoTracking()
             .SingleOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
 
@@ -34,25 +43,13 @@ public class CreateTodoItemCommandHandler(IApplicationDbContext context)
             return Result.Failure<int>(UserErrors.NotFound(request.UserId));
         }
 
-        var entity = new TodoItem
-        {
-            ListId = request.ListId,
-            Title = request.Title,
-            Note = request.Note,
-            Done = false,
-            Priority = request.Priority,
-            UserId = user.Id,
-            Description = request.Description,
-            DueDate = request.DueDate,
-            Labels = request.Labels,
-        };
-
-        entity.Equals(user);
+        var entity = _mapper.Map<TodoItem>(request);
+        entity.UserId = user.Id;
 
         entity.AddDomainEvent(new TodoItemCreatedEvent(entity));
 
-        context.TodoItems.Add(entity);
-        await context.SaveChangesAsync(cancellationToken);
+        _context.TodoItems.Add(entity);
+        await _context.SaveChangesAsync(cancellationToken);
 
         return entity.Id;
     }

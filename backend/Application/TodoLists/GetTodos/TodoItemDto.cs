@@ -1,4 +1,5 @@
-﻿using CleanArch.Domain.TodoItems;
+﻿using AutoMapper;
+using CleanArch.Domain.TodoItems;
 
 namespace CleanArch.Application.TodoLists.GetTodos;
 
@@ -15,13 +16,4 @@ public record TodoItemDto
     public DateTime? DueDate { get; set; }
     public List<string> Labels { get; set; } = [];
     public DateTime? CompletedAt { get; set; }
-
-    private class Mapping : Profile
-    {
-        public Mapping()
-        {
-            CreateMap<TodoItem, TodoItemDto>()
-                .ForMember(d => d.Priority, opt => opt.MapFrom(s => (int)s.Priority));
-        }
-    }
 }
