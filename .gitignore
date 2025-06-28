@@ -485,4 +485,5 @@ $RECYCLE.BIN/
 
 *.db-*
 
-seq-data
+**/seq-data
+**/Migrations
