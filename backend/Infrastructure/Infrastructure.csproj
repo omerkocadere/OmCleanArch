@@ -5,8 +5,8 @@
     <AssemblyName>CleanArch.Infrastructure</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CsvHelper" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
 
   <ItemGroup>
