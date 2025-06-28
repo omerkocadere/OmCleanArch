@@ -47,6 +47,8 @@ public class CreateTodoItemCommandHandler(IApplicationDbContext context)
             Labels = request.Labels,
         };
 
+        entity.Equals(user);
+
         entity.AddDomainEvent(new TodoItemCreatedEvent(entity));
 
         context.TodoItems.Add(entity);

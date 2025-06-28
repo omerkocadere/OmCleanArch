@@ -2,7 +2,7 @@
 
 namespace CleanArch.Domain.TodoLists;
 
-public class TodoList : BaseAuditableEntity
+public sealed class TodoList : BaseAuditableEntity
 {
     public string? Title { get; set; }
     public Colour Colour { get; set; } = Colour.White;
