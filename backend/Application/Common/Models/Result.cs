@@ -42,5 +42,8 @@ public class Result<TValue>(TValue? value, bool isSuccess, Error error) : Result
     public static implicit operator Result<TValue>(TValue? value) =>
         value is not null ? Success(value) : Failure<TValue>(Error.NullValue);
 
+    // Hide the base class Failure method with "new" to return our own type.
+    public new static Result<TValue> Failure(Error error) => new(default, false, error);
+
     public static Result<TValue> ValidationFailure(Error error) => new(default, false, error);
 }
