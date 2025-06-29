@@ -1,12 +1,12 @@
 ﻿using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Models;
+using CleanArch.Application.TodoItems.DTOs;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.Users;
-using AutoMapper;
 
 namespace CleanArch.Application.TodoItems.CreateTodoItem;
 
-public record CreateTodoItemCommand() : IRequest<Result<int>>
+public record CreateTodoItemCommand() : IRequest<Result<TodoItemDto>>
 {
     public int ListId { get; init; }
     public required string Title { get; init; }
@@ -18,39 +18,32 @@ public record CreateTodoItemCommand() : IRequest<Result<int>>
     public List<string> Labels { get; set; } = [];
 }
 
-public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemCommand, Result<int>>
+public class CreateTodoItemCommandHandler(IApplicationDbContext context, IMapper mapper)
+    : IRequestHandler<CreateTodoItemCommand, Result<TodoItemDto>>
 {
-    private readonly IApplicationDbContext _context;
-    private readonly IMapper _mapper;
-
-    public CreateTodoItemCommandHandler(IApplicationDbContext context, IMapper mapper)
-    {
-        _context = context;
-        _mapper = mapper;
-    }
-
-    public async Task<Result<int>> Handle(
+    public async Task<Result<TodoItemDto>> Handle(
         CreateTodoItemCommand request,
         CancellationToken cancellationToken
     )
     {
-        User? user = await _context
+        User? user = await context
             .Users.AsNoTracking()
             .SingleOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
 
         if (user is null)
         {
-            return Result.Failure<int>(UserErrors.NotFound(request.UserId));
+            return Result.Failure<TodoItemDto>(UserErrors.NotFound(request.UserId));
         }
 
-        var entity = _mapper.Map<TodoItem>(request);
+        var entity = mapper.Map<TodoItem>(request);
         entity.UserId = user.Id;
 
         entity.AddDomainEvent(new TodoItemCreatedEvent(entity));
 
-        _context.TodoItems.Add(entity);
-        await _context.SaveChangesAsync(cancellationToken);
+        context.TodoItems.Add(entity);
+        await context.SaveChangesAsync(cancellationToken);
 
-        return entity.Id;
+        var dto = mapper.Map<TodoItemDto>(entity);
+        return dto;
     }
 }

@@ -1,4 +1,4 @@
-﻿using CleanArch.Domain.TodoLists;
+﻿using CleanArch.Application.TodoItems.DTOs;
 
 namespace CleanArch.Application.TodoLists.GetTodos;
 
