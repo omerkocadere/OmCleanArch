@@ -2,7 +2,16 @@
 
 namespace CleanArch.Application.Common.Models;
 
-public class Result
+public interface IOperationResult
+{
+    bool IsSuccess { get; }
+    bool IsFailure { get; }
+    Error Error { get; }
+
+    static abstract IOperationResult CreateFailure(Error error);
+}
+
+public class Result : IOperationResult
 {
     public Result(bool isSuccess, Error error)
     {
@@ -16,21 +25,23 @@ public class Result
     }
 
     public bool IsSuccess { get; }
-
     public bool IsFailure => !IsSuccess;
-
     public Error Error { get; }
 
     public static Result Success() => new(true, Error.None);
 
-    public static Result<TValue> Success<TValue>(TValue value) => new(value, true, Error.None);
-
     public static Result Failure(Error error) => new(false, error);
 
+    public static Result<TValue> Success<TValue>(TValue value) => new(value, true, Error.None);
+
     public static Result<TValue> Failure<TValue>(Error error) => new(default, false, error);
+
+    public static IOperationResult CreateFailure(Error error) => Failure(error);
 }
 
-public class Result<TValue>(TValue? value, bool isSuccess, Error error) : Result(isSuccess, error)
+public class Result<TValue>(TValue? value, bool isSuccess, Error error)
+    : Result(isSuccess, error),
+        IOperationResult
 {
     public TValue Value =>
         IsSuccess
@@ -42,8 +53,5 @@ public class Result<TValue>(TValue? value, bool isSuccess, Error error) : Result
     public static implicit operator Result<TValue>(TValue? value) =>
         value is not null ? Success(value) : Failure<TValue>(Error.NullValue);
 
-    // Hide the base class Failure method with "new" to return our own type.
-    public new static Result<TValue> Failure(Error error) => new(default, false, error);
-
-    public static Result<TValue> ValidationFailure(Error error) => new(default, false, error);
+    public static new IOperationResult CreateFailure(Error error) => Failure<TValue>(error);
 }

@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using CleanArch.Application.Common.Models;
+﻿using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Common;
 using FluentValidation.Results;
 
@@ -8,7 +7,7 @@ namespace CleanArch.Application.Common.Behaviours;
 public class ValidationBehaviour<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
-    where TResponse : Result
+    where TResponse : IOperationResult
 {
     public async Task<TResponse> Handle(
         TRequest request,
@@ -16,38 +15,39 @@ public class ValidationBehaviour<TRequest, TResponse>(IEnumerable<IValidator<TRe
         CancellationToken cancellationToken
     )
     {
-        if (!validators.Any())
+        List<ValidationFailure> validationFailures = await ValidateAsync(request, validators);
+
+        if (validationFailures.Count == 0)
         {
             return await next(cancellationToken);
+        }
+
+        ValidationError error = CreateValidationError(validationFailures);
+        return (TResponse)TResponse.CreateFailure(error);
+    }
+
+    private static async Task<List<ValidationFailure>> ValidateAsync(
+        TRequest request,
+        IEnumerable<IValidator<TRequest>> validators
+    )
+    {
+        if (!validators.Any())
+        {
+            return [];
         }
 
         var context = new ValidationContext<TRequest>(request);
 
         var validationResults = await Task.WhenAll(
-            validators.Select(v => v.ValidateAsync(context, cancellationToken))
+            validators.Select(v => v.ValidateAsync(context))
         );
 
-        var failures = validationResults
-            .Where(r => r.Errors.Count != 0)
-            .SelectMany(r => r.Errors)
-            .ToList();
+        List<ValidationFailure> validationFailures =
+        [
+            .. validationResults.Where(r => r.Errors.Count != 0).SelectMany(r => r.Errors),
+        ];
 
-        if (failures.Count == 0)
-            return await next(cancellationToken);
-
-        ValidationError error = CreateValidationError(failures);
-
-        var failureMethod =
-            typeof(TResponse).GetMethod(
-                nameof(Result.Failure),
-                BindingFlags.Public | BindingFlags.Static,
-                [typeof(Error)]
-            )
-            ?? throw new InvalidOperationException(
-                $"No suitable 'Failure' method found for type '{typeof(TResponse).Name}'."
-            ); // This situation should not occur because we have a 'where TResponse : Result' constraint. But still, this is a safety precaution.
-
-        return (TResponse)failureMethod.Invoke(null, [error])!;
+        return validationFailures;
     }
 
     private static ValidationError CreateValidationError(
