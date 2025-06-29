@@ -55,7 +55,18 @@ public static class CustomResults
                 return null;
             }
 
-            return new Dictionary<string, object?> { { "errors", validationError.Errors } };
+            return new Dictionary<string, object?>
+            {
+                {
+                    "errors",
+                    validationError.Errors.Select(e => new
+                    {
+                        e.Code,
+                        e.Description,
+                        Type = e.Type.ToString(),
+                    })
+                },
+            };
         }
     }
 }

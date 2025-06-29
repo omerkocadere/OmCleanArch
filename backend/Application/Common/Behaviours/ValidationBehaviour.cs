@@ -52,5 +52,5 @@ public class ValidationBehaviour<TRequest, TResponse>(IEnumerable<IValidator<TRe
 
     private static ValidationError CreateValidationError(
         List<ValidationFailure> validationFailures
-    ) => new(validationFailures.Select(f => Error.Problem(f.ErrorCode, f.ErrorMessage)).ToArray());
+    ) => new([.. validationFailures.Select(f => Error.Validation(f.ErrorCode, f.ErrorMessage))]);
 }
