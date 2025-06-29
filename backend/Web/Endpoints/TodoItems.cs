@@ -39,25 +39,12 @@ public class TodoItems : EndpointGroupBase
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    public async Task<IResult> CreateTodoItem(
-        ISender sender,
-        CreateTodoItemCommand command,
-        LinkGenerator linkGenerator,
-        HttpContext httpContext
-    )
+    public async Task<IResult> CreateTodoItem(ISender sender, CreateTodoItemCommand command)
     {
         Result<TodoItemDto> result = await sender.Send(command);
 
         return result.Match(
-            dto =>
-            {
-                var url = linkGenerator.GetUriByName(
-                    httpContext,
-                    nameof(GetTodoItemById),
-                    new { id = dto.Id }
-                );
-                return Results.Created(url, dto);
-            },
+            dto => Results.CreatedAtRoute(nameof(GetTodoItemById), new { id = dto.Id }, dto),
             CustomResults.Problem
         );
     }

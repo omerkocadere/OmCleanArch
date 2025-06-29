@@ -30,7 +30,7 @@ public class TodoLists : EndpointGroupBase
     {
         Result<int> result = await sender.Send(command);
 
-        return result.Match(Results.Ok, CustomResults.Problem);
+        return result.Match(Results.Created, CustomResults.Problem);
     }
 
     public async Task<IResult> UpdateTodoList(ISender sender, int id, UpdateTodoListCommand command)
