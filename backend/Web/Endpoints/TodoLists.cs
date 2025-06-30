@@ -28,9 +28,8 @@ public class TodoLists : EndpointGroupBase
 
     public async Task<IResult> CreateTodoList(ISender sender, CreateTodoListCommand command)
     {
-        Result<int> result = await sender.Send(command);
-
-        return result.Match(Results.Created, CustomResults.Problem);
+        var result = await sender.Send(command);
+        return result.Match(dto => Results.Created(string.Empty, dto), CustomResults.Problem);
     }
 
     public async Task<IResult> UpdateTodoList(ISender sender, int id, UpdateTodoListCommand command)

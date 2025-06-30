@@ -1,16 +1,17 @@
 ﻿using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Models;
+using CleanArch.Application.TodoLists.GetTodos;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.TodoLists.CreateTodoList;
 
-public record CreateTodoListCommand(string Title, int UserId) : IRequest<Result<int>>;
+public record CreateTodoListCommand(string Title, int UserId) : IRequest<Result<TodoListDto>>;
 
-public class CreateTodoListCommandHandler(IApplicationDbContext context)
-    : IRequestHandler<CreateTodoListCommand, Result<int>>
+public class CreateTodoListCommandHandler(IApplicationDbContext context, IMapper mapper)
+    : IRequestHandler<CreateTodoListCommand, Result<TodoListDto>>
 {
-    public async Task<Result<int>> Handle(
+    public async Task<Result<TodoListDto>> Handle(
         CreateTodoListCommand request,
         CancellationToken cancellationToken
     )
@@ -21,7 +22,7 @@ public class CreateTodoListCommandHandler(IApplicationDbContext context)
 
         if (user is null)
         {
-            return Result.Failure<int>(UserErrors.NotFound(request.UserId));
+            return Result.Failure<TodoListDto>(UserErrors.NotFound(request.UserId));
         }
 
         var entity = new TodoList { Title = request.Title, UserId = request.UserId };
@@ -30,6 +31,7 @@ public class CreateTodoListCommandHandler(IApplicationDbContext context)
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return entity.Id;
+        var dto = mapper.Map<TodoListDto>(entity);
+        return dto;
     }
 }
