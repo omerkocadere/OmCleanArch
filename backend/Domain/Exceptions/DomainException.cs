@@ -1,3 +1,3 @@
 namespace CleanArch.Domain.Exceptions;
 
-public class DomainException(string message) : Exception(message), Exception { }
+public class DomainException(string message) : Exception(message) { }
