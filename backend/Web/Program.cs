@@ -13,10 +13,7 @@ builder.Host.UseSerilog(
 );
 
 var services = builder.Services;
-services
-    .AddApplicationServices()
-    .AddInfrastructureServices(builder.Configuration, builder.Environment)
-    .AddWebServices();
+services.AddApplicationServices().AddInfrastructureServices(builder.Environment).AddWebServices();
 
 var app = builder.Build();
 
