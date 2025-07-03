@@ -1,13 +1,11 @@
 ﻿using CleanArch.Application.Common.Interfaces;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Data.Interceptors;
-using CleanArch.Infrastructure.Data.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CleanArch.Infrastructure;
 
@@ -15,10 +13,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(
         this IServiceCollection services,
+        IConfiguration configuration,
         IHostEnvironment env
     )
     {
-        return services.AddServices().AddDatabase(env).AddAuthenticationInternal();
+        return services.AddServices().AddDatabase(configuration, env).AddAuthenticationInternal();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -29,44 +28,17 @@ public static class DependencyInjection
 
     private static IServiceCollection AddDatabase(
         this IServiceCollection services,
+        IConfiguration configuration,
         IHostEnvironment env
     )
     {
-        services.ConfigureOptions<DatabaseOptionsSetup>();
-
         services.AddDbContext<ApplicationDbContext>(
             (sp, options) =>
             {
-                var databaseOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-                var logger = sp.GetRequiredService<ILogger<ApplicationDbContext>>();
-                logger.LogInformation(
-                    "Selected database provider: {Provider}",
-                    databaseOptions.Provider
-                );
-
-                switch (databaseOptions.Provider)
-                {
-                    case DbProvider.Sqlite:
-                        ValidateConnectionString(
-                            databaseOptions.SqliteConnectionString,
-                            DbProvider.Sqlite
-                        );
-                        options.UseSqlite(databaseOptions.SqliteConnectionString);
-                        break;
-                    case DbProvider.Postgres:
-                        ValidateConnectionString(
-                            databaseOptions.PostgresConnectionString,
-                            DbProvider.Postgres
-                        );
-                        options.UseNpgsql(databaseOptions.PostgresConnectionString);
-                        break;
-                    default:
-                        throw new InvalidOperationException(
-                            $"Unsupported database provider: {databaseOptions.Provider}"
-                        );
-                }
+                var connectionString = configuration.GetConnectionString("CleanArchDb");
 
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
+                options.UseSqlite(connectionString);
 
                 if (env.IsDevelopment())
                 {
@@ -90,13 +62,5 @@ public static class DependencyInjection
     {
         services.AddHttpContextAccessor();
         return services;
-    }
-
-    private static void ValidateConnectionString(string? connectionString, DbProvider provider)
-    {
-        if (string.IsNullOrWhiteSpace(connectionString))
-            throw new InvalidOperationException(
-                $"Database connection string for '{provider}' is missing in configuration."
-            );
     }
 }
