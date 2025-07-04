@@ -1,22 +1,23 @@
 ﻿using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Models;
+using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Users.GetByEmail;
 
-public sealed record GetUserByEmailQuery(string Email) : IRequest<Result<UserResponse>>;
+public sealed record GetUserByEmailQuery(string Email) : IRequest<Result<UserDto>>;
 
 internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context)
-    : IRequestHandler<GetUserByEmailQuery, Result<UserResponse>>
+    : IRequestHandler<GetUserByEmailQuery, Result<UserDto>>
 {
-    public async Task<Result<UserResponse>> Handle(
+    public async Task<Result<UserDto>> Handle(
         GetUserByEmailQuery query,
         CancellationToken cancellationToken
     )
     {
-        UserResponse? user = await context
+        UserDto? user = await context
             .Users.Where(u => u.Email == query.Email)
-            .Select(u => new UserResponse
+            .Select(u => new UserDto
             {
                 Id = u.Id,
                 FirstName = u.FirstName,
@@ -27,7 +28,7 @@ internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context)
 
         if (user is null)
         {
-            return Result.Failure<UserResponse>(UserErrors.NotFoundByEmail);
+            return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
         }
 
         return user;

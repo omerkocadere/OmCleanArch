@@ -1,3 +1,3 @@
 ﻿namespace CleanArch.Domain.Users;
 
-public sealed record UserRegisteredDomainEvent(Guid UserId) : BaseEvent;
+public sealed record UserRegisteredDomainEvent(User User) : BaseEvent;

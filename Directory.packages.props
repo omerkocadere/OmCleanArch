@@ -16,6 +16,9 @@
     <!-- Infrastructure -->
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EfcoreVersion)" />
+    <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.20" />
+    <PackageVersion Include="Hangfire.Storage.SQLite" Version="0.4.2" />
+    <PackageVersion Include="Hangfire.PostgreSql" Version="1.20.12" />
     <!-- Web.Api -->
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(AspnetVersion)" />
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />

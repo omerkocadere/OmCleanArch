@@ -1,7 +1,11 @@
 ﻿using CleanArch.Application.Common.Interfaces;
+using CleanArch.Infrastructure.BackgroundJobOmer;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Data.Interceptors;
 using CleanArch.Infrastructure.Data.Options;
+using Hangfire;
+using Hangfire.PostgreSql;
+using Hangfire.Storage.SQLite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +22,11 @@ public static class DependencyInjection
         IHostEnvironment env
     )
     {
-        return services.AddServices().AddDatabase(env).AddAuthenticationInternal();
+        return services
+            .AddServices()
+            .AddDatabase(env)
+            .AddBackgroundJobs()
+            .AddAuthenticationInternal();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -93,6 +101,49 @@ public static class DependencyInjection
     private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
+        return services;
+    }
+
+    private static IServiceCollection AddBackgroundJobs(this IServiceCollection services)
+    {
+        services.AddHangfire(
+            (sp, configuration) =>
+            {
+                var databaseOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+                var connectionString = databaseOptions.Provider switch
+                {
+                    DbProvider.Sqlite => databaseOptions.SqliteConnectionString,
+                    DbProvider.Postgres => databaseOptions.PostgresConnectionString,
+                    _ => throw new InvalidOperationException(
+                        $"Unsupported database provider: {databaseOptions.Provider}"
+                    ),
+                };
+
+                switch (databaseOptions.Provider)
+                {
+                    case DbProvider.Sqlite:
+                        configuration.UseSQLiteStorage(connectionString);
+                        break;
+                    case DbProvider.Postgres:
+                        configuration.UsePostgreSqlStorage(options =>
+                            options.UseNpgsqlConnection(connectionString)
+                        );
+                        break;
+                    default:
+                        throw new InvalidOperationException(
+                            $"Unsupported database provider: {databaseOptions.Provider}"
+                        );
+                }
+            }
+        );
+
+        // Add the processing server as IHostedService
+        services.AddHangfireServer();
+
+        // Register background job services
+        services.AddScoped<ProcessOutboxMessagesJob>();
+        services.AddScoped<IBackgroundJobService, HangfireBackgroundJobService>();
+
         return services;
     }
 

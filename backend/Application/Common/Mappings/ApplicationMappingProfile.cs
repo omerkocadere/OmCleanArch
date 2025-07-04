@@ -2,8 +2,11 @@ using CleanArch.Application.Common.Models;
 using CleanArch.Application.TodoItems.CreateTodoItem;
 using CleanArch.Application.TodoItems.DTOs;
 using CleanArch.Application.TodoLists.GetTodos;
+using CleanArch.Application.Users.CreateUser;
+using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
+using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Common.Mappings;
 
@@ -26,6 +29,13 @@ public class ApplicationMappingProfile : Profile
         CreateMap<TodoItem, TodoItemDto>()
             .ForMember(d => d.Priority, opt => opt.MapFrom(s => (int)s.Priority));
         CreateMap<TodoList, LookupDto>();
+
+        #endregion
+
+        #region Users
+
+        CreateMap<User, UserDto>();
+        CreateMap<CreateUserCommand, User>();
 
         #endregion
     }

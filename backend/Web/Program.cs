@@ -3,6 +3,7 @@ using CleanArch.Infrastructure;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Web;
 using CleanArch.Web.Extensions;
+using Hangfire;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,8 @@ if (app.Environment.IsDevelopment())
 {
     await app.InitialiseDatabaseAsync();
     app.UseSwaggerWithUi();
+
+    app.UseHangfireDashboard("/hangfire");
 }
 else
 {
@@ -43,5 +46,7 @@ app.UseStaticFiles();
 app.Map("/", () => Results.Redirect("/api"));
 app.MapEndpoints();
 app.MapControllers();
+
+app.ConfigureBackgroundJobs();
 
 app.Run();
