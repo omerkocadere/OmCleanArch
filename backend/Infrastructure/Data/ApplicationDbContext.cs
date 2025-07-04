@@ -3,6 +3,7 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
+using CleanArch.Infrastructure.Data.Outbox;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Infrastructure.Data;
@@ -16,6 +17,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<TodoItem> TodoItems => Set<TodoItem>();
 
     public DbSet<User> Users => Set<User>();
+
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
