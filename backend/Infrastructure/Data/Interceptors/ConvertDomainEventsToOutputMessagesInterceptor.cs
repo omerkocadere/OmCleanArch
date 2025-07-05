@@ -1,6 +1,7 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using CleanArch.Domain.Common;
-using CleanArch.Infrastructure.Data.Outbox;
+using CleanArch.Infrastructure.BackgroundJobs.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -31,7 +32,12 @@ public class ConvertDomainEventsToOutputMessagesInterceptor : SaveChangesInterce
             })
             .Select(domainEvent =>
             {
-                var content = JsonSerializer.Serialize(domainEvent, domainEvent.GetType());
+                var content = JsonSerializer.Serialize(
+                    domainEvent,
+                    domainEvent.GetType(),
+                    new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.IgnoreCycles }
+                );
+
                 return new OutboxMessage
                 {
                     Id = Guid.NewGuid(),

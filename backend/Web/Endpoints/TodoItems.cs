@@ -18,7 +18,7 @@ public class TodoItems : EndpointGroupBase
             .MapGet(GetTodoItemsWithPagination)
             .MapGet(GetTodoItemById, "{id}")
             .MapPost(CreateTodoItem)
-            .MapPut(UpdateTodoItem, "{id}")
+            .MapPut(UpdateTodoItem, "{id}") // done is now a query parameter again
             .MapPut(UpdateTodoItemDetail, "UpdateDetail/{id}")
             .MapDelete(DeleteTodoItem, "{id}");
     }
@@ -49,12 +49,9 @@ public class TodoItems : EndpointGroupBase
         );
     }
 
-    public async Task<IResult> UpdateTodoItem(ISender sender, int id, UpdateTodoItemCommand command)
+    public async Task<IResult> UpdateTodoItem(ISender sender, int id, bool done)
     {
-        if (id != command.Id)
-            return TypedResults.BadRequest();
-
-        Result result = await sender.Send(command);
+        Result result = await sender.Send(new UpdateTodoItemCommand(id, done));
 
         return result.Match(Results.NoContent, CustomResults.Problem);
     }

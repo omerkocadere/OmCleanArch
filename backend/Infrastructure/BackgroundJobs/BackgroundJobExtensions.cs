@@ -1,6 +1,8 @@
-using CleanArch.Infrastructure.BackgroundJobs;
+using CleanArch.Application.Common.Interfaces;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace CleanArch.Web.Extensions;
+namespace CleanArch.Infrastructure.BackgroundJobs;
 
 public static class BackgroundJobExtensions
 {
@@ -10,6 +12,7 @@ public static class BackgroundJobExtensions
         var backgroundJobService =
             scope.ServiceProvider.GetRequiredService<IBackgroundJobService>();
         backgroundJobService.ScheduleRecurringOutboxProcessing();
+        backgroundJobService.ScheduleRecurringFailedMessageCleanup();
 
         return app;
     }

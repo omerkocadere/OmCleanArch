@@ -1,5 +1,7 @@
-﻿using CleanArch.Application.Common.Interfaces;
+﻿using System.IO;
+using CleanArch.Application.Common.Interfaces;
 using CleanArch.Infrastructure.BackgroundJobs;
+using CleanArch.Infrastructure.BackgroundJobs.Outbox;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Data.Interceptors;
 using CleanArch.Infrastructure.Data.Options;
@@ -122,7 +124,8 @@ public static class DependencyInjection
                 switch (databaseOptions.Provider)
                 {
                     case DbProvider.Sqlite:
-                        configuration.UseSQLiteStorage(connectionString);
+                        var hangfireConn = GetHangfireSqliteConnectionString(connectionString!);
+                        configuration.UseSQLiteStorage(hangfireConn);
                         break;
                     case DbProvider.Postgres:
                         configuration.UsePostgreSqlStorage(options =>
@@ -162,5 +165,22 @@ public static class DependencyInjection
             throw new InvalidOperationException(
                 $"Database connection string for '{provider}' is missing in configuration."
             );
+    }
+
+    private static string GetHangfireSqliteConnectionString(string original)
+    {
+        // Extracts the base name from Data Source and appends 'Hangfire'
+        var parts = original.Split(';');
+        foreach (var part in parts)
+        {
+            var trimmed = part.Trim();
+            if (trimmed.StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase))
+            {
+                var fileName = trimmed["Data Source=".Length..].Trim();
+                var name = Path.GetFileNameWithoutExtension(fileName);
+                return name + "Hangfire";
+            }
+        }
+        throw new InvalidOperationException("No Data Source found in connection string.");
     }
 }

@@ -1,5 +1,6 @@
 using CleanArch.Application;
 using CleanArch.Infrastructure;
+using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Web;
 using CleanArch.Web.Extensions;

@@ -3,7 +3,7 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
-using CleanArch.Infrastructure.Data.Outbox;
+using CleanArch.Infrastructure.BackgroundJobs.Outbox;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Infrastructure.Data;

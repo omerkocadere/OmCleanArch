@@ -1,9 +1,8 @@
 using CleanArch.Infrastructure.Data;
-using CleanArch.Infrastructure.Data.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CleanArch.Infrastructure.BackgroundJobs;
+namespace CleanArch.Infrastructure.BackgroundJobs.Outbox;
 
 public class MarkFailedOutboxMessagesJob(
     ApplicationDbContext context,
@@ -14,8 +13,8 @@ public class MarkFailedOutboxMessagesJob(
     {
         logger.LogInformation("Marking old processing outbox messages as failed started");
 
-        // Mark messages that have been processing for more than 20 minutes as failed
-        var cutoffTime = DateTime.UtcNow.AddMinutes(-20);
+        // Mark messages that have been processing for more than 1 hour as failed
+        var cutoffTime = DateTime.UtcNow.AddHours(-1);
 
         var stuckMessages = await context
             .OutboxMessages.Where(x =>
@@ -23,12 +22,14 @@ public class MarkFailedOutboxMessagesJob(
             )
             .ToListAsync(cancellationToken);
 
-        if (stuckMessages.Count != 0)
+        if (stuckMessages.Any())
         {
             foreach (var message in stuckMessages)
             {
                 message.Status = OutboxMessageStatus.Failed;
-                message.Error ??= "Job exceeded maximum processing time and was marked as failed";
+                message.Error =
+                    message.Error
+                    ?? "Job exceeded maximum processing time and was marked as failed";
 
                 logger.LogWarning(
                     "Marked outbox message {MessageId} of type {MessageType} as failed after timeout",
@@ -38,7 +39,6 @@ public class MarkFailedOutboxMessagesJob(
             }
 
             await context.SaveChangesAsync(cancellationToken);
-
             logger.LogInformation(
                 "Marked {Count} stuck outbox messages as failed",
                 stuckMessages.Count

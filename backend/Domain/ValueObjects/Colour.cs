@@ -1,5 +1,8 @@
-﻿namespace CleanArch.Domain.ValueObjects;
+﻿using System.Text.Json.Serialization;
 
+namespace CleanArch.Domain.ValueObjects;
+
+[JsonConverter(typeof(ColourJsonConverter))]
 public class Colour : ValueObject
 {
     private Colour(string code)

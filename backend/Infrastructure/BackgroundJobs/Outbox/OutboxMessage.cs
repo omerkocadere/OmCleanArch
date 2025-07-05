@@ -1,4 +1,4 @@
-namespace CleanArch.Infrastructure.Data.Outbox;
+namespace CleanArch.Infrastructure.BackgroundJobs.Outbox;
 
 public enum OutboxMessageStatus
 {

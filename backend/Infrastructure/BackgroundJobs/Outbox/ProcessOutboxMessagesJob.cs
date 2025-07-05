@@ -1,12 +1,11 @@
 using System.Text.Json;
 using CleanArch.Domain.Common;
 using CleanArch.Infrastructure.Data;
-using CleanArch.Infrastructure.Data.Outbox;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CleanArch.Infrastructure.BackgroundJobs;
+namespace CleanArch.Infrastructure.BackgroundJobs.Outbox;
 
 public class ProcessOutboxMessagesJob(
     ApplicationDbContext context,
