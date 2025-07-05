@@ -13,8 +13,8 @@ public class MarkFailedOutboxMessagesJob(
     {
         logger.LogInformation("Marking old processing outbox messages as failed started");
 
-        // Mark messages that have been processing for more than 1 hour as failed
-        var cutoffTime = DateTime.UtcNow.AddHours(-1);
+        // Mark messages that have been processing for more than 10 minutes as failed
+        var cutoffTime = DateTime.UtcNow.AddMinutes(-10);
 
         var stuckMessages = await context
             .OutboxMessages.Where(x =>
@@ -22,7 +22,7 @@ public class MarkFailedOutboxMessagesJob(
             )
             .ToListAsync(cancellationToken);
 
-        if (stuckMessages.Any())
+        if (stuckMessages.Count != 0)
         {
             foreach (var message in stuckMessages)
             {

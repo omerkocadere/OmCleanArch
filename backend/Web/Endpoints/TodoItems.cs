@@ -18,7 +18,7 @@ public class TodoItems : EndpointGroupBase
             .MapGet(GetTodoItemsWithPagination)
             .MapGet(GetTodoItemById, "{id}")
             .MapPost(CreateTodoItem)
-            .MapPut(UpdateTodoItem, "{id}") // done is now a query parameter again
+            .MapPut(UpdateTodoItem, "{id}")
             .MapPut(UpdateTodoItemDetail, "UpdateDetail/{id}")
             .MapDelete(DeleteTodoItem, "{id}");
     }

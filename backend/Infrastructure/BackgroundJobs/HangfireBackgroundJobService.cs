@@ -25,7 +25,7 @@ public class HangfireBackgroundJobService : IBackgroundJobService
         RecurringJob.AddOrUpdate<MarkFailedOutboxMessagesJob>(
             "mark-failed-outbox-messages",
             job => job.Execute(CancellationToken.None),
-            "0 */10 * * *" // Run every 10 minutes
+            "*/10 * * * *" // Run every 10 minutes
         );
     }
 }
