@@ -6,15 +6,8 @@ namespace CleanArch.Web.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TestController : ControllerBase
+public class TestController(ApplicationDbContext context) : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
-
-    public TestController(ApplicationDbContext context)
-    {
-        _context = context;
-    }
-
     [HttpPost]
     public async Task<IActionResult> CreateUser()
     {
@@ -30,8 +23,8 @@ public class TestController : ControllerBase
         // This will trigger the domain event via the entity
         user.AddDomainEvent(new UserRegisteredDomainEvent(user));
 
-        _context.Set<User>().Add(user);
-        await _context.SaveChangesAsync();
+        context.Set<User>().Add(user);
+        await context.SaveChangesAsync();
 
         return Ok(new { Message = "Domain event triggered", UserId = user.Id });
     }

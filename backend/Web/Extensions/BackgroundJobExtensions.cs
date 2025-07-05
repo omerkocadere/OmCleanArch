@@ -1,4 +1,4 @@
-using CleanArch.Infrastructure.BackgroundJobOmer;
+using CleanArch.Infrastructure.BackgroundJobs;
 
 namespace CleanArch.Web.Extensions;
 

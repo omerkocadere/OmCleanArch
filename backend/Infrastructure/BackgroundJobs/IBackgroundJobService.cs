@@ -1,4 +1,4 @@
-namespace CleanArch.Infrastructure.BackgroundJobOmer;
+namespace CleanArch.Infrastructure.BackgroundJobs;
 
 public interface IBackgroundJobService
 {

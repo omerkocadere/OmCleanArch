@@ -9,8 +9,10 @@ public class UserRegisteredDomainEventHandler(ILogger<UserRegisteredDomainEventH
     public Task Handle(UserRegisteredDomainEvent notification, CancellationToken cancellationToken)
     {
         logger.LogInformation(
-            "User registered event handled for user {UserId}",
-            notification.User.Id
+            "User registered event handled for user {FirstName} {LastName} and email {Email}",
+            notification.User.FirstName,
+            notification.User.LastName,
+            notification.User.Email
         );
 
         // Here you could add business logic like:

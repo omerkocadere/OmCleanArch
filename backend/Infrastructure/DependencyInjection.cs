@@ -1,5 +1,5 @@
 ﻿using CleanArch.Application.Common.Interfaces;
-using CleanArch.Infrastructure.BackgroundJobOmer;
+using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Data.Interceptors;
 using CleanArch.Infrastructure.Data.Options;

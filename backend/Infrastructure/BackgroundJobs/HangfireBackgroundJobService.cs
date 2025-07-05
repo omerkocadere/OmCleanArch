@@ -1,6 +1,6 @@
 using Hangfire;
 
-namespace CleanArch.Infrastructure.BackgroundJobOmer;
+namespace CleanArch.Infrastructure.BackgroundJobs;
 
 public class HangfireBackgroundJobService : IBackgroundJobService
 {

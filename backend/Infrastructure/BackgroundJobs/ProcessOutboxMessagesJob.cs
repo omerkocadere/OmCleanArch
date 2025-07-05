@@ -1,10 +1,11 @@
 using System.Text.Json;
+using CleanArch.Domain.Common;
 using CleanArch.Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CleanArch.Infrastructure.BackgroundJobOmer;
+namespace CleanArch.Infrastructure.BackgroundJobs;
 
 public class ProcessOutboxMessagesJob(
     ApplicationDbContext context,
@@ -71,18 +72,18 @@ public class ProcessOutboxMessagesJob(
         logger.LogInformation("Processing outbox messages completed");
     }
 
-    private static INotification? DeserializeDomainEvent(string type, string content)
+    private static BaseEvent? DeserializeDomainEvent(string type, string content)
     {
         // Get the domain event type from the type name
         var domainEventType = AppDomain
             .CurrentDomain.GetAssemblies()
             .SelectMany(assembly => assembly.GetTypes())
-            .FirstOrDefault(t => t.Name == type && typeof(INotification).IsAssignableFrom(t));
+            .FirstOrDefault(t => t.Name == type && typeof(BaseEvent).IsAssignableFrom(t));
 
         if (domainEventType == null)
             return null;
 
         var domainEvent = JsonSerializer.Deserialize(content, domainEventType);
-        return domainEvent as INotification;
+        return domainEvent as BaseEvent;
     }
 }
