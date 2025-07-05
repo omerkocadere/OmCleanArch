@@ -38,6 +38,7 @@ public class ConvertDomainEventsToOutputMessagesInterceptor : SaveChangesInterce
                     Type = domainEvent.GetType().Name,
                     Content = content,
                     OccuredOnUtc = DateTime.UtcNow,
+                    Status = OutboxMessageStatus.Pending,
                 };
             })
             .ToList();

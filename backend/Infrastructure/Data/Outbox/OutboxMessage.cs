@@ -1,6 +1,12 @@
-using CleanArch.Domain.Common;
-
 namespace CleanArch.Infrastructure.Data.Outbox;
+
+public enum OutboxMessageStatus
+{
+    Pending = 0,
+    Processing = 1,
+    Completed = 2,
+    Failed = 3,
+}
 
 public class OutboxMessage
 {
@@ -10,4 +16,6 @@ public class OutboxMessage
     public DateTime OccuredOnUtc { get; set; }
     public DateTime? ProcessedOnUtc { get; set; }
     public string? Error { get; set; }
+    public OutboxMessageStatus Status { get; set; } = OutboxMessageStatus.Pending;
+    public DateTime? ProcessingStartedAt { get; set; }
 }

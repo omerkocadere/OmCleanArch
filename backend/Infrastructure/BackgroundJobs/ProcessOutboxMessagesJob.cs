@@ -1,6 +1,7 @@
 using System.Text.Json;
 using CleanArch.Domain.Common;
 using CleanArch.Infrastructure.Data;
+using CleanArch.Infrastructure.Data.Outbox;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,12 +19,24 @@ public class ProcessOutboxMessagesJob(
         logger.LogInformation("Processing outbox messages started");
 
         var outboxMessages = await context
-            .OutboxMessages.Where(x => x.ProcessedOnUtc == null)
+            .OutboxMessages.Where(x => x.Status == OutboxMessageStatus.Pending)
             .OrderBy(x => x.OccuredOnUtc)
             .Take(20) // Process in batches
             .ToListAsync(cancellationToken);
 
         logger.LogInformation("Found {Count} outbox messages to process", outboxMessages.Count);
+
+        // Lock messages by setting status to Processing
+        foreach (var message in outboxMessages)
+        {
+            message.Status = OutboxMessageStatus.Processing;
+            message.ProcessingStartedAt = DateTime.UtcNow;
+        }
+
+        if (outboxMessages.Count != 0)
+        {
+            await context.SaveChangesAsync(cancellationToken); // Lock messages immediately
+        }
 
         foreach (var outboxMessage in outboxMessages)
         {
@@ -36,6 +49,7 @@ public class ProcessOutboxMessagesJob(
                     await publisher.Publish(domainEvent, cancellationToken);
 
                     outboxMessage.ProcessedOnUtc = DateTime.UtcNow;
+                    outboxMessage.Status = OutboxMessageStatus.Completed;
                     outboxMessage.Error = null;
 
                     logger.LogInformation(
@@ -48,22 +62,32 @@ public class ProcessOutboxMessagesJob(
                 {
                     outboxMessage.Error =
                         $"Failed to deserialize domain event of type {outboxMessage.Type}";
+
                     logger.LogWarning(
                         "Failed to deserialize outbox message {MessageId} of type {MessageType}",
                         outboxMessage.Id,
                         outboxMessage.Type
+                    );
+
+                    // Throw exception to trigger Hangfire retry
+                    throw new InvalidOperationException(
+                        $"Failed to deserialize domain event of type {outboxMessage.Type}"
                     );
                 }
             }
             catch (Exception ex)
             {
                 outboxMessage.Error = ex.Message;
+
                 logger.LogError(
                     ex,
                     "Error processing outbox message {MessageId} of type {MessageType}",
                     outboxMessage.Id,
                     outboxMessage.Type
                 );
+
+                // Don't handle the exception - let Hangfire retry
+                throw;
             }
         }
 

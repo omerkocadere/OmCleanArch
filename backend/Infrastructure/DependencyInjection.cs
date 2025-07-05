@@ -140,8 +140,17 @@ public static class DependencyInjection
         // Add the processing server as IHostedService
         services.AddHangfireServer();
 
+        GlobalJobFilters.Filters.Add(
+            new AutomaticRetryAttribute
+            {
+                Attempts = 5, // Retry 5 times
+                DelaysInSeconds = [10, 30, 60, 300, 600], // 10s, 30s, 1m, 5m, 10m
+            }
+        );
+
         // Register background job services
         services.AddScoped<ProcessOutboxMessagesJob>();
+        services.AddScoped<MarkFailedOutboxMessagesJob>();
         services.AddScoped<IBackgroundJobService, HangfireBackgroundJobService>();
 
         return services;
