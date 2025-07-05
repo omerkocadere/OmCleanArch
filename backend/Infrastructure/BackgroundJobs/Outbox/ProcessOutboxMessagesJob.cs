@@ -59,24 +59,21 @@ public class ProcessOutboxMessagesJob(
                 }
                 else
                 {
-                    outboxMessage.Error =
-                        $"Failed to deserialize domain event of type {outboxMessage.Type}";
+                    HandleFailedMessage(
+                        outboxMessage,
+                        $"Failed to deserialize domain event of type {outboxMessage.Type}"
+                    );
 
                     logger.LogWarning(
                         "Failed to deserialize outbox message {MessageId} of type {MessageType}",
                         outboxMessage.Id,
                         outboxMessage.Type
                     );
-
-                    // Throw exception to trigger Hangfire retry
-                    throw new InvalidOperationException(
-                        $"Failed to deserialize domain event of type {outboxMessage.Type}"
-                    );
                 }
             }
             catch (Exception ex)
             {
-                outboxMessage.Error = ex.Message;
+                HandleFailedMessage(outboxMessage, ex.Message);
 
                 logger.LogError(
                     ex,
@@ -84,9 +81,6 @@ public class ProcessOutboxMessagesJob(
                     outboxMessage.Id,
                     outboxMessage.Type
                 );
-
-                // Don't handle the exception - let Hangfire retry
-                throw;
             }
         }
 
@@ -108,5 +102,22 @@ public class ProcessOutboxMessagesJob(
 
         var domainEvent = JsonSerializer.Deserialize(content, domainEventType);
         return domainEvent as BaseEvent;
+    }
+
+    private static void HandleFailedMessage(OutboxMessage outboxMessage, string errorMessage)
+    {
+        const int maxRetryAttempts = 3;
+
+        outboxMessage.RetryCount++;
+        outboxMessage.Error = errorMessage;
+
+        if (outboxMessage.RetryCount >= maxRetryAttempts)
+        {
+            outboxMessage.Status = OutboxMessageStatus.Failed; // Permanent failure
+        }
+        else
+        {
+            outboxMessage.Status = OutboxMessageStatus.Pending; // Retry
+        }
     }
 }

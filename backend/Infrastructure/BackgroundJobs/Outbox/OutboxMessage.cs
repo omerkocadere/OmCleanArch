@@ -18,4 +18,5 @@ public class OutboxMessage
     public string? Error { get; set; }
     public OutboxMessageStatus Status { get; set; } = OutboxMessageStatus.Pending;
     public DateTime? ProcessingStartedAt { get; set; }
+    public int RetryCount { get; set; }
 }
