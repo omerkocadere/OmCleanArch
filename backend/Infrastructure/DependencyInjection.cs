@@ -1,19 +1,9 @@
-﻿using CleanArch.Application.Common.Interfaces;
-using CleanArch.Infrastructure.BackgroundJobs;
-using CleanArch.Infrastructure.BackgroundJobs.Outbox;
+﻿using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
-using CleanArch.Infrastructure.Data.Interceptors;
-using CleanArch.Infrastructure.Data.Options;
 using CleanArch.Infrastructure.OpenTelemetry;
-using Hangfire;
-using Hangfire.PostgreSql;
-using Hangfire.Storage.SQLite;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CleanArch.Infrastructure;
 
@@ -21,14 +11,15 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(
         this IServiceCollection services,
-        IHostEnvironment env
+        IHostEnvironment env,
+        IConfiguration configuration
     )
     {
         return services
             .AddServices()
-            .AddDatabase(env)
+            .AddDatabase(env) // Now uses DatabaseConfiguration
             .AddBackgroundJobs()
-            .ConfigureOpenTelemetry()
+            .ConfigureOpenTelemetry(configuration)
             .AddAuthenticationInternal();
     }
 
@@ -38,150 +29,9 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddDatabase(
-        this IServiceCollection services,
-        IHostEnvironment env
-    )
-    {
-        services.ConfigureOptions<DatabaseOptionsSetup>();
-
-        services.AddDbContext<ApplicationDbContext>(
-            (sp, options) =>
-            {
-                var databaseOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-                var logger = sp.GetRequiredService<ILogger<ApplicationDbContext>>();
-                logger.LogInformation(
-                    "Selected database provider: {Provider}",
-                    databaseOptions.Provider
-                );
-
-                switch (databaseOptions.Provider)
-                {
-                    case DbProvider.Sqlite:
-                        ValidateConnectionString(
-                            databaseOptions.SqliteConnectionString,
-                            DbProvider.Sqlite
-                        );
-                        options.UseSqlite(databaseOptions.SqliteConnectionString);
-                        break;
-                    case DbProvider.Postgres:
-                        ValidateConnectionString(
-                            databaseOptions.PostgresConnectionString,
-                            DbProvider.Postgres
-                        );
-                        options.UseNpgsql(databaseOptions.PostgresConnectionString);
-                        break;
-                    default:
-                        throw new InvalidOperationException(
-                            $"Unsupported database provider: {databaseOptions.Provider}"
-                        );
-                }
-
-                options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-
-                if (env.IsDevelopment())
-                {
-                    options.EnableDetailedErrors(true);
-                    options.EnableSensitiveDataLogging(true);
-                }
-            }
-        );
-
-        services.AddScoped<IApplicationDbContext>(provider =>
-            provider.GetRequiredService<ApplicationDbContext>()
-        );
-
-        services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
-        // services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
-        services.AddScoped<
-            ISaveChangesInterceptor,
-            ConvertDomainEventsToOutputMessagesInterceptor
-        >();
-
-        return services;
-    }
-
     private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
         return services;
-    }
-
-    private static IServiceCollection AddBackgroundJobs(this IServiceCollection services)
-    {
-        services.AddHangfire(
-            (sp, configuration) =>
-            {
-                var databaseOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-                var connectionString = databaseOptions.Provider switch
-                {
-                    DbProvider.Sqlite => databaseOptions.SqliteConnectionString,
-                    DbProvider.Postgres => databaseOptions.PostgresConnectionString,
-                    _ => throw new InvalidOperationException(
-                        $"Unsupported database provider: {databaseOptions.Provider}"
-                    ),
-                };
-
-                switch (databaseOptions.Provider)
-                {
-                    case DbProvider.Sqlite:
-                        var hangfireConn = GetHangfireSqliteConnectionString(connectionString!);
-                        configuration.UseSQLiteStorage(hangfireConn);
-                        break;
-                    case DbProvider.Postgres:
-                        configuration.UsePostgreSqlStorage(options =>
-                            options.UseNpgsqlConnection(connectionString)
-                        );
-                        break;
-                    default:
-                        throw new InvalidOperationException(
-                            $"Unsupported database provider: {databaseOptions.Provider}"
-                        );
-                }
-            }
-        );
-
-        // Add the processing server as IHostedService
-        services.AddHangfireServer();
-
-        GlobalJobFilters.Filters.Add(
-            new AutomaticRetryAttribute
-            {
-                Attempts = 5, // Retry 5 times
-                DelaysInSeconds = [10, 30, 60, 300, 600], // 10s, 30s, 1m, 5m, 10m
-            }
-        );
-
-        // Register background job services
-        services.AddScoped<ProcessOutboxMessagesJob>();
-        services.AddScoped<MarkFailedOutboxMessagesJob>();
-        services.AddScoped<IBackgroundJobService, HangfireBackgroundJobService>();
-
-        return services;
-    }
-
-    private static void ValidateConnectionString(string? connectionString, DbProvider provider)
-    {
-        if (string.IsNullOrWhiteSpace(connectionString))
-            throw new InvalidOperationException(
-                $"Database connection string for '{provider}' is missing in configuration."
-            );
-    }
-
-    private static string GetHangfireSqliteConnectionString(string original)
-    {
-        // Extracts the base name from Data Source and appends 'Hangfire'
-        var parts = original.Split(';');
-        foreach (var part in parts)
-        {
-            var trimmed = part.Trim();
-            if (trimmed.StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase))
-            {
-                var fileName = trimmed["Data Source=".Length..].Trim();
-                var name = Path.GetFileNameWithoutExtension(fileName);
-                return name + "Hangfire";
-            }
-        }
-        throw new InvalidOperationException("No Data Source found in connection string.");
     }
 }

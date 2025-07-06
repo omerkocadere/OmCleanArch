@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry.Logs;
@@ -7,10 +8,24 @@ using OpenTelemetry.Trace;
 
 namespace CleanArch.Infrastructure.OpenTelemetry;
 
-public static class OpenTelemetryExtensions
+public static class OpenTelemetryConfiguration
 {
-    public static IServiceCollection ConfigureOpenTelemetry(this IServiceCollection services)
+    public static IServiceCollection ConfigureOpenTelemetry(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
+        var options = configuration
+            .GetSection(OpenTelemetryOptions.SectionName)
+            .Get<OpenTelemetryOptions>();
+
+        var otlpEndpoint = options?.OtlpEndpoint;
+
+        if (string.IsNullOrEmpty(otlpEndpoint))
+        {
+            throw new InvalidOperationException("OTLP endpoint is not configured.");
+        }
+
         services
             .AddOpenTelemetry()
             .ConfigureResource(resource => resource.AddService("OmCleanArch"))
@@ -19,7 +34,7 @@ public static class OpenTelemetryExtensions
                 metrics.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation();
                 metrics.AddOtlpExporter(options =>
                 {
-                    options.Endpoint = new Uri("http://localhost:18889"); // OTLP gRPC endpoint
+                    options.Endpoint = new Uri(otlpEndpoint);
                 });
             })
             .WithTracing(tracing =>
@@ -30,7 +45,7 @@ public static class OpenTelemetryExtensions
                     .AddEntityFrameworkCoreInstrumentation();
                 tracing.AddOtlpExporter(options =>
                 {
-                    options.Endpoint = new Uri("http://localhost:18889"); // OTLP gRPC endpoint
+                    options.Endpoint = new Uri(otlpEndpoint);
                 });
             });
 

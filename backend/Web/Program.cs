@@ -11,20 +11,22 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// builder.Host.UseSerilog(
-//     (context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration)
-// );
+builder.Host.UseSerilog(
+    (context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration)
+);
 
-builder.Logging.AddOpenTelemetry(logging =>
-{
-    logging.AddOtlpExporter(options =>
-    {
-        options.Endpoint = new Uri("http://localhost:18889");
-    });
-});
+builder
+    .Services.AddApplicationServices()
+    .AddInfrastructureServices(builder.Environment, builder.Configuration)
+    .AddWebServices();
 
-var services = builder.Services;
-services.AddApplicationServices().AddInfrastructureServices(builder.Environment).AddWebServices();
+// builder.Logging.AddOpenTelemetry(logging =>
+// {
+//     logging.AddOtlpExporter(options =>
+//     {
+//         options.Endpoint = new Uri("http://localhost:18889");
+//     });
+// });
 
 var app = builder.Build();
 
@@ -58,6 +60,6 @@ app.Map("/", () => Results.Redirect("/api"));
 app.MapEndpoints();
 app.MapControllers();
 
-app.ConfigureBackgroundJobs();
+app.InitializeBackgroundJobs();
 
 app.Run();
