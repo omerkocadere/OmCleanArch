@@ -21,5 +21,12 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  aspire:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
+    ports:
+      - "18888:18888" # Dashboard UI
+      - "18889:18889" # OTLP gRPC
+      - "18890:18890" # OTLP HTTP
+
 volumes:
   pgdata:

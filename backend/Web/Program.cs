@@ -5,14 +5,23 @@ using CleanArch.Infrastructure.Data;
 using CleanArch.Web;
 using CleanArch.Web.Extensions;
 using Hangfire;
+using OpenTelemetry.Logs;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Host.UseSerilog(
-    (context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration)
-);
+// builder.Host.UseSerilog(
+//     (context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration)
+// );
+
+builder.Logging.AddOpenTelemetry(logging =>
+{
+    logging.AddOtlpExporter(options =>
+    {
+        options.Endpoint = new Uri("http://localhost:18889");
+    });
+});
 
 var services = builder.Services;
 services.AddApplicationServices().AddInfrastructureServices(builder.Environment).AddWebServices();
@@ -40,7 +49,8 @@ app.MapHealthChecks("/health");
 app.UseHttpsRedirection();
 
 app.UseRequestContextLogging();
-app.UseSerilogRequestLogging();
+
+// app.UseSerilogRequestLogging();
 
 app.UseStaticFiles();
 

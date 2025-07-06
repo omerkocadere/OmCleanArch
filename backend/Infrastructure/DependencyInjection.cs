@@ -1,10 +1,10 @@
-﻿using System.IO;
-using CleanArch.Application.Common.Interfaces;
+﻿using CleanArch.Application.Common.Interfaces;
 using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.BackgroundJobs.Outbox;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Data.Interceptors;
 using CleanArch.Infrastructure.Data.Options;
+using CleanArch.Infrastructure.OpenTelemetry;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Hangfire.Storage.SQLite;
@@ -28,6 +28,7 @@ public static class DependencyInjection
             .AddServices()
             .AddDatabase(env)
             .AddBackgroundJobs()
+            .ConfigureOpenTelemetry()
             .AddAuthenticationInternal();
     }
 
