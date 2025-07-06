@@ -33,8 +33,6 @@ await app.InitialiseDatabaseAsync();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerWithUi();
-
-    app.UseHangfireDashboard("/hangfire");
 }
 else
 {
@@ -42,13 +40,18 @@ else
     app.UseHsts();
 }
 
+app.UseHangfireDashboard(
+    "/hangfire",
+    new DashboardOptions { Authorization = [new NoAuthorizationFilter()] }
+);
+
 app.MapHealthChecks("/health");
 
 app.UseHttpsRedirection();
 
 app.UseRequestContextLogging();
 
-// app.UseSerilogRequestLogging();
+app.UseSerilogRequestLogging();
 
 app.UseStaticFiles();
 

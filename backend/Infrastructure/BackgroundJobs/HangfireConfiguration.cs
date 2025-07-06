@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace CleanArch.Infrastructure.BackgroundJobs;
 
-public static class BackgroundJobsConfiguration
+public static class HangfireConfiguration
 {
     public static IServiceCollection AddBackgroundJobs(this IServiceCollection services)
     {
@@ -80,4 +80,13 @@ public static class BackgroundJobsConfiguration
         }
         throw new InvalidOperationException("No Data Source found in connection string.");
     }
+}
+
+/// <summary>
+/// Authorization filter that allows unrestricted access to Hangfire dashboard.
+/// Use only in development/docker environments, not recommended for production.
+/// </summary>
+public class NoAuthorizationFilter : Hangfire.Dashboard.IDashboardAuthorizationFilter
+{
+    public bool Authorize(Hangfire.Dashboard.DashboardContext context) => true;
 }
