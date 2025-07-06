@@ -15,29 +15,37 @@ public static class OpenTelemetryConfiguration
         IConfiguration configuration
     )
     {
-        var options = configuration
-            .GetSection(OpenTelemetryOptions.SectionName)
-            .Get<OpenTelemetryOptions>();
+        var options = OpenTelemetryOptions.FromSerilogConfiguration(configuration);
 
-        var otlpEndpoint = options?.OtlpEndpoint;
-
-        if (string.IsNullOrEmpty(otlpEndpoint))
+        if (string.IsNullOrEmpty(options?.Endpoint))
         {
-            throw new InvalidOperationException("OTLP endpoint is not configured.");
+            throw new InvalidOperationException("OTLP endpoint is not configured in Serilog sink.");
         }
 
         services
             .AddOpenTelemetry()
-            .ConfigureResource(resource => resource.AddService(DiagnosticsConfig.ServiceName))
+            .ConfigureResource(resource =>
+            {
+                if (!string.IsNullOrEmpty(options.ServiceName))
+                {
+                    resource.AddService(options.ServiceName);
+                }
+                else
+                {
+                    resource.AddService(DiagnosticsConfig.ServiceName);
+                }
+            })
             .WithMetrics(metrics =>
             {
                 metrics
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddMeter(DiagnosticsConfig.Meter.Name)
-                    .AddOtlpExporter(options =>
+                    .AddOtlpExporter(exporterOptions =>
                     {
-                        options.Endpoint = new Uri(otlpEndpoint);
+                        exporterOptions.Endpoint = new Uri(options.Endpoint);
+                        // Optionally set protocol if needed
+                        // exporterOptions.Protocol = ...
                     });
             })
             .WithTracing(tracing =>
@@ -46,9 +54,11 @@ public static class OpenTelemetryConfiguration
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddEntityFrameworkCoreInstrumentation()
-                    .AddOtlpExporter(options =>
+                    .AddOtlpExporter(exporterOptions =>
                     {
-                        options.Endpoint = new Uri(otlpEndpoint);
+                        exporterOptions.Endpoint = new Uri(options.Endpoint);
+                        // Optionally set protocol if needed
+                        // exporterOptions.Protocol = ...
                     });
             });
 
