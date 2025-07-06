@@ -23,14 +23,6 @@ builder
     .AddInfrastructureServices(builder.Environment, builder.Configuration)
     .AddWebServices();
 
-// builder.Logging.AddOpenTelemetry(logging =>
-// {
-//     logging.AddOtlpExporter(options =>
-//     {
-//         options.Endpoint = new Uri("http://localhost:18889");
-//     });
-// });
-
 var app = builder.Build();
 
 app.UseExceptionHandler();
