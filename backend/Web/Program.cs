@@ -27,10 +27,12 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 
+await app.InitialiseDatabaseAsync();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    await app.InitialiseDatabaseAsync();
+
     app.UseSwaggerWithUi();
 
     app.UseHangfireDashboard("/hangfire");

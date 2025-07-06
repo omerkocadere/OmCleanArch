@@ -4,16 +4,21 @@ using Hangfire;
 
 namespace CleanArch.Infrastructure.BackgroundJobs;
 
-public class HangfireBackgroundJobService : IBackgroundJobService
+public class HangfireBackgroundJobService(
+    IBackgroundJobClient backgroundJobClient,
+    IRecurringJobManager recurringJobManager
+) : IBackgroundJobService
 {
     public void EnqueueOutboxProcessing()
     {
-        BackgroundJob.Enqueue<ProcessOutboxMessagesJob>(job => job.Execute(CancellationToken.None));
+        backgroundJobClient.Enqueue<ProcessOutboxMessagesJob>(job =>
+            job.Execute(CancellationToken.None)
+        );
     }
 
     public void ScheduleRecurringOutboxProcessing()
     {
-        RecurringJob.AddOrUpdate<ProcessOutboxMessagesJob>(
+        recurringJobManager.AddOrUpdate<ProcessOutboxMessagesJob>(
             "process-outbox-messages",
             job => job.Execute(CancellationToken.None),
             "* * * * *" // Run every minute (Cron expression)
@@ -22,7 +27,7 @@ public class HangfireBackgroundJobService : IBackgroundJobService
 
     public void ScheduleRecurringFailedMessageCleanup()
     {
-        RecurringJob.AddOrUpdate<MarkFailedOutboxMessagesJob>(
+        recurringJobManager.AddOrUpdate<MarkFailedOutboxMessagesJob>(
             "mark-failed-outbox-messages",
             job => job.Execute(CancellationToken.None),
             "*/10 * * * *" // Run every 10 minutes

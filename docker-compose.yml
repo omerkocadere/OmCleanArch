@@ -8,6 +8,7 @@ services:
       - 7800:7800
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:7800
     depends_on:
       - postgres
 
