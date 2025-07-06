@@ -12,7 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Host.UseSerilog(
-    (context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration)
+    (context, loggerConfig) =>
+    {
+        loggerConfig.ReadFrom.Configuration(context.Configuration);
+    }
 );
 
 builder

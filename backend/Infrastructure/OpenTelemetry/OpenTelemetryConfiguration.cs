@@ -28,25 +28,28 @@ public static class OpenTelemetryConfiguration
 
         services
             .AddOpenTelemetry()
-            .ConfigureResource(resource => resource.AddService("OmCleanArch"))
+            .ConfigureResource(resource => resource.AddService(DiagnosticsConfig.ServiceName))
             .WithMetrics(metrics =>
             {
-                metrics.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation();
-                metrics.AddOtlpExporter(options =>
-                {
-                    options.Endpoint = new Uri(otlpEndpoint);
-                });
+                metrics
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddMeter(DiagnosticsConfig.Meter.Name)
+                    .AddOtlpExporter(options =>
+                    {
+                        options.Endpoint = new Uri(otlpEndpoint);
+                    });
             })
             .WithTracing(tracing =>
             {
                 tracing
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddEntityFrameworkCoreInstrumentation();
-                tracing.AddOtlpExporter(options =>
-                {
-                    options.Endpoint = new Uri(otlpEndpoint);
-                });
+                    .AddEntityFrameworkCoreInstrumentation()
+                    .AddOtlpExporter(options =>
+                    {
+                        options.Endpoint = new Uri(otlpEndpoint);
+                    });
             });
 
         return services;
