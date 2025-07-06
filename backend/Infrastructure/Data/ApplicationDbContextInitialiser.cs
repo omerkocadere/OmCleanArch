@@ -68,35 +68,47 @@ public static class ApplicationDbContextInitialiser
         var usersJsonPath = Path.Combine(seedDir, "users.json");
         var listsJsonPath = Path.Combine(seedDir, "todolists.json");
 
-        if (!context.Users.Any() && File.Exists(usersJsonPath))
+        if (!context.Users.Any())
         {
-            logger.LogInformation("Seeding users from {Path}", usersJsonPath);
-            var usersJson = await File.ReadAllTextAsync(usersJsonPath);
-            var users = JsonSerializer.Deserialize<List<User>>(usersJson, _jsonOptions);
-            if (users is null || users.Count == 0)
+            if (!File.Exists(usersJsonPath))
             {
-                logger.LogWarning("No data found in users.json");
-                return;
+                logger.LogWarning("Seed file not found: {Path}", usersJsonPath);
             }
-            context.Users.AddRange(users);
-            await context.SaveChangesAsync();
-            logger.LogInformation("Seeded {UserCount} users.", users.Count);
+            else
+            {
+                logger.LogInformation("Seeding users from {Path}", usersJsonPath);
+                var usersJson = await File.ReadAllTextAsync(usersJsonPath);
+                var users = JsonSerializer.Deserialize<List<User>>(usersJson, _jsonOptions);
+                if (users is null || users.Count == 0)
+                {
+                    logger.LogWarning("No data found in users.json");
+                    return;
+                }
+                context.Users.AddRange(users);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Seeded {UserCount} users.", users.Count);
+            }
         }
-        if (!context.TodoLists.Any() && File.Exists(listsJsonPath))
+        if (!context.TodoLists.Any())
         {
-            logger.LogInformation("Seeding todolists from {Path}", listsJsonPath);
-
-            var listsJson = await File.ReadAllTextAsync(listsJsonPath);
-            var listsData = JsonSerializer.Deserialize<List<TodoList>>(listsJson, _jsonOptions);
-            if (listsData is null || listsData.Count == 0)
+            if (!File.Exists(listsJsonPath))
             {
-                logger.LogWarning("No data found in todolists.json");
-                return;
+                logger.LogWarning("Seed file not found: {Path}", listsJsonPath);
             }
-
-            context.TodoLists.AddRange(listsData);
-            await context.SaveChangesAsync();
-            logger.LogInformation("Seeded {ListCount} lists.", listsData.Count);
+            else
+            {
+                logger.LogInformation("Seeding todolists from {Path}", listsJsonPath);
+                var listsJson = await File.ReadAllTextAsync(listsJsonPath);
+                var listsData = JsonSerializer.Deserialize<List<TodoList>>(listsJson, _jsonOptions);
+                if (listsData is null || listsData.Count == 0)
+                {
+                    logger.LogWarning("No data found in todolists.json");
+                    return;
+                }
+                context.TodoLists.AddRange(listsData);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Seeded {ListCount} lists.", listsData.Count);
+            }
         }
     }
 }

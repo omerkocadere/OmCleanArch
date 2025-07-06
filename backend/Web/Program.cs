@@ -32,7 +32,6 @@ await app.InitialiseDatabaseAsync();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-
     app.UseSwaggerWithUi();
 
     app.UseHangfireDashboard("/hangfire");
