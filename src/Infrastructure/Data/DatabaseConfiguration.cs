@@ -3,6 +3,7 @@ using CleanArch.Infrastructure.Data.Interceptors;
 using CleanArch.Infrastructure.Data.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -14,10 +15,12 @@ public static class DatabaseConfiguration
 {
     public static IServiceCollection AddDatabase(
         this IServiceCollection services,
-        IHostEnvironment env
+        IHostEnvironment env,
+        IConfiguration configuration
     )
     {
         services.ConfigureOptions<DatabaseOptionsSetup>();
+        string? connectionString = configuration.GetConnectionString("Database");
 
         services.AddDbContext<ApplicationDbContext>(
             (sp, options) =>
@@ -43,7 +46,7 @@ public static class DatabaseConfiguration
                             databaseOptions.PostgresConnectionString,
                             DbProvider.Postgres
                         );
-                        options.UseNpgsql(databaseOptions.PostgresConnectionString);
+                        options.UseNpgsql(connectionString);
                         break;
                     default:
                         throw new InvalidOperationException(
@@ -71,6 +74,8 @@ public static class DatabaseConfiguration
             ISaveChangesInterceptor,
             ConvertDomainEventsToOutputMessagesInterceptor
         >();
+
+        services.AddHealthChecks().AddNpgSql(configuration.GetConnectionString("Database")!);
 
         return services;
     }

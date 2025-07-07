@@ -1,7 +1,6 @@
 ﻿using CleanArch.Application.Common.Interfaces;
 using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
-using CleanArch.Infrastructure.OpenTelemetry;
 using CleanArch.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,12 +16,7 @@ public static class DependencyInjection
         IConfiguration configuration
     )
     {
-        return services
-            .AddServices()
-            .AddDatabase(env) // Now uses DatabaseConfiguration
-            .AddBackgroundJobs()
-            .ConfigureOpenTelemetry(configuration)
-            .AddAuthenticationInternal();
+        return services.AddServices().AddDatabase(env, configuration).AddBackgroundJobs(configuration).AddAuthenticationInternal();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)

@@ -4,6 +4,7 @@ using CleanArch.Infrastructure.Data.Options;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Hangfire.Storage.SQLite;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -11,8 +12,12 @@ namespace CleanArch.Infrastructure.BackgroundJobs;
 
 public static class HangfireConfiguration
 {
-    public static IServiceCollection AddBackgroundJobs(this IServiceCollection services)
+    public static IServiceCollection AddBackgroundJobs(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
+        string? connectionString2 = configuration.GetConnectionString("Database");
         services.AddHangfire(
             (sp, configuration) =>
             {
@@ -34,7 +39,7 @@ public static class HangfireConfiguration
                         break;
                     case DbProvider.Postgres:
                         configuration.UsePostgreSqlStorage(options =>
-                            options.UseNpgsqlConnection(connectionString)
+                            options.UseNpgsqlConnection(connectionString2)
                         );
                         break;
                     default:

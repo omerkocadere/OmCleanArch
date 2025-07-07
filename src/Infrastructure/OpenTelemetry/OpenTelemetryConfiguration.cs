@@ -1,58 +1,78 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using OpenTelemetry.Logs;
+using OpenTelemetry;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 namespace CleanArch.Infrastructure.OpenTelemetry;
 
 public static class OpenTelemetryConfiguration
 {
-    public static IServiceCollection ConfigureOpenTelemetry(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
+    public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder, IConfiguration configuration)
+        where TBuilder : IHostApplicationBuilder
     {
-        var options = configuration
-            .GetSection(OpenTelemetryOptions.SectionName)
-            .Get<OpenTelemetryOptions>();
-
-        if (options?.ServiceName == null)
+        builder.Logging.AddOpenTelemetry(logging =>
         {
-            throw new InvalidOperationException("OTLP service name is not configured in config");
-        }
+            logging.IncludeFormattedMessage = true;
+            logging.IncludeScopes = true;
+        });
 
-        var diagnosticsServiceName = options.ServiceName;
-
-        DiagnosticsConfig.Initialize(diagnosticsServiceName);
-
-        services
-            .AddOpenTelemetry()
-            .ConfigureResource(resource =>
-            {
-                resource.AddService(options.ServiceName);
-            })
+        builder
+            .Services.AddOpenTelemetry()
             .WithMetrics(metrics =>
             {
                 metrics
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddMeter(DiagnosticsConfig.Meter.Name)
-                    .AddOtlpExporter();
+                    .AddNpgsqlInstrumentation()
+                    .AddMeter(DiagnosticsConfig.Meter.Name);
             })
             .WithTracing(tracing =>
             {
                 tracing
+                    .AddSource(builder.Environment.ApplicationName)
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddEntityFrameworkCoreInstrumentation()
-                    .AddNpgsql()
-                    .AddOtlpExporter();
+                    .AddNpgsql();
             });
 
-        return services;
+        builder.AddOpenTelemetryExporters(configuration);
+
+        return builder;
+    }
+
+    private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder, IConfiguration configuration)
+        where TBuilder : IHostApplicationBuilder
+    {
+        var options = configuration.GetSection(OpenTelemetryOptions.SectionName).Get<OpenTelemetryOptions>();
+
+        var otlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+        var useOtlpExporter = !string.IsNullOrWhiteSpace(otlpEndpoint);
+
+        if (useOtlpExporter)
+        {
+            builder.Services.AddOpenTelemetry().UseOtlpExporter();
+        }
+        else if (!string.IsNullOrWhiteSpace(options?.Endpoint))
+        {
+            var protocol = options.Protocol switch
+            {
+                OtlpProtocol.Grpc => OtlpExportProtocol.Grpc,
+                OtlpProtocol.HttpProtobuf => OtlpExportProtocol.HttpProtobuf,
+                _ => OtlpExportProtocol.Grpc,
+            };
+            builder.Services.AddOpenTelemetry().UseOtlpExporter(protocol, new Uri(options.Endpoint));
+        }
+        else
+        {
+            throw new InvalidOperationException("No OTLP endpoint configuration found.");
+        }
+
+        return builder;
     }
 }
