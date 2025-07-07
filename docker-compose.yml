@@ -9,6 +9,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:7800
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire:18889
     depends_on:
       - postgres
 

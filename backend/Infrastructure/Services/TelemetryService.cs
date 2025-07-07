@@ -16,7 +16,7 @@ public class TelemetryService(ILogger<TelemetryService> logger) : ITelemetryServ
             new KeyValuePair<string, object?>("user.lastName", user.LastName)
         );
 
-        logger.LogDebug(
+        logger.LogInformation(
             "Telemetry recorded for user creation: {UserId} - {FirstName} {LastName}",
             user.Id,
             user.FirstName,

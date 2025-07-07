@@ -2,21 +2,26 @@ using CleanArch.Application;
 using CleanArch.Infrastructure;
 using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
+using CleanArch.Infrastructure.OpenTelemetry;
 using CleanArch.Web;
+using CleanArch.Web.Common;
 using CleanArch.Web.Extensions;
 using Hangfire;
-using OpenTelemetry.Logs;
 using Serilog;
+
+EnvironmentInspector.LoadAndPrintAll();
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Host.UseSerilog(
-    (context, loggerConfig) =>
-    {
-        loggerConfig.ReadFrom.Configuration(context.Configuration);
-    }
-);
+// builder.Host.UseSerilog(
+//     (context, loggerConfig) =>
+//     {
+//         loggerConfig.ReadFrom.Configuration(context.Configuration);
+//     }
+// );
+
+builder.Logging.AddOpenTelemetryLogging(builder.Configuration);
 
 builder
     .Services.AddApplicationServices()
@@ -32,6 +37,10 @@ await app.InitialiseDatabaseAsync();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseHangfireDashboard(
+        "/hangfire",
+        new DashboardOptions { Authorization = [new NoAuthorizationFilter()] }
+    );
     app.UseSwaggerWithUi();
 }
 else
@@ -40,10 +49,7 @@ else
     app.UseHsts();
 }
 
-app.UseHangfireDashboard(
-    "/hangfire",
-    new DashboardOptions { Authorization = [new NoAuthorizationFilter()] }
-);
+
 
 app.MapHealthChecks("/health");
 
@@ -51,7 +57,7 @@ app.UseHttpsRedirection();
 
 app.UseRequestContextLogging();
 
-app.UseSerilogRequestLogging();
+// app.UseSerilogRequestLogging();
 
 app.UseStaticFiles();
 

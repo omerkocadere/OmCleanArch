@@ -53,10 +53,10 @@ public static class DatabaseConfiguration
 
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
 
-                if (env.IsDevelopment())
+                if (env.IsDevelopment() || env.IsEnvironment("Docker"))
                 {
-                    options.EnableDetailedErrors(true);
-                    options.EnableSensitiveDataLogging(true);
+                    options.EnableSensitiveDataLogging();
+                    options.EnableDetailedErrors();
                 }
             }
         );

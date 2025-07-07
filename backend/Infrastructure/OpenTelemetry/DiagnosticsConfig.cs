@@ -4,7 +4,7 @@ namespace CleanArch.Infrastructure.OpenTelemetry;
 
 public static class DiagnosticsConfig
 {
-    public const string ServiceName = "OmCleanArch";
+    public static string ServiceName { get; set; } = "UknownService";
 
     public static readonly Meter Meter = new(ServiceName);
 

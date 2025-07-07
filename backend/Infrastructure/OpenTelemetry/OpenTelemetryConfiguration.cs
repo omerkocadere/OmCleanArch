@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Npgsql;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -15,25 +17,22 @@ public static class OpenTelemetryConfiguration
         IConfiguration configuration
     )
     {
-        var options = OpenTelemetryOptions.FromSerilogConfiguration(configuration);
+        var options = configuration
+            .GetSection(OpenTelemetryOptions.SectionName)
+            .Get<OpenTelemetryOptions>();
 
         if (string.IsNullOrEmpty(options?.Endpoint))
         {
             throw new InvalidOperationException("OTLP endpoint is not configured in Serilog sink.");
         }
 
+        DiagnosticsConfig.ServiceName = options.ServiceName;
+
         services
             .AddOpenTelemetry()
             .ConfigureResource(resource =>
             {
-                if (!string.IsNullOrEmpty(options.ServiceName))
-                {
-                    resource.AddService(options.ServiceName);
-                }
-                else
-                {
-                    resource.AddService(DiagnosticsConfig.ServiceName);
-                }
+                resource.AddService(options.ServiceName);
             })
             .WithMetrics(metrics =>
             {
@@ -41,12 +40,7 @@ public static class OpenTelemetryConfiguration
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddMeter(DiagnosticsConfig.Meter.Name)
-                    .AddOtlpExporter(exporterOptions =>
-                    {
-                        exporterOptions.Endpoint = new Uri(options.Endpoint);
-                        // Optionally set protocol if needed
-                        // exporterOptions.Protocol = ...
-                    });
+                    .AddOtlpExporter();
             })
             .WithTracing(tracing =>
             {
@@ -54,12 +48,8 @@ public static class OpenTelemetryConfiguration
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddEntityFrameworkCoreInstrumentation()
-                    .AddOtlpExporter(exporterOptions =>
-                    {
-                        exporterOptions.Endpoint = new Uri(options.Endpoint);
-                        // Optionally set protocol if needed
-                        // exporterOptions.Protocol = ...
-                    });
+                    // .AddNpgsql()
+                    .AddOtlpExporter();
             });
 
         return services;
