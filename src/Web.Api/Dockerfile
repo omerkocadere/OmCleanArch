@@ -14,24 +14,24 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Directory.Packages.props", "."]
 COPY ["Directory.Build.props", "."]
-COPY ["backend/Web/Web.csproj", "backend/Web/"]
-COPY ["backend/Application/Application.csproj", "backend/Application/"]
-COPY ["backend/Domain/Domain.csproj", "backend/Domain/"]
-COPY ["backend/Infrastructure/Infrastructure.csproj", "backend/Infrastructure/"]
-COPY ["backend/Infrastructure/Data/Migrations", "backend/Infrastructure/Data/Migrations"]
-RUN dotnet restore "./backend/Web/Web.csproj"
+COPY ["src/Web.Api/Web.Api.csproj", "src/Web.Api/"]
+COPY ["src/Application/Application.csproj", "src/Application/"]
+COPY ["src/Domain/Domain.csproj", "src/Domain/"]
+COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
+COPY ["src/Infrastructure/Data/Migrations", "src/Infrastructure/Data/Migrations"]
+RUN dotnet restore "./src/Web.Api/Web.Api.csproj"
 COPY . .
-WORKDIR "/src/backend/Web"
-RUN dotnet build "./Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Web.Api"
+RUN dotnet build "./Web.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-COPY backend/Infrastructure/Data/Migrations /app/publish/Migrations
+RUN dotnet publish "./Web.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+COPY src/Infrastructure/Data/Migrations /app/publish/Migrations
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "CleanArch.Web.dll"]
+ENTRYPOINT ["dotnet", "CleanArch.Web.Api.dll"]

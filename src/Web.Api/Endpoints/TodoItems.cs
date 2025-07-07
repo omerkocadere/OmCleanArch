@@ -6,9 +6,9 @@ using CleanArch.Application.TodoItems.GetTodoItemById;
 using CleanArch.Application.TodoItems.GetTodoItemsWithPagination;
 using CleanArch.Application.TodoItems.UpdateTodoItem;
 using CleanArch.Application.TodoItems.UpdateTodoItemDetail;
-using CleanArch.Web.Extensions;
+using CleanArch.Web.Api.Extensions;
 
-namespace CleanArch.Web.Endpoints;
+namespace CleanArch.Web.Api.Endpoints;
 
 public class TodoItems : EndpointGroupBase
 {

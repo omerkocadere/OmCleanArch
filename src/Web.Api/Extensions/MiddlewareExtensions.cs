@@ -1,6 +1,6 @@
-﻿using CleanArch.Web.Middleware;
+﻿using CleanArch.Web.Api.Middleware;
 
-namespace CleanArch.Web.Extensions;
+namespace CleanArch.Web.Api.Extensions;
 
 public static class MiddlewareExtensions
 {

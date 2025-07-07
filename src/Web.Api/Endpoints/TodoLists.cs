@@ -3,10 +3,10 @@ using CleanArch.Application.TodoLists.CreateTodoList;
 using CleanArch.Application.TodoLists.DeleteTodoList;
 using CleanArch.Application.TodoLists.GetTodos;
 using CleanArch.Application.TodoLists.UpdateTodoList;
-using CleanArch.Web.Extensions;
+using CleanArch.Web.Api.Extensions;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace CleanArch.Web.Endpoints;
+namespace CleanArch.Web.Api.Endpoints;
 
 public class TodoLists : EndpointGroupBase
 {

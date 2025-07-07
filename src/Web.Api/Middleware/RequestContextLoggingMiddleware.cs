@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Primitives;
 using Serilog.Context;
 
-namespace CleanArch.Web.Middleware;
+namespace CleanArch.Web.Api.Middleware;
 
 public class RequestContextLoggingMiddleware(RequestDelegate next)
 {

@@ -3,9 +3,9 @@ using CleanArch.Application.Users.CreateUser;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Application.Users.GetByEmail;
 using CleanArch.Application.Users.GetById;
-using CleanArch.Web.Extensions;
+using CleanArch.Web.Api.Extensions;
 
-namespace CleanArch.Web.Endpoints;
+namespace CleanArch.Web.Api.Endpoints;
 
 public class Users : EndpointGroupBase
 {

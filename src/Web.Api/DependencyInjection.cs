@@ -1,7 +1,7 @@
 ﻿using CleanArch.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CleanArch.Web;
+namespace CleanArch.Web.Api;
 
 public static class DependencyInjection
 {

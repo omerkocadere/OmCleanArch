@@ -1,6 +1,6 @@
 ﻿using CleanArch.Application.Common.Models;
 
-namespace CleanArch.Web.Extensions;
+namespace CleanArch.Web.Api.Extensions;
 
 public static class ResultExtensions
 {

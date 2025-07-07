@@ -2,7 +2,7 @@ using CleanArch.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace CleanArch.Web.Controllers;
+namespace CleanArch.Web.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]

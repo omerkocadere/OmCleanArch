@@ -3,7 +3,7 @@ services:
     image: ${DOCKER_REGISTRY-}omcleanarch.api
     build:
       context: .
-      dockerfile: backend/Web/Dockerfile
+      dockerfile: src/Web/Dockerfile
     ports:
       - 7800:7800
     environment:

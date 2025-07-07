@@ -3,9 +3,9 @@ using CleanArch.Infrastructure;
 using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.OpenTelemetry;
-using CleanArch.Web;
-using CleanArch.Web.Common;
-using CleanArch.Web.Extensions;
+using CleanArch.Web.Api;
+using CleanArch.Web.Api.Common;
+using CleanArch.Web.Api.Extensions;
 using Hangfire;
 using Serilog;
 

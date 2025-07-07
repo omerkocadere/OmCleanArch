@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Web.Infrastructure;
+﻿namespace CleanArch.Web.Api.Infrastructure;
 
 public abstract class EndpointGroupBase
 {

@@ -14,9 +14,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "Start Seq Container",
-      "program": "${workspaceFolder}/src/Web/bin/Debug/net9.0/CleanArch.Web.dll",
+      "program": "${workspaceFolder}/src/Web.Api/bin/Debug/net9.0/CleanArch.Web.Api.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/src/Web",
+      "cwd": "${workspaceFolder}/src/Web.Api",
       "serverReadyAction": {
         "action": "openExternally",
         "pattern": "Now listening on: (https?://\\S+)",

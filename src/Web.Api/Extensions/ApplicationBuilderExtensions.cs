@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Web.Extensions;
+﻿namespace CleanArch.Web.Api.Extensions;
 
 public static class ApplicationBuilderExtensions
 {

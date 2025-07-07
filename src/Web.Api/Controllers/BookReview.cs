@@ -1,4 +1,4 @@
-namespace CleanArch.Web.Controllers;
+namespace CleanArch.Web.Api.Controllers;
 
 public class BookReview
 {

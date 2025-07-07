@@ -1,16 +1,9 @@
 using System.Collections;
-using DotNetEnv;
 
-namespace CleanArch.Web.Common;
+namespace CleanArch.Web.Api.Common;
 
-public static class EnvironmentInspector
+public static class EnvDebugPrinter
 {
-    public static void LoadAndPrintAll()
-    {
-        Env.Load();
-        PrintAll();
-    }
-
     public static void PrintAll()
     {
         Console.WriteLine("---- ENVIRONMENT VARIABLES ----");

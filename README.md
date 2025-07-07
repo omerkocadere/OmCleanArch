@@ -6,7 +6,7 @@ Before running the project for the first time, you must create the initial datab
 Run the command:
 
 ```sh
-dotnet ef migrations add InitialCreate --project backend/Infrastructure --startup-project backend/Web --output-dir Data/Migrations
+dotnet ef migrations add InitialCreate --project src/Infrastructure --startup-project src/Web.Api --output-dir Data/Migrations
 ```
 
 ---
@@ -16,12 +16,12 @@ dotnet ef migrations add InitialCreate --project backend/Infrastructure --startu
 1. To add a migration:
 
    ```sh
-   dotnet ef migrations add InitialCreate --project backend/Infrastructure --startup-project backend/Web --output-dir Data/Migrations
+   dotnet ef migrations add InitialCreate --project src/Infrastructure --startup-project src/Web.Api --output-dir Data/Migrations
    ```
 
 2. To apply the migration to the database:
    ```sh
-   dotnet ef database update --project backend/Infrastructure --startup-project backend/Web
+   dotnet ef database update --project src/Infrastructure --startup-project src/Web.Api
    ```
 
-> Note: Migrations are kept in the Infrastructure layer, and the application's entry point is the Web project.
+> Note: Migrations are kept in the Infrastructure layer, and the application's entry point is the Web.Api project.
