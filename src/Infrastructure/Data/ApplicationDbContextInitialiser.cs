@@ -15,9 +15,7 @@ public static class InitialiserExtensions
     {
         using var scope = app.Services.CreateScope();
 
-        var logger = scope
-            .ServiceProvider.GetRequiredService<ILoggerFactory>()
-            .CreateLogger(nameof(ApplicationDbContextInitialiser));
+        var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(ApplicationDbContextInitialiser));
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         await ApplicationDbContextInitialiser.InitialiseAsync(context, logger);
@@ -62,9 +60,7 @@ public static class ApplicationDbContextInitialiser
     private static async Task TrySeedAsync(ApplicationDbContext context, ILogger logger)
     {
         var baseDir = AppContext.BaseDirectory;
-        var seedDir = Path.GetFullPath(
-            Path.Combine(baseDir, "..", "..", "..", "..", "Infrastructure", "Data", "Seed")
-        );
+        var seedDir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "Infrastructure", "Data", "Seed"));
         var usersJsonPath = Path.Combine(seedDir, "users.json");
         var listsJsonPath = Path.Combine(seedDir, "todolists.json");
 

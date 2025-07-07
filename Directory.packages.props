@@ -9,7 +9,6 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Application -->
-    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="9.3.1" />
     <PackageVersion Include="DotNetEnv" Version="3.1.1" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(EfcoreVersion)" />
@@ -35,15 +34,9 @@
     <PackageVersion Include="NSwag.AspNetCore" Version="14.4.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspnetVersion)" />
-    <!-- Open Telemetry -->
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.12.0-beta.2" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryVersion)" />
-    <PackageVersion Include="Npgsql.OpenTelemetry" Version="9.0.3" />
     <!--Aspire AppHost-->
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.3.1" />
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="9.3.1" />
     <!--Aspire ServiceDefaults-->
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.6.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.3.1" />

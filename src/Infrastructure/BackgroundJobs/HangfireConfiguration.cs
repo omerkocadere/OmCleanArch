@@ -12,12 +12,8 @@ namespace CleanArch.Infrastructure.BackgroundJobs;
 
 public static class HangfireConfiguration
 {
-    public static IServiceCollection AddBackgroundJobs(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
+    public static IServiceCollection AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
     {
-        string? connectionString2 = configuration.GetConnectionString("Database");
         services.AddHangfire(
             (sp, configuration) =>
             {
@@ -26,9 +22,7 @@ public static class HangfireConfiguration
                 {
                     DbProvider.Sqlite => databaseOptions.SqliteConnectionString,
                     DbProvider.Postgres => databaseOptions.PostgresConnectionString,
-                    _ => throw new InvalidOperationException(
-                        $"Unsupported database provider: {databaseOptions.Provider}"
-                    ),
+                    _ => throw new InvalidOperationException($"Unsupported database provider: {databaseOptions.Provider}"),
                 };
 
                 switch (databaseOptions.Provider)
@@ -38,14 +32,10 @@ public static class HangfireConfiguration
                         configuration.UseSQLiteStorage(hangfireConn);
                         break;
                     case DbProvider.Postgres:
-                        configuration.UsePostgreSqlStorage(options =>
-                            options.UseNpgsqlConnection(connectionString2)
-                        );
+                        configuration.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString));
                         break;
                     default:
-                        throw new InvalidOperationException(
-                            $"Unsupported database provider: {databaseOptions.Provider}"
-                        );
+                        throw new InvalidOperationException($"Unsupported database provider: {databaseOptions.Provider}");
                 }
             }
         );

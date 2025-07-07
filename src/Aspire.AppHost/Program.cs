@@ -7,7 +7,7 @@ IResourceBuilder<PostgresDatabaseResource> database = builder
 
 builder
     .AddProject<Projects.Web_Api>("web-api")
-    .WithEnvironment("ConnectionStrings__Database", database)
+    .WithEnvironment("DatabaseSettings__PostgresConnectionString", database)
     .WithReference(database)
     .WaitFor(database);
 

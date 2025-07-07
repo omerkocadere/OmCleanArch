@@ -46,7 +46,8 @@ else
     app.UseHsts();
 }
 
-app.MapHealthChecks("/health");
+// Replace direct health check mapping with extension method
+app.MapConditionalHealthChecks();
 
 app.UseHttpsRedirection();
 
