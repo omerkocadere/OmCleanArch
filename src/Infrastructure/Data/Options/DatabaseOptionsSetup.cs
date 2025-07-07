@@ -5,7 +5,7 @@ namespace CleanArch.Infrastructure.Data.Options;
 
 public class DatabaseOptionsSetup(IConfiguration configuration) : IConfigureOptions<DatabaseOptions>
 {
-    private const string ConfigurationSectionName = "DatabaseSettings";
+    public const string ConfigurationSectionName = "DatabaseSettings";
 
     public void Configure(DatabaseOptions options)
     {

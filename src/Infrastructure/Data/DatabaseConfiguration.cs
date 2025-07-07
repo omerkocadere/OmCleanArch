@@ -54,15 +54,19 @@ public static class DatabaseConfiguration
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         // services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, ConvertDomainEventsToOutputMessagesInterceptor>();
-
-        // Add health checks conditionally based on database provider
-        var dbOptions = configuration.GetSection("DatabaseSettings").Get<DatabaseOptions>();
-        if (dbOptions?.Provider == DbProvider.Postgres)
-        {
-            services.AddHealthChecks().AddNpgSql(dbOptions.PostgresConnectionString!);
-        }
+        AddConditionalHealthChecks(services, configuration);
 
         return services;
+    }
+
+    private static void AddConditionalHealthChecks(IServiceCollection services, IConfiguration configuration)
+    {
+        var dbOptions = configuration.GetSection(DatabaseOptionsSetup.ConfigurationSectionName).Get<DatabaseOptions>();
+        if (dbOptions?.Provider == DbProvider.Postgres)
+        {
+            ValidateConnectionString(dbOptions.PostgresConnectionString, DbProvider.Postgres);
+            services.AddHealthChecks().AddNpgSql(dbOptions.PostgresConnectionString!);
+        }
     }
 
     private static void ValidateConnectionString(string? connectionString, DbProvider provider)
