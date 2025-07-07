@@ -1,8 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Npgsql;
-using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -21,12 +19,14 @@ public static class OpenTelemetryConfiguration
             .GetSection(OpenTelemetryOptions.SectionName)
             .Get<OpenTelemetryOptions>();
 
-        if (string.IsNullOrEmpty(options?.Endpoint))
+        if (options?.ServiceName == null)
         {
-            throw new InvalidOperationException("OTLP endpoint is not configured in Serilog sink.");
+            throw new InvalidOperationException("OTLP service name is not configured in config");
         }
 
-        DiagnosticsConfig.ServiceName = options.ServiceName;
+        var diagnosticsServiceName = options.ServiceName;
+
+        DiagnosticsConfig.Initialize(diagnosticsServiceName);
 
         services
             .AddOpenTelemetry()
