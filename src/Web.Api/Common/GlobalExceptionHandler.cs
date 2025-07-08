@@ -2,7 +2,7 @@
 
 namespace CleanArch.Web.Api.Common;
 
-public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
+public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IWebHostEnvironment env) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
@@ -24,8 +24,9 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
             innerException
         );
 
+        var showStackTrace = env.IsDevelopment() || env.IsEnvironment("Docker");
         var problemDetails = Results.Problem(
-            detail: exception.Message,
+            detail: showStackTrace ? exception.StackTrace?.ToString() : exception.Message,
             statusCode: StatusCodes.Status500InternalServerError
         );
 

@@ -13,7 +13,8 @@ public class BuggyCustomResult : EndpointGroupBase
             .MapGet(GetBadRequestCustom, "bad-request-custom")
             .MapGet(GetUnauthorizedCustom, "unauthorized-custom")
             .MapGet(GetValidationErrorCustom, "validation-error-custom")
-            .MapGet(GetServerErrorCustom, "server-error-custom");
+            .MapGet(GetFailureCustom, "failure-custom")
+            .MapGet(GetExceptionCustom, "server-error-custom");
     }
 
     public IResult GetNotFoundCustom()
@@ -46,9 +47,14 @@ public class BuggyCustomResult : EndpointGroupBase
         return CustomResults.Problem(result);
     }
 
-    public IResult GetServerErrorCustom()
+    public IResult GetFailureCustom()
     {
         var result = Result.Failure(Error.Failure("ServerError", "This is a server error"));
         return CustomResults.Problem(result);
+    }
+
+    public IResult GetExceptionCustom()
+    {
+        throw new Exception("This is a real server error (exception)");
     }
 }
