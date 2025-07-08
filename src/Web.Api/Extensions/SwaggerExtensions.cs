@@ -1,6 +1,6 @@
 ﻿namespace CleanArch.Web.Api.Extensions;
 
-public static class ApplicationBuilderExtensions
+public static class SwaggerExtensions
 {
     public static IApplicationBuilder UseSwaggerWithUi(this WebApplication app)
     {

@@ -6,6 +6,7 @@ using CleanArch.Application.TodoItems.GetTodoItemById;
 using CleanArch.Application.TodoItems.GetTodoItemsWithPagination;
 using CleanArch.Application.TodoItems.UpdateTodoItem;
 using CleanArch.Application.TodoItems.UpdateTodoItemDetail;
+using CleanArch.Web.Api.Common;
 using CleanArch.Web.Api.Extensions;
 
 namespace CleanArch.Web.Api.Endpoints;
@@ -56,11 +57,7 @@ public class TodoItems : EndpointGroupBase
         return result.Match(Results.NoContent, CustomResults.Problem);
     }
 
-    public async Task<IResult> UpdateTodoItemDetail(
-        ISender sender,
-        int id,
-        UpdateTodoItemDetailCommand command
-    )
+    public async Task<IResult> UpdateTodoItemDetail(ISender sender, int id, UpdateTodoItemDetailCommand command)
     {
         if (id != command.Id)
             return TypedResults.BadRequest();

@@ -58,9 +58,7 @@ public static class IEndpointRouteBuilderExtensions
 
     private static void EnsureNotAnonymous(Delegate handler)
     {
-        if (
-            string.IsNullOrWhiteSpace(handler.Method.Name) || handler.Method.Name.Contains("lambda")
-        )
+        if (string.IsNullOrWhiteSpace(handler.Method.Name) || handler.Method.Name.Contains("lambda"))
             throw new ArgumentException(
                 "Anonymous methods (lambdas) are not supported. Use a named method.",
                 nameof(handler)

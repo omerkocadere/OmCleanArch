@@ -3,6 +3,7 @@ using CleanArch.Application.Users.CreateUser;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Application.Users.GetByEmail;
 using CleanArch.Application.Users.GetById;
+using CleanArch.Web.Api.Common;
 using CleanArch.Web.Api.Extensions;
 
 namespace CleanArch.Web.Api.Endpoints;
@@ -11,10 +12,7 @@ public class Users : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
-        app.MapGroup(this)
-            .MapGet(GetById, "{id:int}")
-            .MapGet(GetByEmail, "by-email/{email}")
-            .MapPost(CreateUser);
+        app.MapGroup(this).MapGet(GetById, "{id:int}").MapGet(GetByEmail, "by-email/{email}").MapPost(CreateUser);
     }
 
     public async Task<IResult> CreateUser(ISender sender, CreateUserCommand command)

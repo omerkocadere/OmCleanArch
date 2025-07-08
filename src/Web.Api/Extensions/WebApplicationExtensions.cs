@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using CleanArch.Web.Api.Common;
 
 namespace CleanArch.Web.Api.Extensions;
 
@@ -17,9 +18,7 @@ public static class WebApplicationExtensions
 
         var assembly = Assembly.GetExecutingAssembly();
 
-        var endpointGroupTypes = assembly
-            .GetExportedTypes()
-            .Where(t => t.IsSubclassOf(endpointGroupType));
+        var endpointGroupTypes = assembly.GetExportedTypes().Where(t => t.IsSubclassOf(endpointGroupType));
 
         foreach (var type in endpointGroupTypes)
         {

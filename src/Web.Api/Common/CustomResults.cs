@@ -1,7 +1,7 @@
 ﻿using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Common;
 
-namespace CleanArch.Web.Api.Infrastructure;
+namespace CleanArch.Web.Api.Common;
 
 public static class CustomResults
 {
