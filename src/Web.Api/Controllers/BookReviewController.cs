@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArch.Web.Api.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class BookReviewController(ILogger<BookReviewController> logger) : ControllerBase
+public class BookReviewController(ILogger<BookReviewController> logger) : BaseApiController
 {
     private static readonly string[] ReviewComments =
     [
@@ -38,4 +36,13 @@ public class BookReviewController(ILogger<BookReviewController> logger) : Contro
                 }),
         ];
     }
+}
+
+public class BookReview
+{
+    public int Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Reviewer { get; set; } = string.Empty;
+    public int Rating { get; set; }
+    public string Comment { get; set; } = string.Empty;
 }

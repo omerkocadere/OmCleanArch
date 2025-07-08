@@ -1,5 +1,4 @@
 ﻿using CleanArch.Application.WeatherForecasts.GetWeatherForecasts;
-using CleanArch.Web.Api.Common;
 using CleanArch.Web.Api.Extensions;
 
 namespace CleanArch.Web.Api.Endpoints;

@@ -3,9 +3,7 @@ using CleanArch.Application.TodoLists.CreateTodoList;
 using CleanArch.Application.TodoLists.DeleteTodoList;
 using CleanArch.Application.TodoLists.GetTodos;
 using CleanArch.Application.TodoLists.UpdateTodoList;
-using CleanArch.Web.Api.Common;
 using CleanArch.Web.Api.Extensions;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace CleanArch.Web.Api.Endpoints;
 

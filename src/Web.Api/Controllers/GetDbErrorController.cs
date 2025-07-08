@@ -4,9 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Web.Api.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class GetDbErrorController(ApplicationDbContext db) : ControllerBase
+public class GetDbErrorController(ApplicationDbContext db) : BaseApiController
 {
     [HttpGet()]
     public IActionResult ForceDbError()

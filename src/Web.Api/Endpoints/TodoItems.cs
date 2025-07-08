@@ -6,7 +6,6 @@ using CleanArch.Application.TodoItems.GetTodoItemById;
 using CleanArch.Application.TodoItems.GetTodoItemsWithPagination;
 using CleanArch.Application.TodoItems.UpdateTodoItem;
 using CleanArch.Application.TodoItems.UpdateTodoItemDetail;
-using CleanArch.Web.Api.Common;
 using CleanArch.Web.Api.Extensions;
 
 namespace CleanArch.Web.Api.Endpoints;

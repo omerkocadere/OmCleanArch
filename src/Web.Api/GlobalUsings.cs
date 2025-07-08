@@ -1,2 +1,2 @@
-global using CleanArch.Web.Api.Infrastructure;
+global using CleanArch.Web.Api.Common;
 global using MediatR;
