@@ -1,12 +1,12 @@
-using AutoMapper;
 using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Users.CreateUser;
 
-public sealed record CreateUserCommand : IRequest<Result<UserDto>>
+public sealed record CreateUserCommand : ICommand<UserDto>
 {
     public required string Email { get; set; }
     public required string FirstName { get; set; }
@@ -15,17 +15,14 @@ public sealed record CreateUserCommand : IRequest<Result<UserDto>>
 }
 
 public class CreateUserCommandHandler(IApplicationDbContext context, IMapper mapper)
-    : IRequestHandler<CreateUserCommand, Result<UserDto>>
+    : ICommandHandler<CreateUserCommand, UserDto>
 {
-    public async Task<Result<UserDto>> Handle(
-        CreateUserCommand request,
-        CancellationToken cancellationToken
-    )
+    public async Task<Result<UserDto>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var user = mapper.Map<User>(request);
         user.PasswordHash = HashPassword(request.Password);
 
-        user.AddDomainEvent(new UserRegisteredDomainEvent(user));
+        user.AddDomainEvent(new UserCreatedDomainEvent(user));
 
         context.Users.Add(user);
         await context.SaveChangesAsync(cancellationToken);

@@ -1,14 +1,15 @@
 ﻿using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Users.GetByEmail;
 
-public sealed record GetUserByEmailQuery(string Email) : IRequest<Result<UserDto>>;
+public sealed record GetUserByEmailQuery(string Email) : IQuery<UserDto>;
 
 internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context)
-    : IRequestHandler<GetUserByEmailQuery, Result<UserDto>>
+    : IQueryHandler<GetUserByEmailQuery, UserDto>
 {
     public async Task<Result<UserDto>> Handle(
         GetUserByEmailQuery query,

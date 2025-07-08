@@ -1,4 +1,3 @@
-using AutoMapper;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Users;
@@ -6,13 +5,13 @@ using Microsoft.Extensions.Logging;
 
 namespace CleanArch.Application.Users.EventHandlers;
 
-public class UserRegisteredDomainEventHandler(
-    ILogger<UserRegisteredDomainEventHandler> logger,
+public class UserCreatedDomainEventHandler(
+    ILogger<UserCreatedDomainEventHandler> logger,
     ITelemetryService telemetryService,
     IMapper mapper
-) : INotificationHandler<UserRegisteredDomainEvent>
+) : INotificationHandler<UserCreatedDomainEvent>
 {
-    public Task Handle(UserRegisteredDomainEvent notification, CancellationToken cancellationToken)
+    public Task Handle(UserCreatedDomainEvent notification, CancellationToken cancellationToken)
     {
         var user = notification.User;
 

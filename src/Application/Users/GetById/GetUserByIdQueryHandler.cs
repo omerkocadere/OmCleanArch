@@ -1,14 +1,15 @@
 ﻿using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Users.GetById;
 
-public sealed record GetUserByIdQuery(int UserId) : IRequest<Result<UserDto>>;
+public sealed record GetUserByIdQuery(int UserId) : IQuery<UserDto>;
 
 internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context)
-    : IRequestHandler<GetUserByIdQuery, Result<UserDto>>
+    : IQueryHandler<GetUserByIdQuery, UserDto>
 {
     public async Task<Result<UserDto>> Handle(
         GetUserByIdQuery query,
