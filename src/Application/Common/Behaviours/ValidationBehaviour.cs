@@ -6,7 +6,7 @@ namespace CleanArch.Application.Common.Behaviours;
 
 public class ValidationBehaviour<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : notnull
+    where TRequest : IRequest<TResponse>
     where TResponse : IOperationResult
 {
     public async Task<TResponse> Handle(
@@ -38,13 +38,15 @@ public class ValidationBehaviour<TRequest, TResponse>(IEnumerable<IValidator<TRe
 
         var context = new ValidationContext<TRequest>(request);
 
-        var validationResults = await Task.WhenAll(
+        ValidationResult[] validationResults = await Task.WhenAll(
             validators.Select(v => v.ValidateAsync(context))
         );
 
         List<ValidationFailure> validationFailures =
         [
-            .. validationResults.Where(r => r.Errors.Count != 0).SelectMany(r => r.Errors),
+            .. validationResults
+                .Where(validationResult => !validationResult.IsValid)
+                .SelectMany(validationResult => validationResult.Errors),
         ];
 
         return validationFailures;

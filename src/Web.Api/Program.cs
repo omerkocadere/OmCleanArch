@@ -23,7 +23,10 @@ builder.AddServiceDefaults();
 
 // builder.Logging.AddOpenTelemetryLogging(builder.Configuration);
 
-builder.Services.AddApplicationServices().AddInfrastructureServices(builder.Environment, builder.Configuration).AddWebServices();
+builder
+    .Services.AddApplicationServices()
+    .AddInfrastructureServices(builder.Environment, builder.Configuration)
+    .AddWebServices();
 
 var app = builder.Build();
 
@@ -36,7 +39,10 @@ await app.InitialiseDatabaseAsync();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Docker"))
 {
-    app.UseHangfireDashboard("/hangfire", new DashboardOptions { Authorization = [new NoAuthorizationFilter()] });
+    app.UseHangfireDashboard(
+        "/hangfire",
+        new DashboardOptions { Authorization = [new NoAuthorizationFilter()] }
+    );
     app.UseSwaggerWithUi();
 }
 else

@@ -7,10 +7,10 @@ public class WeatherForecasts : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
-        app.MapGroup(this).MapGet(GetWeatherForecasts);
+        app.MapGroup(this).MapGet(GetWeatherForecasts, "{id:int}");
     }
 
-    public async Task<IResult> GetWeatherForecasts(ISender sender)
+    public async Task<IResult> GetWeatherForecasts(ISender sender, int id)
     {
         var result = await sender.Send(new GetWeatherForecastsQuery());
 

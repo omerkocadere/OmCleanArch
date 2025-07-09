@@ -16,11 +16,11 @@ public class TodoItems : EndpointGroupBase
     {
         app.MapGroup(this)
             .MapGet(GetTodoItemsWithPagination)
-            .MapGet(GetTodoItemById, "{id}")
+            .MapGet(GetTodoItemById, "{id:int}")
             .MapPost(CreateTodoItem)
-            .MapPut(UpdateTodoItem, "{id}")
-            .MapPut(UpdateTodoItemDetail, "UpdateDetail/{id}")
-            .MapDelete(DeleteTodoItem, "{id}");
+            .MapPut(UpdateTodoItem, "{id:int}")
+            .MapPut(UpdateTodoItemDetail, "UpdateDetail/{id:int}")
+            .MapDelete(DeleteTodoItem, "{id:int}");
     }
 
     public async Task<IResult> GetTodoItemsWithPagination(

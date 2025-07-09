@@ -14,10 +14,13 @@ public sealed record CreateUserCommand : ICommand<UserDto>
     public required string Password { get; set; }
 }
 
-public class CreateUserCommandHandler(IApplicationDbContext context, IMapper mapper)
+public class CreateUser(IApplicationDbContext context, IMapper mapper)
     : ICommandHandler<CreateUserCommand, UserDto>
 {
-    public async Task<Result<UserDto>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<UserDto>> Handle(
+        CreateUserCommand request,
+        CancellationToken cancellationToken
+    )
     {
         var user = mapper.Map<User>(request);
         user.PasswordHash = HashPassword(request.Password);
