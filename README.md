@@ -11,17 +11,20 @@ dotnet ef migrations add InitialCreate --project src/Infrastructure --startup-pr
 
 ---
 
-# Database Migration Steps
+## Install Aspire CLI
 
-1. To add a migration:
+To use Aspire orchestration and dashboard features, install the Aspire CLI tool globally:
 
-   ```sh
-   dotnet ef migrations add InitialCreate --project src/Infrastructure --startup-project src/Web.Api --output-dir Data/Migrations
-   ```
+```sh
+ dotnet tool install -g aspire.cli --prerelease
+ aspire publish -o infra
+ cd infra
+ docker compose up -d
+```
 
-2. To apply the migration to the database:
-   ```sh
-   dotnet ef database update --project src/Infrastructure --startup-project src/Web.Api
-   ```
 
-> Note: Migrations are kept in the Infrastructure layer, and the application's entry point is the Web.Api project.
+
+docker cp infra-web-api-1:/app ./local-directory
+
+
+For more info: https://learn.microsoft.com/en-us/dotnet/aspire/get-started/aspire-cli

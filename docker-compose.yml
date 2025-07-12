@@ -13,7 +13,7 @@ services:
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic MTMwODc0OTpnbGNfZXlKdklqb2lNVFEzTmpBM05TSXNJbTRpT2lKemRHRmpheTB4TXpBNE56UTVMVzkwYkhBdGQzSnBkR1V0YjIxamJHVmhibUZ5WTJndGRHOXJaVzRpTENKcklqb2lPVEJNUVRKUE5XWkdORXBwZFRGbGRtSTVPWHBPUWpjNElpd2liU0k2ZXlKeUlqb2ljSEp2WkMxbGRTMWpaVzUwY21Gc0xUQWlmWDA9
     depends_on:
-      - postgres
+      - om-postgres
 
   seq:
     image: datalust/seq:latest
@@ -26,7 +26,7 @@ services:
     volumes:
       - ./seq-data:/data
 
-  postgres:
+  om-postgres:
     image: postgres:latest
     environment:
       POSTGRES_PASSWORD: postgrespw

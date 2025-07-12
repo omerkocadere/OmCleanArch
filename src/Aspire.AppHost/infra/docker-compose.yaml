@@ -1,0 +1,51 @@
+services:
+  om-postgres:
+    image: "docker.io/library/postgres:17.4"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+      POSTGRES_USER: "${POSTGRES_USERNAME}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    ports:
+      - "5432:5432"
+    volumes:
+      - type: "bind"
+        target: "/var/lib/postgresql/data"
+        source: "D:\\Codes\\Omer\\CleanArchitecture\\OmCleanArch\\.containers\\db"
+        read_only: false
+    networks:
+      - "aspire"
+  web-api:
+    image: "${WEB_API_IMAGE}"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8000"
+      ConnectionStrings__omcleanarch: "Host=om-postgres;Port=5432;Username=${POSTGRES_USERNAME};Password=${POSTGRES_PASSWORD};Database=omcleanarch"
+    ports:
+      - "8001:8000"
+      - "8003:8002"
+    depends_on:
+      om-postgres:
+        condition: "service_started"
+    networks:
+      - "aspire"
+  dummy-api:
+    image: "${DUMMY_API_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8004"
+    ports:
+      - "8005:8004"
+      - "8007:8006"
+    networks:
+      - "aspire"
+networks:
+  aspire:
+    driver: "bridge"
