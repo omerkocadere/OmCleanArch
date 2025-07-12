@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using CleanArch.Application.Common.Interfaces;
+using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Products;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
@@ -17,7 +18,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<TodoItem> TodoItems => Set<TodoItem>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Product> Products => Set<Product>();
-
+    public DbSet<Auction> Auctions => Set<Auction>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
