@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
+    <PackageReference Include="Aspire.Seq" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Aspire.ServiceDefaults\Aspire.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

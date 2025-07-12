@@ -13,6 +13,7 @@ EnvironmentInspector.LoadAndPrintAll();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.AddSeqEndpoint("om-seq");
 
 // builder.Host.UseSerilog(
 //     (context, loggerConfig) =>
@@ -39,10 +40,7 @@ await app.InitialiseDatabaseAsync();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Docker"))
 {
-    app.UseHangfireDashboard(
-        "/hangfire",
-        new DashboardOptions { Authorization = [new NoAuthorizationFilter()] }
-    );
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions { Authorization = [new NoAuthorizationFilter()] });
     app.UseSwaggerWithUi();
 }
 else
