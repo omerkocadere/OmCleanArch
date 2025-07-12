@@ -14,4 +14,7 @@ IResourceBuilder<PostgresDatabaseResource> database = builder
 // API projenize referans verin
 builder.AddProject<Projects.Web_Api>("web-api").WithReference(database).WaitFor(database);
 
+// Dummy API projesini ekleyin
+builder.AddProject<Projects.Dummy_Api>("dummy-api");
+
 builder.Build().Run();
