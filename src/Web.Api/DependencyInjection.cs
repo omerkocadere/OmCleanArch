@@ -1,4 +1,5 @@
 ﻿using CleanArch.Infrastructure.Data;
+using CleanArch.Web.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArch.Web.Api;
@@ -16,14 +17,19 @@ public static class DependencyInjection
         services.AddProblemDetails();
 
         // Customise default API behaviour
-        services.Configure<ApiBehaviorOptions>(options =>
-            options.SuppressModelStateInvalidFilter = true
-        );
+        services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 
         // Registers services required for minimal API endpoint discovery and Swagger/OpenAPI documentation generation.
         services.AddEndpointsApiExplorer();
 
         // This service relies on the metadata collected by AddEndpointsApiExplorer() to build a comprehensive OpenAPI (Swagger) specification document,
         services.AddOpenApiDocument();
+
+        // Add typed HttpClient for Dummy API
+        services.AddHttpClient<DummyApiClient>(client =>
+        {
+            client.BaseAddress = new Uri("http://localhost:7702");
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
     }
 }

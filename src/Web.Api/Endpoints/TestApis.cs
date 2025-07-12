@@ -2,14 +2,18 @@
 using CleanArch.Application.WeatherForecasts.GetWeatherForecasts;
 using CleanArch.Domain.Common;
 using CleanArch.Web.Api.Extensions;
+using CleanArch.Web.Api.Services;
 
 namespace CleanArch.Web.Api.Endpoints;
 
-public class WeatherForecasts : EndpointGroupBase
+public class TestApis : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
-        app.MapGroup(this).MapGet(GetWeatherForecasts, "{id:int}").MapPost(CreateEmail, "create-email");
+        app.MapGroup(this)
+            .MapGet(GetWeatherForecasts, "{id:int}")
+            .MapPost(CreateEmail, "create-email")
+            .MapGet(GetDummyMessage, "dummy-message");
     }
 
     public async Task<IResult> GetWeatherForecasts(ISender sender, int id)
@@ -22,6 +26,12 @@ public class WeatherForecasts : EndpointGroupBase
     public IResult CreateEmail(ISender sender, string email)
     {
         var result = Email.Create(email);
+        return result.Match(Results.Ok, CustomResults.Problem);
+    }
+
+    public async Task<IResult> GetDummyMessage(DummyApiClient dummyApiClient)
+    {
+        var result = await dummyApiClient.GetHelloMessageAsync();
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 }
