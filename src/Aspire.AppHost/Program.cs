@@ -7,9 +7,9 @@ var postgresUserName = builder.AddParameter("postgres-username", "postgres", sec
 
 // PostgreSQL container'ını oluşturun ve veritabanını ekleyin
 IResourceBuilder<PostgresDatabaseResource> database = builder
-    .AddPostgres("database", userName: postgresUserName, password: postgresPassword, port: 5432)
+    .AddPostgres("om-postgres", userName: postgresUserName, password: postgresPassword, port: 5432)
     .WithBindMount("../../.containers/db", "/var/lib/postgresql/data")
-    .AddDatabase("OmCleanArch");
+    .AddDatabase("omcleanarch");
 
 // API projenize referans verin
 builder.AddProject<Projects.Web_Api>("web-api").WithReference(database).WaitFor(database);
