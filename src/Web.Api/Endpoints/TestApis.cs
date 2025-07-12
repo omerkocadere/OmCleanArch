@@ -1,8 +1,10 @@
 ﻿using CleanArch.Application.Common.Models;
 using CleanArch.Application.WeatherForecasts.GetWeatherForecasts;
 using CleanArch.Domain.Common;
+using CleanArch.Infrastructure.Data;
 using CleanArch.Web.Api.Extensions;
 using CleanArch.Web.Api.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Web.Api.Endpoints;
 
@@ -29,8 +31,9 @@ public class TestApis : EndpointGroupBase
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    public async Task<IResult> GetDummyMessage(DummyApiClient dummyApiClient)
+    public async Task<IResult> GetDummyMessage(ApplicationDbContext context, DummyApiClient dummyApiClient)
     {
+        await context.Users.ToListAsync();
         var result = await dummyApiClient.GetHelloMessageAsync();
         return result.Match(Results.Ok, CustomResults.Problem);
     }
