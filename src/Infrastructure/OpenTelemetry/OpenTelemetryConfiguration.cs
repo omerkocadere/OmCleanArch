@@ -6,6 +6,7 @@ using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 namespace CleanArch.Infrastructure.OpenTelemetry;
@@ -23,6 +24,10 @@ public static class OpenTelemetryConfiguration
 
         builder
             .Services.AddOpenTelemetry()
+            .ConfigureResource(cfg =>
+            {
+                cfg.AddService(builder.Environment.ApplicationName);
+            })
             .WithMetrics(metrics =>
             {
                 metrics

@@ -6,7 +6,7 @@ namespace CleanArch.Web.Api;
 
 public static class DependencyInjection
 {
-    public static void AddWebServices(this IServiceCollection services)
+    public static void AddWebServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>();
 
@@ -26,10 +26,16 @@ public static class DependencyInjection
         services.AddOpenApiDocument();
 
         // Add typed HttpClient for Dummy API
-        services.AddHttpClient<DummyApiClient>(client =>
-        {
-            client.BaseAddress = new Uri("http://localhost:7702");
-            client.Timeout = TimeSpan.FromSeconds(30);
-        });
+        services.AddHttpClient<DummyApiClient>(
+            (serviceProvider, client) =>
+            {
+                var baseUrl = configuration["ApiClients:DummyApiBaseUrl"];
+                if (string.IsNullOrWhiteSpace(baseUrl))
+                    throw new InvalidOperationException("ApiClients:DummyApiBaseUrl config is missing!");
+
+                client.BaseAddress = new Uri(baseUrl);
+                client.Timeout = TimeSpan.FromSeconds(30);
+            }
+        );
     }
 }

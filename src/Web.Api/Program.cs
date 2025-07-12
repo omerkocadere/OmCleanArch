@@ -27,7 +27,7 @@ builder.AddSeqEndpoint("om-seq");
 builder
     .Services.AddApplicationServices()
     .AddInfrastructureServices(builder.Environment, builder.Configuration)
-    .AddWebServices();
+    .AddWebServices(builder.Configuration);
 
 var app = builder.Build();
 
