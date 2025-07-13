@@ -6,7 +6,7 @@ using CleanArch.Domain.Auctions;
 
 namespace CleanArch.Application.Auctions.GetAuctionById;
 
-public sealed record GetAuctionByIdQuery(Guid AuctionId) : IQuery<AuctionDto>;
+public sealed record GetAuctionByIdQuery(int AuctionId) : IQuery<AuctionDto>;
 
 public class GetAuctionByIdQueryHandler(IApplicationDbContext context, IMapper mapper)
     : IQueryHandler<GetAuctionByIdQuery, AuctionDto>

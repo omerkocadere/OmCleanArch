@@ -27,7 +27,7 @@ public class Auctions : EndpointGroupBase
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    public async Task<IResult> GetAuctionById(ISender sender, Guid id)
+    public async Task<IResult> GetAuctionById(ISender sender, int id)
     {
         var result = await sender.Send(new GetAuctionByIdQuery(id));
         return result.Match(Results.Ok, CustomResults.Problem);
@@ -43,7 +43,7 @@ public class Auctions : EndpointGroupBase
         );
     }
 
-    public async Task<IResult> UpdateAuction(ISender sender, Guid id, UpdateAuctionCommand command)
+    public async Task<IResult> UpdateAuction(ISender sender, int id, UpdateAuctionCommand command)
     {
         if (id != command.Id)
             return TypedResults.BadRequest("Id mismatch between route and body");
@@ -53,7 +53,7 @@ public class Auctions : EndpointGroupBase
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    public async Task<IResult> DeleteAuction(ISender sender, Guid id)
+    public async Task<IResult> DeleteAuction(ISender sender, int id)
     {
         Result result = await sender.Send(new DeleteAuctionCommand(id));
         return result.Match(Results.NoContent, CustomResults.Problem);

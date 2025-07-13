@@ -5,7 +5,7 @@ using CleanArch.Domain.Auctions;
 
 namespace CleanArch.Application.Auctions.DeleteAuction;
 
-public record DeleteAuctionCommand(Guid Id) : ICommand;
+public record DeleteAuctionCommand(int Id) : ICommand;
 
 public class DeleteAuctionCommandHandler(IApplicationDbContext context) : ICommandHandler<DeleteAuctionCommand>
 {

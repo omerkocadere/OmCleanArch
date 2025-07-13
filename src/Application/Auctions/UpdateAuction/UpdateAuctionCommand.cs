@@ -8,7 +8,7 @@ namespace CleanArch.Application.Auctions.UpdateAuction;
 
 public record UpdateAuctionCommand : IQuery<AuctionDto>
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public string? Make { get; init; }
     public string? Model { get; init; }
     public int? Year { get; init; }
@@ -38,7 +38,6 @@ public class UpdateAuctionCommandHandler(IApplicationDbContext context, IMapper 
         auction.Item.Year = request.Year ?? auction.Item.Year;
         auction.Item.Color = request.Color ?? auction.Item.Color;
         auction.Item.Mileage = request.Mileage ?? auction.Item.Mileage;
-        auction.UpdatedAt = DateTime.UtcNow;
 
         await context.SaveChangesAsync(cancellationToken);
 
