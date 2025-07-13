@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Seq" />
+    <PackageReference Include="MongoDB.Entities" />
     <PackageReference Include="NSwag.AspNetCore" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
   </ItemGroup>
 
   <ItemGroup>
