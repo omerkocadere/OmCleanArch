@@ -16,7 +16,11 @@ public static class DependencyInjection
         IConfiguration configuration
     )
     {
-        return services.AddServices().AddDatabase(env, configuration).AddBackgroundJobs(configuration).AddAuthenticationInternal();
+        return services
+            .AddServices()
+            .AddDatabase(env, configuration)
+            .AddBackgroundJobs(configuration)
+            .AddAuthenticationInternal();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)

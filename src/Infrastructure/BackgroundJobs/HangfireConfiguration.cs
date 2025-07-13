@@ -22,7 +22,9 @@ public static class HangfireConfiguration
                 {
                     DbProvider.Sqlite => databaseOptions.SqliteConnectionString,
                     DbProvider.Postgres => databaseOptions.PostgresConnectionString,
-                    _ => throw new InvalidOperationException($"Unsupported database provider: {databaseOptions.Provider}"),
+                    _ => throw new InvalidOperationException(
+                        $"Unsupported database provider: {databaseOptions.Provider}"
+                    ),
                 };
 
                 switch (databaseOptions.Provider)
@@ -35,7 +37,9 @@ public static class HangfireConfiguration
                         configuration.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString));
                         break;
                     default:
-                        throw new InvalidOperationException($"Unsupported database provider: {databaseOptions.Provider}");
+                        throw new InvalidOperationException(
+                            $"Unsupported database provider: {databaseOptions.Provider}"
+                        );
                 }
             }
         );

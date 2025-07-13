@@ -43,7 +43,8 @@ public static class OpenTelemetryConfiguration
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddEntityFrameworkCoreInstrumentation()
-                    .AddNpgsql();
+                    .AddNpgsql()
+                    .AddProcessor(new HangfireTaggerProcessor());
             });
 
         builder.AddOpenTelemetryExporters(configuration);

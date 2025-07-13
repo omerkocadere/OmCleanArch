@@ -9,8 +9,7 @@ public static class BackgroundJobInitialiser
     public static void InitializeBackgroundJobs(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
-        var backgroundJobService =
-            scope.ServiceProvider.GetRequiredService<IBackgroundJobService>();
+        var backgroundJobService = scope.ServiceProvider.GetRequiredService<IBackgroundJobService>();
         backgroundJobService.ScheduleRecurringOutboxProcessing();
         backgroundJobService.ScheduleRecurringFailedMessageCleanup();
     }

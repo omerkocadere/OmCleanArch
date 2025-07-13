@@ -11,8 +11,9 @@ using Serilog;
 EnvironmentInspector.LoadAndPrintAll();
 
 var builder = WebApplication.CreateBuilder(args);
+builder.ConfigureOpenTelemetry(builder.Configuration);
 
-builder.AddServiceDefaults();
+// builder.AddServiceDefaults();
 builder.AddSeqEndpoint("om-seq");
 
 // builder.Host.UseSerilog(
