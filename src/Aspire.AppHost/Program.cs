@@ -1,4 +1,3 @@
-// Program.cs (AppHost projesi)
 var builder = DistributedApplication.CreateBuilder(args);
 
 builder.AddDockerComposeEnvironment("env");

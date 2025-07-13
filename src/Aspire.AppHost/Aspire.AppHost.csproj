@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\other-services\Dummy.Api\Dummy.Api.csproj" />
     <ProjectReference Include="..\Web.Api\Web.Api.csproj" />
-    <ProjectReference Include="..\..\dummy\Dummy.Api\Dummy.Api.csproj" />
   </ItemGroup>
 
 </Project>
