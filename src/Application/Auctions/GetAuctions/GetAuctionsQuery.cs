@@ -16,7 +16,7 @@ public class GetAuctionsQueryHandler(IApplicationDbContext context, IMapper mapp
 
         if (request.Date.HasValue)
         {
-            query = query.Where(x => x.UpdatedAt > request.Date.Value.ToUniversalTime());
+            query = query.Where(x => x.LastModified > request.Date.Value.ToUniversalTime());
         }
 
         var auctionDtos = await query
