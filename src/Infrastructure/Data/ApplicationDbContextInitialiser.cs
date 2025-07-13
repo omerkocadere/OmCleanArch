@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using CleanArch.Domain.Auctions;
-using CleanArch.Domain.Items;
 using CleanArch.Domain.Products;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
@@ -67,6 +66,8 @@ public static class ApplicationDbContextInitialiser
     {
         var baseDir = AppContext.BaseDirectory;
         var seedDir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "Infrastructure", "Data", "Seed"));
+        logger.LogInformation("[Seed] baseDir: {BaseDir}", baseDir);
+        logger.LogInformation("[Seed] seedDir: {SeedDir}", seedDir);
         var usersJsonPath = Path.Combine(seedDir, "users.json");
         var listsJsonPath = Path.Combine(seedDir, "todolists.json");
         var productsJsonPath = Path.Combine(seedDir, "products.json");

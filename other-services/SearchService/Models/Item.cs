@@ -1,8 +1,9 @@
-namespace CleanArch.Application.Auctions.DTOs;
+using MongoDB.Entities;
 
-public class AuctionDto
+namespace SearchService.Models;
+
+public class Item : Entity
 {
-    public int Id { get; set; }
     public int ReservePrice { get; set; }
     public required string Seller { get; set; }
     public string? Winner { get; set; }
