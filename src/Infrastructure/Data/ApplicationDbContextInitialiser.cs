@@ -1,4 +1,7 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using CleanArch.Domain.Auctions;
+using CleanArch.Domain.Items;
 using CleanArch.Domain.Products;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
@@ -16,7 +19,9 @@ public static class InitialiserExtensions
     {
         using var scope = app.Services.CreateScope();
 
-        var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(ApplicationDbContextInitialiser));
+        var logger = scope
+            .ServiceProvider.GetRequiredService<ILoggerFactory>()
+            .CreateLogger(nameof(ApplicationDbContextInitialiser));
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         await ApplicationDbContextInitialiser.InitialiseAsync(context, logger);
@@ -29,7 +34,7 @@ public static class ApplicationDbContextInitialiser
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
-        Converters = { new ColourJsonConverter() },
+        Converters = { new ColourJsonConverter(), new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
     };
 
     public static async Task InitialiseAsync(ApplicationDbContext context, ILogger logger)
@@ -65,6 +70,7 @@ public static class ApplicationDbContextInitialiser
         var usersJsonPath = Path.Combine(seedDir, "users.json");
         var listsJsonPath = Path.Combine(seedDir, "todolists.json");
         var productsJsonPath = Path.Combine(seedDir, "products.json");
+        var auctionsJsonPath = Path.Combine(seedDir, "auctions.json");
 
         if (!context.Users.Any())
         {
@@ -121,6 +127,22 @@ public static class ApplicationDbContextInitialiser
             context.Products.AddRange(products);
             await context.SaveChangesAsync();
             logger.LogInformation("Seeded {ProductCount} products.", products.Count);
+        }
+
+        if (!context.Auctions.Any() && File.Exists(auctionsJsonPath))
+        {
+            logger.LogInformation("Seeding auctions from {Path}", auctionsJsonPath);
+            var auctionsJson = await File.ReadAllTextAsync(auctionsJsonPath);
+            var auctions = JsonSerializer.Deserialize<List<Auction>>(auctionsJson, _jsonOptions);
+            if (auctions is null || auctions.Count == 0)
+            {
+                logger.LogWarning("No data found in auctions.json");
+                return;
+            }
+
+            context.Auctions.AddRange(auctions);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Seeded {AuctionCount} auctions.", auctions.Count);
         }
     }
 }

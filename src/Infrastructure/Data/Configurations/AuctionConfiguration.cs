@@ -17,7 +17,7 @@ public class AuctionConfiguration : IEntityTypeConfiguration<Auction>
         // builder.Property(x => x.UpdatedAt).IsRequired();
         // builder.Property(x => x.AuctionEnd).IsRequired();
 
-        // // Navigation properties
+        // Navigation properties
         // builder
         //     .HasOne(x => x.Item)
         //     .WithOne(x => x.Auction)

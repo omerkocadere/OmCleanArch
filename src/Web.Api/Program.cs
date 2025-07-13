@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.ConfigureOpenTelemetry(builder.Configuration);
 
 // builder.AddServiceDefaults();
-builder.AddSeqEndpoint("om-seq");
+ builder.AddSeqEndpoint("om-seq");
 
 // builder.Host.UseSerilog(
 //     (context, loggerConfig) =>
