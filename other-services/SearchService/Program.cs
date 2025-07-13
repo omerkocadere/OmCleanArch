@@ -20,6 +20,7 @@ app.UseHttpsRedirection();
 
 // Map endpoints
 app.MapWeatherForecastEndpoints();
+app.MapSearchEndpoints();
 await app.InitDb();
 
 app.Run();

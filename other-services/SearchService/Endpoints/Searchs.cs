@@ -11,10 +11,10 @@ public static class Searchs
 {
     public static void MapSearchEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("", SearchItemsAsync).WithTags("Search");
+        endpoints.MapGet("api/search", SearchItemsAsync).WithTags("Search");
     }
 
-    private static async Task<IResult> SearchItemsAsync(SearchParams searchParams)
+    private static async Task<IResult> SearchItemsAsync([AsParameters] SearchParams searchParams)
     {
         var query = DB.PagedSearch<Item, Item>();
 
@@ -49,8 +49,8 @@ public static class Searchs
             query.Match(x => x.Winner == searchParams.Winner);
         }
 
-        query.PageNumber(searchParams.PageNumber);
-        query.PageSize(searchParams.PageSize);
+        query.PageNumber(searchParams.PageNumber ?? 1);
+        query.PageSize(searchParams.PageSize ?? 4);
 
         var result = await query.ExecuteAsync();
 
