@@ -8,7 +8,7 @@ public static class WeatherForecasts
 
     public static void MapWeatherForecastEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("", GetWeatherForecast).WithTags("WeatherForecast");
+        endpoints.MapGet("/weatherforecast", GetWeatherForecast).WithTags("WeatherForecast");
     }
 
     private static WeatherForecast[] GetWeatherForecast()
