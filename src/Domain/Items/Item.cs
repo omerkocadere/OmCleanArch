@@ -4,9 +4,8 @@ using CleanArch.Domain.Auctions;
 namespace CleanArch.Domain.Items;
 
 [Table("Items")]
-public class Item
+public class Item : BaseEntity
 {
-    public Guid Id { get; set; }
     public required string Make { get; set; }
     public required string Model { get; set; }
     public int Year { get; set; }
@@ -16,5 +15,5 @@ public class Item
 
     // navigation properties
     public Auction Auction { get; set; } = null!;
-    public Guid AuctionId { get; set; }
+    public int AuctionId { get; set; }
 }

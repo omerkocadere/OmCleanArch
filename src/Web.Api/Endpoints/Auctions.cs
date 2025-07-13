@@ -15,10 +15,10 @@ public class Auctions : EndpointGroupBase
     {
         app.MapGroup(this)
             .MapGet(GetAuctions)
-            .MapGet(GetAuctionById, "{id:guid}")
+            .MapGet(GetAuctionById, "{id:int}")
             .MapPost(CreateAuction)
-            .MapPut(UpdateAuction, "{id:guid}")
-            .MapDelete(DeleteAuction, "{id:guid}");
+            .MapPut(UpdateAuction, "{id:int}")
+            .MapDelete(DeleteAuction, "{id:int}");
     }
 
     public async Task<IResult> GetAuctions(ISender sender, DateTime? date = null)
