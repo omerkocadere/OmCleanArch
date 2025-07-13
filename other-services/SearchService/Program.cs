@@ -1,3 +1,4 @@
+using SearchService.Data;
 using SearchService.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,5 +20,6 @@ app.UseHttpsRedirection();
 
 // Map endpoints
 app.MapWeatherForecastEndpoints();
+await app.InitDb();
 
 app.Run();

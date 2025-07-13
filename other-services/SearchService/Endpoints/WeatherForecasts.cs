@@ -2,13 +2,13 @@ using SearchService.Models;
 
 namespace SearchService.Endpoints;
 
-public static class WeatherForecastEndpoints
+public static class WeatherForecasts
 {
     private static readonly string[] Summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Hot"];
 
     public static void MapWeatherForecastEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/weatherforecast", GetWeatherForecast).WithTags("WeatherForecast");
+        endpoints.MapGet("", GetWeatherForecast).WithTags("WeatherForecast");
     }
 
     private static WeatherForecast[] GetWeatherForecast()
