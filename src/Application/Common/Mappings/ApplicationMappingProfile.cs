@@ -1,3 +1,4 @@
+using CleanArch.Application.Auctions.CreateAuction;
 using CleanArch.Application.Auctions.DTOs;
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.TodoItems.CreateTodoItem;
@@ -42,10 +43,12 @@ public class ApplicationMappingProfile : Profile
 
         #region Auctions
 
-        CreateMap<Auction, AuctionDto>().IncludeMembers(x => x.Item);
+        CreateMap<Auction, AuctionDto>()
+            .IncludeMembers(x => x.Item)
+            .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()));
         CreateMap<Item, AuctionDto>();
-        CreateMap<CreateAuctionDto, Auction>().ForMember(dest => dest.Item, opt => opt.MapFrom(src => src));
-        CreateMap<CreateAuctionDto, Item>();
+        CreateMap<CreateAuctionCommand, Auction>().ForMember(dest => dest.Item, opt => opt.MapFrom(src => src));
+        CreateMap<CreateAuctionCommand, Item>();
 
         #endregion
     }

@@ -141,3 +141,65 @@ DELETE {{Web_HostAddress}}/api/TodoItems/1
 Authorization: Bearer {{BearerToken}}
 
 ###
+
+# GET Auctions
+GET {{Web_HostAddress}}/api/Auctions
+Authorization: Bearer {{BearerToken}}
+
+###
+
+# GET Auctions with date filter
+@FilterDate = 2024-01-01T00:00:00Z
+GET {{Web_HostAddress}}/api/Auctions?date={{FilterDate}}
+Authorization: Bearer {{BearerToken}}
+
+###
+
+# GET Auction by Id
+@AuctionId = 00000000-0000-0000-0000-000000000000
+GET {{Web_HostAddress}}/api/Auctions/{{AuctionId}}
+Authorization: Bearer {{BearerToken}}
+
+###
+
+# POST Create Auction
+POST {{Web_HostAddress}}/api/Auctions
+Authorization: Bearer {{BearerToken}}
+Content-Type: application/json
+
+// CreateAuctionCommand
+{
+  "make": "Ford",
+  "model": "Mustang",
+  "year": 2020,
+  "color": "Red",
+  "mileage": 15000,
+  "imageUrl": "https://example.com/mustang.jpg",
+  "reservePrice": 25000,
+  "auctionEnd": "2024-12-31T23:59:59Z"
+}
+
+###
+
+# PUT Update Auction
+PUT {{Web_HostAddress}}/api/Auctions/{{AuctionId}}
+Authorization: Bearer {{BearerToken}}
+Content-Type: application/json
+
+// UpdateAuctionCommand
+{
+  "id": "{{AuctionId}}",
+  "make": "Ford",
+  "model": "Mustang GT",
+  "year": 2021,
+  "color": "Blue",
+  "mileage": 12000
+}
+
+###
+
+# DELETE Auction
+DELETE {{Web_HostAddress}}/api/Auctions/{{AuctionId}}
+Authorization: Bearer {{BearerToken}}
+
+###
