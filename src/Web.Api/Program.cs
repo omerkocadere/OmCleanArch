@@ -61,8 +61,6 @@ else
     app.UseHsts();
 }
 
-app.MapHealthChecks("/health");
-
 app.UseHttpsRedirection();
 
 app.UseRequestContextLogging();

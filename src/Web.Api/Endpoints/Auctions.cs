@@ -45,8 +45,7 @@ public class Auctions : EndpointGroupBase
 
     public async Task<IResult> UpdateAuction(ISender sender, int id, UpdateAuctionCommand command)
     {
-        if (id != command.Id)
-            return TypedResults.BadRequest("Id mismatch between route and body");
+        command = command with { Id = id }; // Set the Id for the command
 
         Result<AuctionDto> result = await sender.Send(command);
 
