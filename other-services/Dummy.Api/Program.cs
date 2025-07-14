@@ -1,9 +1,13 @@
+using DotNetEnv;
 using Dummy.Api;
 using Dummy.Api.Data;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+
 // builder.AddSeqEndpoint("om-seq");
 
 builder.Services.AddEndpointsApiExplorer();
