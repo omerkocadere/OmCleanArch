@@ -3,7 +3,7 @@ using Dummy.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// builder.AddServiceDefaults();
+builder.AddServiceDefaults();
 // builder.AddSeqEndpoint("om-seq");
 
 builder.Services.AddEndpointsApiExplorer();

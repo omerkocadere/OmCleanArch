@@ -6,7 +6,7 @@
     <EfcoreVersion>9.0.6</EfcoreVersion>
     <MicrosoftExtensionsVersion>9.0.6</MicrosoftExtensionsVersion>
     <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
-    <AspireVersion>1.12.0</AspireVersion>
+    <AspireVersion>9.3.1</AspireVersion>
   </PropertyGroup>
   <ItemGroup>
     <!-- Application -->
@@ -52,7 +52,7 @@
     <!--Aspire ServiceDefaults-->
 
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.6.0" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="$(AspireVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="$(AspireVersion)"  />
     <PackageVersion Include="Npgsql.OpenTelemetry" Version="9.0.3" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />

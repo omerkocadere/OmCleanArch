@@ -15,7 +15,8 @@ public class TestApis : EndpointGroupBase
         app.MapGroup(this)
             .MapGet(GetWeatherForecasts, "{id:int}")
             .MapPost(CreateEmail, "create-email")
-            .MapGet(GetDummyMessage, "dummy-message");
+            .MapGet(GetDummyMessage, "dummy-message")
+            .MapGet(GetToDoItemsFromDummyApi, "todo-items");
     }
 
     public async Task<IResult> GetWeatherForecasts(ISender sender, int id)
@@ -35,6 +36,12 @@ public class TestApis : EndpointGroupBase
     {
         await context.Users.ToListAsync();
         var result = await dummyApiClient.GetHelloMessageAsync();
+        return result.Match(Results.Ok, CustomResults.Problem);
+    }
+
+    public async Task<IResult> GetToDoItemsFromDummyApi(ApplicationDbContext context, DummyApiClient dummyApiClient)
+    {
+        var result = await dummyApiClient.GetToDoItemsAsync();
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 }
