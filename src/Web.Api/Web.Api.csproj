@@ -8,7 +8,9 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Seq" />
+    <PackageReference Include="Bogus" />
     <PackageReference Include="DotNetEnv" />
+    <PackageReference Include="Handlebars.Net" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
       <PrivateAssets>all</PrivateAssets>
@@ -16,6 +18,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
     <PackageReference Include="NSwag.AspNetCore" />
+    <PackageReference Include="PuppeteerSharp" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Enrichers.Environment" />
     <PackageReference Include="Serilog.Enrichers.Span" />

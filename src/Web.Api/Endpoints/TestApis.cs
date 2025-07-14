@@ -22,7 +22,6 @@ public class TestApis : EndpointGroupBase
     public async Task<IResult> GetWeatherForecasts(ISender sender, int id)
     {
         var result = await sender.Send(new GetWeatherForecastsQuery());
-
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 

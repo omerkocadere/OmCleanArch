@@ -6,7 +6,7 @@ namespace CleanArch.Web.Api;
 
 public static class DependencyInjection
 {
-    public static void AddWebServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddWebServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>();
 
@@ -37,5 +37,7 @@ public static class DependencyInjection
                 client.Timeout = TimeSpan.FromSeconds(30);
             }
         );
+
+        return services;
     }
 }

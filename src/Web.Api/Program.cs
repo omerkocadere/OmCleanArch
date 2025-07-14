@@ -4,6 +4,7 @@ using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.OpenTelemetry;
 using CleanArch.Web.Api;
+using CleanArch.Web.Api.EndpointsPlay;
 using CleanArch.Web.Api.Extensions;
 using Hangfire;
 using Serilog;
@@ -28,7 +29,8 @@ builder.AddSeqEndpoint("om-seq");
 builder
     .Services.AddApplicationServices()
     .AddInfrastructureServices(builder.Environment, builder.Configuration)
-    .AddWebServices(builder.Configuration);
+    .AddWebServices(builder.Configuration)
+    .AddPlayServices(builder.Configuration);
 
 var app = builder.Build();
 
