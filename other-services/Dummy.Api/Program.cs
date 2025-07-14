@@ -1,24 +1,28 @@
+using Dummy.Api;
+using Dummy.Api.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
-builder.AddSeqEndpoint("om-seq");
+// builder.AddServiceDefaults();
+// builder.AddSeqEndpoint("om-seq");
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApiDocument();
+builder.Services.AddDatabase(builder.Environment, builder.Configuration);
 
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
+// app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseOpenApi();
+    app.UseSwaggerUi();
 }
 
 app.UseHttpsRedirection();
 
-app.MapGet("/hellofromdummy", () => "Hello, world from Dummy API!");
+app.MapDummyEndpoints();
 
 app.Run();

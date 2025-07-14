@@ -2,8 +2,7 @@
 
 namespace CleanArch.Web.Api.Common;
 
-public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IWebHostEnvironment env)
-    : IExceptionHandler
+public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IWebHostEnvironment env) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
@@ -30,9 +29,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IWeb
             (int?)exceptionType.GetProperty("StatusCode")?.GetValue(exception)
             ?? StatusCodes.Status500InternalServerError;
 
-        var title =
-            exceptionType.GetProperty("Title")?.GetValue(exception)?.ToString()
-            ?? exception.Message;
+        var title = exceptionType.GetProperty("Title")?.GetValue(exception)?.ToString() ?? exception.Message;
 
         var problemDetails = Results.Problem(
             title: title,
