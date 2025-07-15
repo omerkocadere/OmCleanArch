@@ -76,7 +76,9 @@ public static class OpenTelemetryConfiguration
         }
         else
         {
-            throw new InvalidOperationException("No OTLP endpoint configuration found.");
+            var loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
+            var logger = loggerFactory?.CreateLogger("OpenTelemetryConfiguration");
+            logger?.LogError("No OTLP endpoint configuration found.");
         }
 
         return builder;

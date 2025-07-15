@@ -26,6 +26,7 @@ public class Pdfs : EndpointGroupBase
             "Views",
             "InvoiceReport.hbs"
         );
+
         var templateContent = await File.ReadAllTextAsync(templatePath);
 
         var template = Handlebars.Compile(templateContent);

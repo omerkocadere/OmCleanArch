@@ -19,7 +19,7 @@ public static class DependencyInjection
         return services
             .AddServices()
             .AddDatabase(env, configuration)
-            .AddBackgroundJobs(configuration)
+            // .AddBackgroundJobs(configuration)
             .AddAuthenticationInternal();
     }
 

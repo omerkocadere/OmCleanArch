@@ -4,6 +4,13 @@
     <RootNamespace>CleanArch.Infrastructure</RootNamespace>
     <AssemblyName>CleanArch.Infrastructure</AssemblyName>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <Content Include="Data\Seed\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
     <PackageReference Include="Hangfire.AspNetCore" />

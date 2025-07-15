@@ -14,6 +14,7 @@ IResourceBuilder<PostgresDatabaseResource> database = builder
 
 builder
     .AddProject<Projects.Web_Api>("web-api")
+    // .PublishAsDockerFile()
     .WithReference(database)
     .WaitFor(database)
     .WithReference(seq)

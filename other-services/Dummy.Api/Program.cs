@@ -1,10 +1,12 @@
+using System.Collections;
 using DotNetEnv;
 using Dummy.Api;
 using Dummy.Api.Data;
 
-Env.Load();
+LoadAndPrintAll();
 
 var builder = WebApplication.CreateBuilder(args);
+Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
 
 builder.AddServiceDefaults();
 
@@ -30,3 +32,24 @@ app.UseHttpsRedirection();
 app.MapDummyEndpoints();
 
 app.Run();
+
+static void LoadAndPrintAll()
+{
+    Env.Load();
+    PrintAll();
+}
+
+static void PrintAll()
+{
+    Console.WriteLine("---- ENVIRONMENT VARIABLES ----");
+    foreach (
+        DictionaryEntry env in Environment
+            .GetEnvironmentVariables()
+            .Cast<DictionaryEntry>()
+            .OrderBy(e => e.Key.ToString(), StringComparer.OrdinalIgnoreCase)
+    )
+    {
+        Console.WriteLine($"{env.Key} = {env.Value}");
+    }
+    Console.WriteLine("--------------------------------");
+}

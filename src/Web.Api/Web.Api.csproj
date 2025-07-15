@@ -5,6 +5,12 @@
     <AssemblyName>CleanArch.Web.Api</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Include="EndpointsPlay\PdfSection\Views\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Aspire.Seq" />
