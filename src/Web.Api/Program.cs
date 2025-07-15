@@ -24,15 +24,26 @@ builder.AddSeqEndpoint("om-seq");
 //     }
 // );
 
-// builder.Logging.AddOpenTelemetryLogging(builder.Configuration);
-
 builder
     .Services.AddApplicationServices()
     .AddInfrastructureServices(builder.Environment, builder.Configuration)
     .AddWebServices(builder.Configuration)
     .AddPlayServices(builder.Configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        "LocalCorsPolicy",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4000", "https://localhost:4000").AllowAnyHeader().AllowAnyMethod();
+        }
+    );
+});
+
 var app = builder.Build();
+
+app.UseCors("LocalCorsPolicy");
 
 app.MapDefaultEndpoints();
 
@@ -51,8 +62,6 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
-app.MapHealthChecks("/health");
 
 app.UseHttpsRedirection();
 

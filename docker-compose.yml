@@ -35,9 +35,22 @@ services:
     volumes:
       -  ./.containers/db:/var/lib/postgresql/data
 
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=mongopw
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
   aspire:
     image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
     ports:
       - "18888:18888" # Dashboard UI
       - "18889:18889" # OTLP gRPC
       - "18890:18890" # OTLP HTTP
+
+volumes:
+  mongodata:

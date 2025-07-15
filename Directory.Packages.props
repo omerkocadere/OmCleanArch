@@ -15,9 +15,13 @@
     <PackageVersion Include="Bogus" Version="35.6.3" />
     <PackageVersion Include="DotNetEnv" Version="3.1.1" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(EfcoreVersion)" />
+    <PackageVersion Include="MongoDB.Entities" Version="24.1.1" />
+    <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="MediatR" Version="13.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(EfcoreVersion)" />
     <PackageVersion Include="PuppeteerSharp" Version="20.2.0" />
+    <PackageVersion Include="MongoDB.Entities" Version="24.1.1" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <!-- Infrastructure -->
     <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />

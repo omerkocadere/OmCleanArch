@@ -1,0 +1,21 @@
+namespace CleanArch.Application.Auctions.DTOs;
+
+public class AuctionDto
+{
+    public int Id { get; set; }
+    public int ReservePrice { get; set; }
+    public required string Seller { get; set; }
+    public string? Winner { get; set; }
+    public int SoldAmount { get; set; }
+    public int CurrentHighBid { get; set; }
+    public DateTimeOffset Created { get; set; }
+    public DateTimeOffset LastModified { get; set; }
+    public DateTimeOffset AuctionEnd { get; set; }
+    public required string Status { get; set; }
+    public required string Make { get; set; }
+    public required string Model { get; set; }
+    public int Year { get; set; }
+    public required string Color { get; set; }
+    public int Mileage { get; set; }
+    public required string ImageUrl { get; set; }
+}
