@@ -7,7 +7,14 @@ using SearchService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddHttpClient<AuctionSvcHttpClient>().AddPolicyHandler(GetRetryPolicy());
+// builder.Services.AddHttpClient<AuctionSvcHttpClient>().AddPolicyHandler(GetRetryPolicy());
+builder.Services.AddHttpClient<AuctionSvcHttpClient>();
+
+builder.Services.ConfigureHttpClientDefaults(http =>
+{
+    // Turn on resilience by default
+    http.AddStandardResilienceHandler();
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiDocument();
