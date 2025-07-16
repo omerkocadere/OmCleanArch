@@ -9,9 +9,9 @@ public class Item : Entity
     public string? Winner { get; set; }
     public int SoldAmount { get; set; }
     public int CurrentHighBid { get; set; }
-    public DateTimeOffset Created { get; set; }
-    public DateTimeOffset LastModified { get; set; }
-    public DateTimeOffset AuctionEnd { get; set; }
+    public DateTime Created { get; set; }
+    public DateTime LastModified { get; set; }
+    public DateTime AuctionEnd { get; set; }
     public required string Status { get; set; }
     public required string Make { get; set; }
     public required string Model { get; set; }

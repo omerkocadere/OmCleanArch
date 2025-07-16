@@ -5,7 +5,7 @@ using CleanArch.Application.Common.Models;
 
 namespace CleanArch.Application.Auctions.GetAuctions;
 
-public record GetAuctionsQuery(DateTime? Date = null) : IQuery<List<AuctionDto>>;
+public record GetAuctionsQuery(string? Date) : IQuery<List<AuctionDto>>;
 
 public class GetAuctionsQueryHandler(IApplicationDbContext context, IMapper mapper)
     : IQueryHandler<GetAuctionsQuery, List<AuctionDto>>
@@ -14,9 +14,9 @@ public class GetAuctionsQueryHandler(IApplicationDbContext context, IMapper mapp
     {
         var query = context.Auctions.OrderBy(x => x.Item.Make).AsQueryable();
 
-        if (request.Date.HasValue)
+        if (!string.IsNullOrEmpty(request.Date))
         {
-            query = query.Where(x => x.LastModified > request.Date.Value.ToUniversalTime());
+            query = query.Where(x => x.LastModified.CompareTo(DateTime.Parse(request.Date).ToUniversalTime()) > 0);
         }
 
         var auctionDtos = await query

@@ -1,9 +1,11 @@
 using SearchService.Data;
 using SearchService.Endpoints;
+using SearchService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddHttpClient<AuctionSvcHttpClient>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiDocument();
 

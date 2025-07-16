@@ -21,7 +21,7 @@ public class Auctions : EndpointGroupBase
             .MapDelete(DeleteAuction, "{id:int}");
     }
 
-    public async Task<IResult> GetAuctions(ISender sender, DateTime? date = null)
+    public async Task<IResult> GetAuctions(ISender sender, string? date)
     {
         var result = await sender.Send(new GetAuctionsQuery(date));
         return result.Match(Results.Ok, CustomResults.Problem);

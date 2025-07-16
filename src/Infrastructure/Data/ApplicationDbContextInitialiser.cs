@@ -64,9 +64,8 @@ public static class ApplicationDbContextInitialiser
 
     private static async Task TrySeedAsync(ApplicationDbContext context, ILogger logger)
     {
-        var seedDir = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Seed");
+        var seedDir = Path.Combine(AppContext.BaseDirectory, "Data", "Seed");
         logger.LogInformation("Seed directory resolved to: {SeedDir}", seedDir);
-
 
         var usersJsonPath = Path.Combine(seedDir, "users.json");
         var listsJsonPath = Path.Combine(seedDir, "todolists.json");

@@ -5,10 +5,16 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "C#: API Debug",
+      "name": "C#: Web.API Debug",
       "type": "dotnet",
       "request": "launch",
       "projectPath": "${workspaceFolder}/src/Web.Api/Web.Api.csproj"
+    },
+    {
+      "name": "C#: SearchService Debug",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/other-services/SearchService/SearchService.csproj"
     },
     {
       "name": ".NET Core Attach",

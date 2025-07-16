@@ -3,6 +3,7 @@ using System.Text.Json;
 using MongoDB.Driver;
 using MongoDB.Entities;
 using SearchService.Models;
+using SearchService.Services;
 
 namespace SearchService.Data;
 
@@ -26,47 +27,13 @@ public static class DbInitializer
 
         var count = await DB.CountAsync<Item>();
 
-        if (count == 0)
-        {
-            logger.LogWarning("No items found in the database.");
+        var httpClient = scope.ServiceProvider.GetRequiredService<AuctionSvcHttpClient>();
 
-            var filePath = Path.Combine(AppContext.BaseDirectory, "Data", "auctions.json");
-            var json = await File.ReadAllTextAsync(filePath);
-            var items = JsonSerializer.Deserialize<List<Item>>(
-                json,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            );
+        var items = await httpClient.GetItemsForSearchDb();
 
-            if (items == null)
-            {
-                logger.LogError("Failed to deserialize auctions.json to Item list.");
-                return;
-            }
+        Console.WriteLine($"Items count: {items.Count}");
 
+        if (items.Count > 0)
             await DB.SaveAsync(items);
-            // if (auctionDtos == null)
-            // {
-            //     logger.LogError("Failed to deserialize auctions.json");
-            //     return;
-            // }
-
-            // // AuctionDto'dan Item entity'ye dönüştür
-            // var items = auctionDtos
-            //     .Select(dto => new Item
-            //     {
-            //         AuctionId = dto.id,
-            //         Make = dto.make,
-            //         Model = dto.model,
-            //         Color = dto.color,
-            //         Mileage = dto.mileage,
-            //         Year = dto.year,
-            //         ImageUrl = dto.imageUrl,
-            //     })
-            //     .ToList();
-
-            // logger.LogInformation("Seeding {Count} items from auctions.json", items.Count);
-            // if (items.Count > 0)
-            //     await DB.SaveAsync(items);
-        }
     }
 }

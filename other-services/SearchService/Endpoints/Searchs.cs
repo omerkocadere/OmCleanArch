@@ -1,6 +1,3 @@
-using System;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using MongoDB.Entities;
 using SearchService.Models;
 using SearchService.RequestHelpers;
