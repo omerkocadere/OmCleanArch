@@ -40,6 +40,8 @@
     <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
     <PackageVersion Include="Serilog.Sinks.Seq" Version="9.0.0" />
     <PackageVersion Include="Handlebars.Net" Version="2.1.6" />
+    <!--SearchService AppHost-->
+    <PackageVersion Include="Microsoft.Extensions.Http.Polly" Version="$(AspnetVersion)" />
     <!--Aspire AppHost-->
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Docker" Version="9.3.1-preview.1.25305.6" />

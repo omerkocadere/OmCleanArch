@@ -1,10 +1,13 @@
+using System.Net;
+using Polly;
+using Polly.Extensions.Http;
 using SearchService.Data;
 using SearchService.Endpoints;
 using SearchService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddHttpClient<AuctionSvcHttpClient>();
+builder.Services.AddHttpClient<AuctionSvcHttpClient>().AddPolicyHandler(GetRetryPolicy());
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiDocument();
@@ -23,6 +26,18 @@ app.UseHttpsRedirection();
 // Map endpoints
 app.MapWeatherForecastEndpoints();
 app.MapSearchEndpoints();
-await app.InitDb();
+
+app.Lifetime.ApplicationStarted.Register(async () =>
+{
+    await app.InitDb();
+});
 
 app.Run();
+
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .OrResult(msg => msg.StatusCode == HttpStatusCode.NotFound)
+        .WaitAndRetryForeverAsync(_ => TimeSpan.FromSeconds(3));
+}
