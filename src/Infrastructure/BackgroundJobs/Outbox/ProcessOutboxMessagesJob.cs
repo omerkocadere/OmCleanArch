@@ -4,6 +4,7 @@ using CleanArch.Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Polly;
 
 namespace CleanArch.Infrastructure.BackgroundJobs.Outbox;
 
@@ -39,49 +40,28 @@ public class ProcessOutboxMessagesJob(
 
         foreach (var outboxMessage in outboxMessages)
         {
+            BaseEvent? domainEvent = null;
+
             try
             {
-                var domainEvent = DeserializeDomainEvent(outboxMessage.Type, outboxMessage.Content);
-
-                if (domainEvent is not null)
-                {
-                    await publisher.Publish(domainEvent, cancellationToken);
-
-                    outboxMessage.ProcessedOnUtc = DateTime.UtcNow;
-                    outboxMessage.Status = OutboxMessageStatus.Completed;
-                    outboxMessage.Error = null;
-
-                    logger.LogInformation(
-                        "Successfully processed outbox message {MessageId} of type {MessageType}",
-                        outboxMessage.Id,
-                        outboxMessage.Type
-                    );
-                }
-                else
-                {
-                    HandleFailedMessage(
-                        outboxMessage,
-                        $"Failed to deserialize domain event of type {outboxMessage.Type}"
-                    );
-
-                    logger.LogWarning(
-                        "Failed to deserialize outbox message {MessageId} of type {MessageType}",
-                        outboxMessage.Id,
-                        outboxMessage.Type
-                    );
-                }
+                domainEvent = DeserializeDomainEvent(outboxMessage.Type, outboxMessage.Content);
             }
             catch (Exception ex)
             {
-                HandleFailedMessage(outboxMessage, ex.Message);
-
-                logger.LogError(
-                    ex,
-                    "Error processing outbox message {MessageId} of type {MessageType}",
-                    outboxMessage.Id,
-                    outboxMessage.Type
-                );
+                HandleFailedMessage(outboxMessage, ex.Message, logger);
             }
+
+            if (domainEvent is null)
+                return;
+
+            var policy = Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(3, attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)));
+            var result = await policy.ExecuteAndCaptureAsync(() => publisher.Publish(domainEvent, cancellationToken));
+
+            outboxMessage.ProcessedOnUtc = DateTime.UtcNow;
+            outboxMessage.Status = OutboxMessageStatus.Failed;
+            outboxMessage.Error = result.FinalException?.Message;
         }
 
         await context.SaveChangesAsync(cancellationToken);
@@ -104,7 +84,11 @@ public class ProcessOutboxMessagesJob(
         return domainEvent as BaseEvent;
     }
 
-    private static void HandleFailedMessage(OutboxMessage outboxMessage, string errorMessage)
+    private static void HandleFailedMessage(
+        OutboxMessage outboxMessage,
+        string errorMessage,
+        ILogger<ProcessOutboxMessagesJob> logger
+    )
     {
         const int maxRetryAttempts = 3;
 
@@ -119,5 +103,12 @@ public class ProcessOutboxMessagesJob(
         {
             outboxMessage.Status = OutboxMessageStatus.Pending; // Retry
         }
+
+        logger.LogError(
+            "Failed to process outbox message {MessageId} of type {MessageType}. Error: {ErrorMessage}",
+            outboxMessage.Id,
+            outboxMessage.Type,
+            errorMessage
+        );
     }
 }
