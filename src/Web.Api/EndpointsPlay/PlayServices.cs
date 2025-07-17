@@ -1,4 +1,5 @@
-﻿using CleanArch.Web.Api.EndpointsPlay.PdfSection;
+﻿using CleanArch.Web.Api.EndpointsPlay.Pdfs;
+using CleanArch.Web.Api.EndpointsPlay.QueryBenchmarks;
 
 namespace CleanArch.Web.Api.EndpointsPlay;
 

@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Web.Api.EndpointsPlay.PdfSection.Contracts;
+﻿namespace CleanArch.Web.Api.EndpointsPlay.Pdfs.Contracts;
 
 public sealed class LineItem
 {

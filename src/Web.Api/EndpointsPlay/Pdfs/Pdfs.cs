@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
 
-namespace CleanArch.Web.Api.EndpointsPlay.PdfSection;
+namespace CleanArch.Web.Api.EndpointsPlay.Pdfs;
 
-public class Pdfs : EndpointGroupBase
+public class Pdf : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
-        app.MapGroup(this).MapGet(CreateInvoiceReport);
+        app.MapGroup(this, "[Play]").MapGet(CreateInvoiceReport);
     }
 
     public async Task<IResult> CreateInvoiceReport(InvoiceFactory invoiceFactory)
