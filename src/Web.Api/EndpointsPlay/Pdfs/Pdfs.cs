@@ -47,9 +47,10 @@ public class Pdf : EndpointGroupBase
 
         var html = template(data);
 
-        logger.LogInformation("Launching headless browser for PDF rendering.");
+        logger.LogInformation("Downloading headless browser for PDF rendering.");
         var browserFetcher = new BrowserFetcher();
         await browserFetcher.DownloadAsync();
+        logger.LogInformation("Headless browser downloaded successfully.");
 
         logger.LogInformation("Launching Puppeteer browser.");
         try
@@ -58,7 +59,7 @@ public class Pdf : EndpointGroupBase
                 new LaunchOptions
                 {
                     Headless = true,
-                    Args = new[] { "--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage" },
+                    Args = ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
                 }
             );
             using var page = await browser.NewPageAsync();
@@ -71,17 +72,17 @@ public class Pdf : EndpointGroupBase
                 new PdfOptions
                 {
                     HeaderTemplate = """
-                <div style='font-size: 14px; text-align: center; padding: 10px;'>
-                    <span style='margin-right: 20px;'><span class='title'></span></span>
-                    <span><span class='date'></span></span>
-                </div>
-                """,
+                    <div style='font-size: 14px; text-align: center; padding: 10px;'>
+                        <span style='margin-right: 20px;'><span class='title'></span></span>
+                        <span><span class='date'></span></span>
+                    </div>
+                    """,
                     FooterTemplate = """
-                <div style='font-size: 14px; text-align: center; padding: 10px;'>
-                    <span style='margin-right: 20px;'>Generated on <span class='date'></span></span>
-                    <span>Page <span class='pageNumber'></span> of <span class='totalPages'></span></span>
-                </div>
-                """,
+                    <div style='font-size: 14px; text-align: center; padding: 10px;'>
+                        <span style='margin-right: 20px;'>Generated on <span class='date'></span></span>
+                        <span>Page <span class='pageNumber'></span> of <span class='totalPages'></span></span>
+                    </div>
+                    """,
                     DisplayHeaderFooter = true,
                     Format = PaperFormat.A4,
                     PrintBackground = true,
@@ -100,8 +101,12 @@ public class Pdf : EndpointGroupBase
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Detailed Puppeteer error: {ErrorMessage}. InnerException: {InnerException}", 
-                ex.Message, ex.InnerException?.Message);
+            logger.LogError(
+                ex,
+                "Detailed Puppeteer error: {ErrorMessage}. InnerException: {InnerException}",
+                ex.Message,
+                ex.InnerException?.Message
+            );
             throw;
         }
     }
