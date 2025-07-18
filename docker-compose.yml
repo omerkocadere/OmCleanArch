@@ -3,15 +3,13 @@ services:
     image: ${DOCKER_REGISTRY-}omcleanarch.api
     build:
       context: .
-      dockerfile: src/Web/Dockerfile
+      dockerfile: src/Web.Api/Dockerfile
     ports:
       - 7800:7800
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:7800
-      - OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-central-0.grafana.net/otlp
-      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-      - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic MTMwODc0OTpnbGNfZXlKdklqb2lNVFEzTmpBM05TSXNJbTRpT2lKemRHRmpheTB4TXpBNE56UTVMVzkwYkhBdGQzSnBkR1V0YjIxamJHVmhibUZ5WTJndGRHOXJaVzRpTENKcklqb2lPVEJNUVRKUE5XWkdORXBwZFRGbGRtSTVPWHBPUWpjNElpd2liU0k2ZXlKeUlqb2ljSEp2WkMxbGRTMWpaVzUwY21Gc0xUQWlmWDA9
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire:18889
     depends_on:
       - om-postgres
 
@@ -33,7 +31,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      -  ./.containers/db:/var/lib/postgresql/data
+      - ./.containers/db:/var/lib/postgresql/data
 
   aspire:
     image: mcr.microsoft.com/dotnet/aspire-dashboard:latest

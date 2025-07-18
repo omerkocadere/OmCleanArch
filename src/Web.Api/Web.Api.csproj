@@ -3,10 +3,13 @@
   <PropertyGroup>
     <RootNamespace>CleanArch.Web.Api</RootNamespace>
     <AssemblyName>CleanArch.Web.Api</AssemblyName>
+    <UserSecretsId>fd5c7461-b46c-4e9e-89ff-d403362ce8d2</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="EndpointsPlay\PdfSection\Views\**\*.*">
+    <Content Include="EndpointsPlay\Pdfs\Views\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

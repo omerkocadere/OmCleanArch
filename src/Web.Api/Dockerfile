@@ -17,11 +17,11 @@ COPY ["Directory.Build.props", "."]
 COPY ["src/Web.Api/Web.Api.csproj", "src/Web.Api/"]
 COPY ["src/Application/Application.csproj", "src/Application/"]
 COPY ["src/Domain/Domain.csproj", "src/Domain/"]
+COPY ["src/Aspire.ServiceDefaults/Aspire.ServiceDefaults.csproj", "src/Aspire.ServiceDefaults/"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
-COPY ["src/Infrastructure/Data/Migrations", "src/Infrastructure/Data/Migrations"]
 RUN dotnet restore "./src/Web.Api/Web.Api.csproj"
 COPY . .
-WORKDIR "/src/Web.Api"
+WORKDIR "/src/src/Web.Api"
 RUN dotnet build "./Web.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
