@@ -25,7 +25,7 @@ public class Pdf : EndpointGroupBase
             var templatePath = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "EndpointsPlay",
-                "Pdf",
+                "Pdfs",
                 "Views",
                 "InvoiceReport.hbs"
             );

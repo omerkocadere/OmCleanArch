@@ -25,6 +25,8 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IWeb
         );
 
         var showStackTrace = env.IsDevelopment() || env.IsEnvironment("Docker");
+        logger.LogInformation("showStackTrace: {ShowStackTrace}", showStackTrace);
+        logger.LogInformation("showStackTrace: {ShowStackTrace}", exception.ToString());
         var statusCode =
             (int?)exceptionType.GetProperty("StatusCode")?.GetValue(exception)
             ?? StatusCodes.Status500InternalServerError;
