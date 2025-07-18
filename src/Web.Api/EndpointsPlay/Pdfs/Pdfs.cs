@@ -14,76 +14,89 @@ public class Pdf : EndpointGroupBase
         app.MapGroup(this, "[Play]").MapGet(CreateInvoiceReport);
     }
 
-    public async Task<IResult> CreateInvoiceReport(InvoiceFactory invoiceFactory)
+    public async Task<IResult> CreateInvoiceReport(InvoiceFactory invoiceFactory, ILogger<Pdf> logger)
     {
-        RegisterFormats();
-        var invoice = invoiceFactory.Create(10);
-
-        var templatePath = Path.Combine(
-            Directory.GetCurrentDirectory(),
-            "EndpointsPlay",
-            "PdfSection",
-            "Views",
-            "InvoiceReport.hbs"
-        );
-
-        var templateContent = await File.ReadAllTextAsync(templatePath);
-
-        var template = Handlebars.Compile(templateContent);
-
-        var data = new
+        try
         {
-            invoice.Number,
-            invoice.IssuedDate,
-            invoice.DueDate,
-            invoice.SellerAddress,
-            invoice.CustomerAddress,
-            invoice.LineItems,
-            Subtotal = invoice.LineItems.Sum(li => li.Price * li.Quantity),
-            Total = invoice.LineItems.Sum(li => li.Price * li.Quantity), // optionally apply tax
-        };
+            logger.LogInformation("Starting invoice PDF generation.");
+            RegisterFormats();
+            var invoice = invoiceFactory.Create(10);
 
-        var html = template(data);
+            var templatePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "EndpointsPlay",
+                "Pdf",
+                "Views",
+                "InvoiceReport.hbs"
+            );
 
-        var browserFetcher = new BrowserFetcher();
-        await browserFetcher.DownloadAsync();
+            logger.LogInformation("Loading template from {TemplatePath}.", templatePath);
+            var templateContent = await File.ReadAllTextAsync(templatePath);
 
-        using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
-        using var page = await browser.NewPageAsync();
+            var template = Handlebars.Compile(templateContent);
 
-        await page.SetContentAsync(html);
-
-        await page.EvaluateExpressionHandleAsync("document.fonts.ready");
-
-        var pdfData = await page.PdfDataAsync(
-            new PdfOptions
+            var data = new
             {
-                HeaderTemplate = """
-                <div style='font-size: 14px; text-align: center; padding: 10px;'>
-                    <span style='margin-right: 20px;'><span class='title'></span></span>
-                    <span><span class='date'></span></span>
-                </div>
-                """,
-                FooterTemplate = """
-                <div style='font-size: 14px; text-align: center; padding: 10px;'>
-                    <span style='margin-right: 20px;'>Generated on <span class='date'></span></span>
-                    <span>Page <span class='pageNumber'></span> of <span class='totalPages'></span></span>
-                </div>
-                """,
-                DisplayHeaderFooter = true,
-                Format = PaperFormat.A4,
-                PrintBackground = true,
-                MarginOptions = new MarginOptions
-                {
-                    Top = "50px",
-                    Right = "20px",
-                    Bottom = "50px",
-                    Left = "20px",
-                },
-            }
-        );
+                invoice.Number,
+                invoice.IssuedDate,
+                invoice.DueDate,
+                invoice.SellerAddress,
+                invoice.CustomerAddress,
+                invoice.LineItems,
+                Subtotal = invoice.LineItems.Sum(li => li.Price * li.Quantity),
+                Total = invoice.LineItems.Sum(li => li.Price * li.Quantity), // optionally apply tax
+            };
 
-        return Results.File(pdfData, "application/pdf", $"invoice-{invoice.Number}.pdf");
+            var html = template(data);
+
+            logger.LogInformation("Launching headless browser for PDF rendering.");
+            var browserFetcher = new BrowserFetcher();
+            await browserFetcher.DownloadAsync();
+
+            logger.LogInformation("Launching Puppeteer browser.");
+            using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+            using var page = await browser.NewPageAsync();
+
+            await page.SetContentAsync(html);
+            await page.EvaluateExpressionHandleAsync("document.fonts.ready");
+
+            logger.LogInformation("Generating PDF data.");
+            var pdfData = await page.PdfDataAsync(
+                new PdfOptions
+                {
+                    HeaderTemplate = """
+                    <div style='font-size: 14px; text-align: center; padding: 10px;'>
+                        <span style='margin-right: 20px;'><span class='title'></span></span>
+                        <span><span class='date'></span></span>
+                    </div>
+                    """,
+                    FooterTemplate = """
+                    <div style='font-size: 14px; text-align: center; padding: 10px;'>
+                        <span style='margin-right: 20px;'>Generated on <span class='date'></span></span>
+                        <span>Page <span class='pageNumber'></span> of <span class='totalPages'></span></span>
+                    </div>
+                    """,
+                    DisplayHeaderFooter = true,
+                    Format = PaperFormat.A4,
+                    PrintBackground = true,
+                    MarginOptions = new MarginOptions
+                    {
+                        Top = "50px",
+                        Right = "20px",
+                        Bottom = "50px",
+                        Left = "20px",
+                    },
+                }
+            );
+
+            logger.LogInformation("PDF generation completed for invoice {InvoiceNumber}.", invoice.Number);
+            return Results.File(pdfData, "application/pdf", $"invoice-{invoice.Number}.pdf");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error occurred during invoice PDF generation.");
+            return Results.Problem("An error occurred while generating the invoice PDF.");
+        }
     }
 
     private static void RegisterFormats()
