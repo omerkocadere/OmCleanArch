@@ -13,7 +13,6 @@ public class AIs : EndpointGroupBase
 
     public async Task<IResult> ChatMessage(IChatClient chatClient)
     {
-        throw new ArgumentNullException(nameof(chatClient));
         var message = new ChatMessage(ChatRole.User, "What is .Net?");
 
         var response = await chatClient.GetResponseAsync(message);

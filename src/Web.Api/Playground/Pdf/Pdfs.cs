@@ -1,21 +1,20 @@
 ﻿using System.Globalization;
 using CleanArch.Web.Api.Extensions;
-using CleanArch.Web.Api.Playground.Pdf.Services;
 using HandlebarsDotNet;
 using Microsoft.EntityFrameworkCore;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
 
-namespace CleanArch.Web.Api.Playground.Pdf.Endpoints;
+namespace CleanArch.Web.Api.Playground.Pdf;
 
-public class Pdf : EndpointGroupBase
+public class Pdfs : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
         app.MapGroup(this, "[Play]").MapGet(CreateInvoiceReport);
     }
 
-    public async Task<IResult> CreateInvoiceReport(InvoiceFactory invoiceFactory, ILogger<Pdf> logger)
+    public async Task<IResult> CreateInvoiceReport(InvoiceFactory invoiceFactory, ILogger<Pdfs> logger)
     {
         logger.LogInformation("Starting invoice PDF generation.");
         RegisterFormats();
@@ -23,9 +22,9 @@ public class Pdf : EndpointGroupBase
 
         var templatePath = Path.Combine(
             Directory.GetCurrentDirectory(),
-            "EndpointsPlay",
-            "Pdfs",
-            "Views",
+            "Playground",
+            "Pdf",
+            "Templates",
             "InvoiceReport.hbs"
         );
 
