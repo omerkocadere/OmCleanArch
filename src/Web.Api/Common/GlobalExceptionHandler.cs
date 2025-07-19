@@ -1,8 +1,13 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArch.Web.Api.Common;
 
-public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IWebHostEnvironment env) : IExceptionHandler
+public class GlobalExceptionHandler(
+    IProblemDetailsService problemDetailsService,
+    ILogger<GlobalExceptionHandler> logger,
+    IWebHostEnvironment env
+) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
@@ -17,7 +22,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IWeb
 
         logger.LogError(
             exception,
-            "Unhandled exception occurred. Type: {ExceptionType}, Path: {Path}, TraceIdentifier: {TraceId}, InnerException: {InnerException}",
+            "OmClenaArch unhandled exception. Type: {ExceptionType}, Path: {Path}, TraceIdentifier: {TraceId}, InnerException: {InnerException}",
             exceptionType.Name,
             path,
             traceId,
@@ -25,22 +30,23 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IWeb
         );
 
         var showStackTrace = env.IsDevelopment() || env.IsEnvironment("Docker");
-        logger.LogInformation("showStackTrace: {ShowStackTrace}", showStackTrace);
-        logger.LogInformation("showStackTrace: {ShowStackTrace}", exception.ToString());
-        var statusCode =
+        httpContext.Response.StatusCode =
             (int?)exceptionType.GetProperty("StatusCode")?.GetValue(exception)
             ?? StatusCodes.Status500InternalServerError;
 
         var title = exceptionType.GetProperty("Title")?.GetValue(exception)?.ToString() ?? exception.Message;
 
-        var problemDetails = Results.Problem(
-            title: title,
-            detail: showStackTrace ? exception.ToString() : exception.Message,
-            statusCode: statusCode
+        return await problemDetailsService.TryWriteAsync(
+            new ProblemDetailsContext
+            {
+                HttpContext = httpContext,
+                Exception = exception,
+                ProblemDetails = new ProblemDetails
+                {
+                    Title = title,
+                    Detail = showStackTrace ? exception.ToString() : exception.Message,
+                },
+            }
         );
-
-        await problemDetails.ExecuteAsync(httpContext);
-
-        return true;
     }
 }
