@@ -21,7 +21,7 @@ public static class DependencyInjection
         return services
             .AddServices()
             .AddDatabase(env, configuration)
-            // .AddBackgroundJobs(configuration)
+            .AddBackgroundJobsConditionally(configuration)
             .AddAuthenticationInternal()
             .AddMediatRDecorators();
     }

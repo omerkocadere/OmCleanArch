@@ -43,7 +43,7 @@ await app.InitialiseDatabaseAsync();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Docker"))
 {
-    // app.UseHangfireDashboard("/hangfire", new DashboardOptions { Authorization = [new NoAuthorizationFilter()] });
+    app.UseHangfireDashboardConditionally();
     app.UseSwaggerWithUi();
 }
 else
@@ -66,6 +66,6 @@ app.Map("/", () => Results.Redirect("/api"));
 app.MapEndpoints();
 app.MapControllers();
 
-// app.InitializeBackgroundJobs();
+app.InitializeBackgroundJobsConditionally();
 
 app.Run();

@@ -12,7 +12,35 @@ namespace CleanArch.Infrastructure.BackgroundJobs;
 
 public static class HangfireConfiguration
 {
-    public static IServiceCollection AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
+    /// <summary>
+    /// Conditionally adds background job services based on configuration.
+    /// Only registers Hangfire services when BackgroundJobs:Enabled is true.
+    /// </summary>
+    public static IServiceCollection AddBackgroundJobsConditionally(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
+    {
+        // Configure background job options
+        services.Configure<BackgroundJobOptions>(configuration.GetSection(BackgroundJobOptions.SectionName));
+
+        // Check if background jobs are enabled
+        var backgroundJobOptions =
+            configuration.GetSection(BackgroundJobOptions.SectionName).Get<BackgroundJobOptions>()
+            ?? new BackgroundJobOptions();
+
+        if (!backgroundJobOptions.Enabled)
+        {
+            // Register a no-op background job service when disabled
+            services.AddScoped<IBackgroundJobService, NoOpBackgroundJobService>();
+            return services;
+        }
+
+        // Background jobs are enabled, register Hangfire services
+        return services.AddBackgroundJobs(configuration);
+    }
+
+    private static IServiceCollection AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHangfire(
             (sp, configuration) =>
