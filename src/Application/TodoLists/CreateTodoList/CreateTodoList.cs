@@ -6,15 +6,12 @@ using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.TodoLists.CreateTodoList;
 
-public record CreateTodoListCommand(string Title, int UserId) : IRequest<Result<TodoListDto>>;
+public record CreateTodoListCommand(string Title, Guid UserId) : IRequest<Result<TodoListDto>>;
 
 public class CreateTodoListCommandHandler(IApplicationDbContext context, IMapper mapper)
     : IRequestHandler<CreateTodoListCommand, Result<TodoListDto>>
 {
-    public async Task<Result<TodoListDto>> Handle(
-        CreateTodoListCommand request,
-        CancellationToken cancellationToken
-    )
+    public async Task<Result<TodoListDto>> Handle(CreateTodoListCommand request, CancellationToken cancellationToken)
     {
         User? user = await context
             .Users.AsNoTracking()

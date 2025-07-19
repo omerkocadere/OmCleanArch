@@ -6,22 +6,18 @@ using CleanArch.Domain.TodoItems;
 namespace CleanArch.Application.TodoLists.GetTodos;
 
 [Authorize]
-public record GetTodosQuery(int UserId) : IRequest<Result<TodosVm>>;
+public record GetTodosQuery(Guid UserId) : IRequest<Result<TodosVm>>;
 
 public class GetTodosQueryHandler(IApplicationDbContext context, IMapper mapper)
     : IRequestHandler<GetTodosQuery, Result<TodosVm>>
 {
-    public async Task<Result<TodosVm>> Handle(
-        GetTodosQuery request,
-        CancellationToken cancellationToken
-    )
+    public async Task<Result<TodosVm>> Handle(GetTodosQuery request, CancellationToken cancellationToken)
     {
         var result = new TodosVm
         {
             PriorityLevels =
             [
-                .. Enum.GetValues<PriorityLevel>()
-                    .Select(p => new LookupDto { Id = (int)p, Title = p.ToString() }),
+                .. Enum.GetValues<PriorityLevel>().Select(p => new LookupDto { Id = (int)p, Title = p.ToString() }),
             ],
 
             Lists = await context

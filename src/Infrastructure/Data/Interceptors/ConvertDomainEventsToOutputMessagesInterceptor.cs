@@ -21,7 +21,7 @@ public class ConvertDomainEventsToOutputMessagesInterceptor : SaveChangesInterce
             return base.SavingChangesAsync(eventData, result, cancellationToken);
 
         var outboxMessages = context
-            .ChangeTracker.Entries<BaseEntity>()
+            .ChangeTracker.Entries<IHasDomainEvents>()
             .Where(e => e.Entity.DomainEvents.Count != 0)
             .Select(e => e.Entity)
             .SelectMany(e =>

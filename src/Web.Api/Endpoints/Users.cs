@@ -24,7 +24,7 @@ public class Users : EndpointGroupBase
         );
     }
 
-    public async Task<IResult> GetById(ISender sender, int id)
+    public async Task<IResult> GetById(ISender sender, Guid id)
     {
         var result = await sender.Send(new GetUserByIdQuery(id));
 

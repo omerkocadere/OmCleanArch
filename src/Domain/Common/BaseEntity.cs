@@ -2,11 +2,10 @@
 
 namespace CleanArch.Domain.Common;
 
-public abstract class BaseEntity : IEquatable<BaseEntity>
+public abstract class BaseEntity<T> : IEquatable<BaseEntity<T>>, IHasDomainEvents
+    where T : IEquatable<T>
 {
-    // This can easily be modified to be BaseEntity<T> and public T Id to support different key types.
-    // Using non-generic integer types for simplicity
-    public int Id { get; private init; }
+    public T Id { get; protected init; } = default!;
 
     private readonly List<BaseEvent> _domainEvents = [];
 
@@ -28,17 +27,17 @@ public abstract class BaseEntity : IEquatable<BaseEntity>
         _domainEvents.Clear();
     }
 
-    public static bool operator ==(BaseEntity? left, BaseEntity? right)
+    public static bool operator ==(BaseEntity<T>? left, BaseEntity<T>? right)
     {
         return left is not null && right is not null && left.Equals(right);
     }
 
-    public static bool operator !=(BaseEntity? left, BaseEntity? right)
+    public static bool operator !=(BaseEntity<T>? left, BaseEntity<T>? right)
     {
         return !(left == right);
     }
 
-    public bool Equals(BaseEntity? other)
+    public bool Equals(BaseEntity<T>? other)
     {
         if (other is null)
             return false;
@@ -46,7 +45,7 @@ public abstract class BaseEntity : IEquatable<BaseEntity>
         if (other.GetType() != GetType())
             return false;
 
-        return Id == other.Id;
+        return EqualityComparer<T>.Default.Equals(Id, other.Id);
     }
 
     public override bool Equals(object? obj)
@@ -54,17 +53,17 @@ public abstract class BaseEntity : IEquatable<BaseEntity>
         if (obj is null)
             return false;
 
-        if (obj is not BaseEntity entity)
+        if (obj is not BaseEntity<T> entity)
             return false;
 
         if (obj.GetType() != GetType())
             return false;
 
-        return Id == entity.Id;
+        return EqualityComparer<T>.Default.Equals(Id, entity.Id);
     }
 
     public override int GetHashCode()
     {
-        return Id.GetHashCode();
+        return Id?.GetHashCode() ?? 0;
     }
 }

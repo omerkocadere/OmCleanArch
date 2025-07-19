@@ -9,7 +9,7 @@ public record UpdateTodoItemDetailCommand() : IRequest<Result>
     public int Id { get; init; }
     public int ListId { get; init; }
     public required string Title { get; init; }
-    public required int UserId { get; init; }
+    public required Guid UserId { get; init; }
     public string? Note { get; init; }
     public string? Description { get; set; }
     public PriorityLevel Priority { get; init; }
@@ -20,15 +20,9 @@ public record UpdateTodoItemDetailCommand() : IRequest<Result>
 public class UpdateTodoItemDetailCommandHandler(IApplicationDbContext context)
     : IRequestHandler<UpdateTodoItemDetailCommand, Result>
 {
-    public async Task<Result> Handle(
-        UpdateTodoItemDetailCommand request,
-        CancellationToken cancellationToken
-    )
+    public async Task<Result> Handle(UpdateTodoItemDetailCommand request, CancellationToken cancellationToken)
     {
-        TodoItem? todoItem = await context.TodoItems.SingleOrDefaultAsync(
-            t => t.Id == request.Id,
-            cancellationToken
-        );
+        TodoItem? todoItem = await context.TodoItems.SingleOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
 
         if (todoItem is null)
         {

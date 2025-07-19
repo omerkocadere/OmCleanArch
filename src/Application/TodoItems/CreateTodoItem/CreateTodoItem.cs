@@ -12,7 +12,7 @@ public record CreateTodoItemCommand() : IRequest<Result<TodoItemDto>>
     public required string Title { get; init; }
     public string? Note { get; init; }
     public PriorityLevel Priority { get; init; }
-    public int UserId { get; set; }
+    public Guid UserId { get; set; }
     public string? Description { get; set; }
     public DateTime? DueDate { get; set; }
     public List<string> Labels { get; set; } = [];
@@ -21,10 +21,7 @@ public record CreateTodoItemCommand() : IRequest<Result<TodoItemDto>>
 public class CreateTodoItemCommandHandler(IApplicationDbContext context, IMapper mapper)
     : IRequestHandler<CreateTodoItemCommand, Result<TodoItemDto>>
 {
-    public async Task<Result<TodoItemDto>> Handle(
-        CreateTodoItemCommand request,
-        CancellationToken cancellationToken
-    )
+    public async Task<Result<TodoItemDto>> Handle(CreateTodoItemCommand request, CancellationToken cancellationToken)
     {
         User? user = await context
             .Users.AsNoTracking()

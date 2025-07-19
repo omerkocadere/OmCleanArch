@@ -7,10 +7,7 @@ namespace CleanArch.Infrastructure.Data.Interceptors;
 
 public class DispatchDomainEventsInterceptor(IMediator mediator) : SaveChangesInterceptor
 {
-    public override InterceptionResult<int> SavingChanges(
-        DbContextEventData eventData,
-        InterceptionResult<int> result
-    )
+    public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
         DispatchDomainEvents(eventData.Context).GetAwaiter().GetResult();
 
@@ -34,7 +31,7 @@ public class DispatchDomainEventsInterceptor(IMediator mediator) : SaveChangesIn
             return;
 
         var entities = context
-            .ChangeTracker.Entries<BaseEntity>()
+            .ChangeTracker.Entries<IHasDomainEvents>()
             .Where(e => e.Entity.DomainEvents.Count != 0)
             .Select(e => e.Entity);
 

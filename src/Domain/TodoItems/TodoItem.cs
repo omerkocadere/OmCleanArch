@@ -2,7 +2,7 @@
 
 namespace CleanArch.Domain.TodoItems;
 
-public sealed class TodoItem : BaseAuditableEntity
+public sealed class TodoItem : BaseAuditableEntity<int>
 {
     public int ListId { get; set; }
     public required string Title { get; set; }
@@ -10,7 +10,7 @@ public sealed class TodoItem : BaseAuditableEntity
     public PriorityLevel Priority { get; set; }
     public DateTime? Reminder { get; set; }
 
-    public int UserId { get; set; }
+    public Guid UserId { get; set; }
     public string? Description { get; set; }
     public DateTime? DueDate { get; set; }
     public List<string> Labels { get; set; } = [];

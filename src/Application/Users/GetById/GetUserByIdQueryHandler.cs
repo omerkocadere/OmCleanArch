@@ -6,15 +6,11 @@ using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Users.GetById;
 
-public sealed record GetUserByIdQuery(int UserId) : IQuery<UserDto>;
+public sealed record GetUserByIdQuery(Guid UserId) : IQuery<UserDto>;
 
-internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context)
-    : IQueryHandler<GetUserByIdQuery, UserDto>
+internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context) : IQueryHandler<GetUserByIdQuery, UserDto>
 {
-    public async Task<Result<UserDto>> Handle(
-        GetUserByIdQuery query,
-        CancellationToken cancellationToken
-    )
+    public async Task<Result<UserDto>> Handle(GetUserByIdQuery query, CancellationToken cancellationToken)
     {
         UserDto? user = await context
             .Users.Where(u => u.Id == query.UserId)

@@ -18,7 +18,7 @@ public class TodoLists : EndpointGroupBase
             .MapDelete(DeleteTodoList, "{id}");
     }
 
-    public async Task<IResult> GetTodoLists(ISender sender, int userId)
+    public async Task<IResult> GetTodoLists(ISender sender, Guid userId)
     {
         var result = await sender.Send(new GetTodosQuery(userId));
 

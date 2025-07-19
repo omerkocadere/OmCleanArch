@@ -33,7 +33,7 @@ public class AuditableEntityInterceptor(TimeProvider dateTime) : SaveChangesInte
         if (context == null)
             return;
 
-        foreach (var entry in context.ChangeTracker.Entries<BaseAuditableEntity>())
+        foreach (var entry in context.ChangeTracker.Entries<IAuditableEntity>())
         {
             if (
                 entry.State is EntityState.Added or EntityState.Modified
