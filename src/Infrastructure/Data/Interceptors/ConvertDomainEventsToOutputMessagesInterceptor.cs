@@ -40,7 +40,7 @@ public class ConvertDomainEventsToOutputMessagesInterceptor : SaveChangesInterce
 
                 return new OutboxMessage
                 {
-                    Id = Guid.NewGuid(),
+                    Id = domainEvent.Id,
                     Type = domainEvent.GetType().Name,
                     Content = content,
                     OccuredOnUtc = DateTime.UtcNow,

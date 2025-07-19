@@ -1,5 +1,5 @@
 using CleanArch.Application.Common.Models;
-using CleanArch.Application.Users.CreateUser;
+using CleanArch.Application.Users.Create;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Application.Users.GetByEmail;
 using CleanArch.Application.Users.GetById;

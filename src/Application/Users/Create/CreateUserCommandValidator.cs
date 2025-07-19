@@ -1,3 +1,4 @@
+using CleanArch.Application.Users.Create;
 using FluentValidation;
 
 namespace CleanArch.Application.Users.CreateUser;

@@ -11,9 +11,7 @@ public class HangfireBackgroundJobService(
 {
     public void EnqueueOutboxProcessing()
     {
-        backgroundJobClient.Enqueue<ProcessOutboxMessagesJob>(job =>
-            job.Execute(CancellationToken.None)
-        );
+        backgroundJobClient.Enqueue<ProcessOutboxMessagesJob>(job => job.Execute(CancellationToken.None));
     }
 
     public void ScheduleRecurringOutboxProcessing()

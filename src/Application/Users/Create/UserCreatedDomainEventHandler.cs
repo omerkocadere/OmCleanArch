@@ -3,10 +3,10 @@ using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Users;
 using Microsoft.Extensions.Logging;
 
-namespace CleanArch.Application.Users.EventHandlers;
+namespace CleanArch.Application.Users.Create;
 
-public class UserCreatedDomainEventHandler(
-    ILogger<UserCreatedDomainEventHandler> logger,
+public class UserCreatedLoggingHandler(
+    ILogger<UserCreatedLoggingHandler> logger,
     ITelemetryService telemetryService,
     IMapper mapper
 ) : INotificationHandler<UserCreatedDomainEvent>
@@ -16,7 +16,8 @@ public class UserCreatedDomainEventHandler(
         var user = notification.User;
 
         logger.LogInformation(
-            "User registered event handled for user {FirstName} {LastName} and email {Email}",
+            "User registered event handled for user {UserId} {FirstName} {LastName} and email {Email}",
+            user.Id,
             user.FirstName,
             user.LastName,
             user.Email

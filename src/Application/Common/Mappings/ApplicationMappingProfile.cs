@@ -2,7 +2,7 @@ using CleanArch.Application.Common.Models;
 using CleanArch.Application.TodoItems.CreateTodoItem;
 using CleanArch.Application.TodoItems.DTOs;
 using CleanArch.Application.TodoLists.GetTodos;
-using CleanArch.Application.Users.CreateUser;
+using CleanArch.Application.Users.Create;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
@@ -17,8 +17,7 @@ public class ApplicationMappingProfile : Profile
         #region TodoItems
 
         CreateMap<CreateTodoItemCommand, TodoItem>();
-        CreateMap<TodoItem, TodoItemDto>()
-            .ForMember(d => d.Priority, opt => opt.MapFrom(s => (int)s.Priority));
+        CreateMap<TodoItem, TodoItemDto>().ForMember(d => d.Priority, opt => opt.MapFrom(s => (int)s.Priority));
         CreateMap<TodoItem, LookupDto>();
 
         #endregion
@@ -26,8 +25,7 @@ public class ApplicationMappingProfile : Profile
         #region TodoLists
 
         CreateMap<TodoList, TodoListDto>();
-        CreateMap<TodoItem, TodoItemDto>()
-            .ForMember(d => d.Priority, opt => opt.MapFrom(s => (int)s.Priority));
+        CreateMap<TodoItem, TodoItemDto>().ForMember(d => d.Priority, opt => opt.MapFrom(s => (int)s.Priority));
         CreateMap<TodoList, LookupDto>();
 
         #endregion

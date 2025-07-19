@@ -5,7 +5,7 @@ namespace CleanArch.Domain.Common;
 public abstract class BaseEntity<T> : IEquatable<BaseEntity<T>>, IHasDomainEvents
     where T : IEquatable<T>
 {
-    public T Id { get; protected init; } = default!;
+    public T Id { get; set; } = default!;
 
     private readonly List<BaseEvent> _domainEvents = [];
 

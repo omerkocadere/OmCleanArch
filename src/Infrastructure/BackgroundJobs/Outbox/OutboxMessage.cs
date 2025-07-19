@@ -1,3 +1,5 @@
+using CleanArch.Domain.Common;
+
 namespace CleanArch.Infrastructure.BackgroundJobs.Outbox;
 
 public enum OutboxMessageStatus
@@ -8,9 +10,8 @@ public enum OutboxMessageStatus
     Failed = 3,
 }
 
-public class OutboxMessage
+public class OutboxMessage : BaseEntity<Guid>
 {
-    public Guid Id { get; set; }
     public string Type { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
     public DateTimeOffset OccuredOnUtc { get; set; }

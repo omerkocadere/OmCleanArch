@@ -4,7 +4,7 @@ using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Users;
 
-namespace CleanArch.Application.Users.CreateUser;
+namespace CleanArch.Application.Users.Create;
 
 public sealed record CreateUserCommand : ICommand<UserDto>
 {

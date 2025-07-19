@@ -19,6 +19,10 @@ public static class DependencyInjection
             cfg.AddOpenBehavior(typeof(ValidationBehaviour<,>));
             cfg.AddOpenBehavior(typeof(PerformanceBehaviour<,>));
             cfg.AddOpenBehavior(typeof(LoggingBehaviour<,>));
+            cfg.AddOpenDecorator(
+                typeof(INotificationHandler<>),
+                typeof(IdempotentDomainEventHandler<>)
+            );
         });
 
         return services;
