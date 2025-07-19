@@ -1,7 +1,7 @@
 ﻿using Bogus;
-using CleanArch.Web.Api.EndpointsPlay.Pdfs.Contracts;
+using CleanArch.Web.Api.Playground.Pdf.Contracts;
 
-namespace CleanArch.Web.Api.EndpointsPlay.Pdfs;
+namespace CleanArch.Web.Api.Playground.Pdf.Services;
 
 public sealed class InvoiceFactory
 {

@@ -17,6 +17,7 @@
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
     <PackageVersion Include="MediatR" Version="12.5.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(EfcoreVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.AI" Version="9.7.1" />
     <PackageVersion Include="PuppeteerSharp" Version="20.2.0" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <!-- Infrastructure -->

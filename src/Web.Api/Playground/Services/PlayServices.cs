@@ -1,6 +1,6 @@
-﻿using CleanArch.Web.Api.EndpointsPlay.Pdfs;
+﻿using CleanArch.Web.Api.Playground.Pdf.Services;
 
-namespace CleanArch.Web.Api.EndpointsPlay;
+namespace CleanArch.Web.Api.Playground.Services;
 
 public static class PlayServices
 {

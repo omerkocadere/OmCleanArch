@@ -1,6 +1,4 @@
-﻿using CleanArch.Web.Api.EndpointsPlay.Pdfs.Contracts;
-
-namespace CleanArch.Web.Api.EndpointsPlay.Pdfs.Contracts;
+﻿namespace CleanArch.Web.Api.Playground.Pdf.Contracts;
 
 public sealed class Invoice
 {

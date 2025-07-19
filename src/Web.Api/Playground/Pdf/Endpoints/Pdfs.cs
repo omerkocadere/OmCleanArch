@@ -1,11 +1,12 @@
 ﻿using System.Globalization;
 using CleanArch.Web.Api.Extensions;
+using CleanArch.Web.Api.Playground.Pdf.Services;
 using HandlebarsDotNet;
 using Microsoft.EntityFrameworkCore;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
 
-namespace CleanArch.Web.Api.EndpointsPlay.Pdfs;
+namespace CleanArch.Web.Api.Playground.Pdf.Endpoints;
 
 public class Pdf : EndpointGroupBase
 {
