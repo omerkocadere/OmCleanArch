@@ -11,7 +11,7 @@ public class Users : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
-        app.MapGroup(this).MapGet(GetById, "{id:int}").MapGet(GetByEmail, "by-email/{email}").MapPost(CreateUser);
+        app.MapGroup(this).MapGet(GetById, "{id:guid}").MapGet(GetByEmail, "by-email/{email}").MapPost(CreateUser);
     }
 
     public async Task<IResult> CreateUser(ISender sender, CreateUserCommand command)

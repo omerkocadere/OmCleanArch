@@ -4,7 +4,7 @@
     <RootNamespace>CleanArch.Infrastructure</RootNamespace>
     <AssemblyName>CleanArch.Infrastructure</AssemblyName>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <Content Include="Data\Seed\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -25,6 +25,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="Polly"/>
+    <PackageReference Include="Scrutor"/>
   </ItemGroup>
 
   <ItemGroup>

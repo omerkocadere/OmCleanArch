@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Reflection;
+using System.Text.Json;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
 using CleanArch.Domain.ValueObjects;
@@ -61,7 +62,14 @@ public static class ApplicationDbContextInitialiser
 
     private static async Task TrySeedAsync(ApplicationDbContext context, ILogger logger)
     {
-        var seedDir = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Seed");
+        // Get the directory where the currently executing assembly is located
+        var assemblyLocation = Assembly.GetExecutingAssembly().Location;
+        var assemblyDirectory =
+            Path.GetDirectoryName(assemblyLocation)
+            ?? throw new InvalidOperationException("Could not determine assembly directory");
+        var seedDir = Path.Combine(assemblyDirectory, "Data", "Seed");
+
+        logger.LogInformation("Assembly location: {AssemblyLocation}", assemblyLocation);
         logger.LogInformation("Seed directory resolved to: {SeedDir}", seedDir);
 
         var usersJsonPath = Path.Combine(seedDir, "users.json");

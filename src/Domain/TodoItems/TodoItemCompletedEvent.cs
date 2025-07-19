@@ -1,3 +1,3 @@
 ﻿namespace CleanArch.Domain.TodoItems;
 
-public record TodoItemCompletedEvent(TodoItem Item) : BaseEvent;
+public record TodoItemCompletedEvent(Guid Id, TodoItem Item) : BaseEvent(Id);

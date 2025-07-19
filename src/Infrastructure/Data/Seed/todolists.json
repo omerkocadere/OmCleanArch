@@ -2,7 +2,7 @@
   {
     "Title": "Personal Tasks",
     "Colour": "#FFFFFF",
-    "UserId": 1,
+    "UserId": "11111111-1111-1111-1111-111111111111",
     "Items": [
       {
         "Title": "Buy groceries",
@@ -14,7 +14,7 @@
         "Labels": ["shopping", "home"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       },
       {
         "Title": "Call plumber",
@@ -26,7 +26,7 @@
         "Labels": ["urgent", "home"],
         "CompletedAt": "2025-06-26T15:00:00",
         "Done": true,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       },
       {
         "Title": "Read a book",
@@ -38,7 +38,7 @@
         "Labels": ["leisure", "personal"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       },
       {
         "Title": "Pay electricity bill",
@@ -50,7 +50,7 @@
         "Labels": ["finance", "urgent"],
         "CompletedAt": "2025-06-27T11:00:00",
         "Done": true,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       },
       {
         "Title": "Walk the dog",
@@ -62,14 +62,14 @@
         "Labels": ["pets", "health"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       }
     ]
   },
   {
     "Title": "Work Projects",
     "Colour": "#6666FF",
-    "UserId": 1,
+    "UserId": "11111111-1111-1111-1111-111111111111",
     "Items": [
       {
         "Title": "Team meeting",
@@ -81,7 +81,7 @@
         "Labels": ["work", "meeting"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       },
       {
         "Title": "Send report",
@@ -93,7 +93,7 @@
         "Labels": ["work", "urgent"],
         "CompletedAt": "2025-06-26T16:30:00",
         "Done": true,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       },
       {
         "Title": "Update resume",
@@ -105,7 +105,7 @@
         "Labels": ["career", "personal"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       },
       {
         "Title": "Book dentist",
@@ -117,7 +117,7 @@
         "Labels": ["health"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       },
       {
         "Title": "Plan vacation",
@@ -129,14 +129,14 @@
         "Labels": ["travel", "leisure"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       }
     ]
   },
   {
     "Title": "Shopping List",
     "Colour": "#CCFF99",
-    "UserId": 1,
+    "UserId": "11111111-1111-1111-1111-111111111111",
     "Items": [
       {
         "Title": "Car service",
@@ -148,7 +148,7 @@
         "Labels": ["car", "maintenance"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       },
       {
         "Title": "Buy birthday gift",
@@ -160,7 +160,7 @@
         "Labels": ["shopping", "gift"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       },
       {
         "Title": "Organize files",
@@ -172,7 +172,7 @@
         "Labels": ["personal", "work"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       },
       {
         "Title": "Water plants",
@@ -184,7 +184,7 @@
         "Labels": ["home", "garden"],
         "CompletedAt": "2025-06-26T08:10:00",
         "Done": true,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       },
       {
         "Title": "Renew insurance",
@@ -196,14 +196,14 @@
         "Labels": ["finance", "car"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 1
+        "UserId": "11111111-1111-1111-1111-111111111111"
       }
     ]
   },
   {
     "Title": "Home Maintenance",
     "Colour": "#FF5733",
-    "UserId": 2,
+    "UserId": "22222222-2222-2222-2222-222222222222",
     "Items": [
       {
         "Title": "Fix leaky faucet",
@@ -215,7 +215,7 @@
         "Labels": ["plumbing", "urgent"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       },
       {
         "Title": "Clean gutters",
@@ -227,7 +227,7 @@
         "Labels": ["maintenance"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       },
       {
         "Title": "Test smoke alarms",
@@ -239,7 +239,7 @@
         "Labels": ["safety"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       },
       {
         "Title": "Paint fence",
@@ -251,7 +251,7 @@
         "Labels": ["outdoor"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       },
       {
         "Title": "Service HVAC",
@@ -263,14 +263,14 @@
         "Labels": ["maintenance", "hvac"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       }
     ]
   },
   {
     "Title": "Travel Plans",
     "Colour": "#FFFF66",
-    "UserId": 2,
+    "UserId": "22222222-2222-2222-2222-222222222222",
     "Items": [
       {
         "Title": "Book flights",
@@ -282,7 +282,7 @@
         "Labels": ["travel", "booking"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       },
       {
         "Title": "Renew passport",
@@ -294,7 +294,7 @@
         "Labels": ["documents"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       },
       {
         "Title": "Reserve hotel",
@@ -306,7 +306,7 @@
         "Labels": ["travel", "hotel"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       },
       {
         "Title": "Plan itinerary",
@@ -318,7 +318,7 @@
         "Labels": ["planning"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       },
       {
         "Title": "Buy travel insurance",
@@ -330,14 +330,14 @@
         "Labels": ["insurance"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       }
     ]
   },
   {
     "Title": "Books to Read",
     "Colour": "#FFFFFF",
-    "UserId": 2,
+    "UserId": "22222222-2222-2222-2222-222222222222",
     "Items": [
       {
         "Title": "Read '1984'",
@@ -349,7 +349,7 @@
         "Labels": ["reading", "fiction"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       },
       {
         "Title": "Start 'Sapiens'",
@@ -361,7 +361,7 @@
         "Labels": ["reading", "nonfiction"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       },
       {
         "Title": "Finish 'Atomic Habits'",
@@ -373,7 +373,7 @@
         "Labels": ["reading", "selfhelp"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       },
       {
         "Title": "Review 'Clean Code'",
@@ -385,7 +385,7 @@
         "Labels": ["reading", "tech"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       },
       {
         "Title": "Explore 'The Pragmatic Programmer'",
@@ -397,14 +397,14 @@
         "Labels": ["reading", "tech"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 2
+        "UserId": "22222222-2222-2222-2222-222222222222"
       }
     ]
   },
   {
     "Title": "Health Goals",
     "Colour": "#6666FF",
-    "UserId": 3,
+    "UserId": "33333333-3333-3333-3333-333333333333",
     "Items": [
       {
         "Title": "Morning jog",
@@ -416,7 +416,7 @@
         "Labels": ["exercise", "health"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       },
       {
         "Title": "Drink water",
@@ -428,7 +428,7 @@
         "Labels": ["health"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       },
       {
         "Title": "Prepare healthy lunch",
@@ -440,7 +440,7 @@
         "Labels": ["diet", "health"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       },
       {
         "Title": "Meditation",
@@ -452,7 +452,7 @@
         "Labels": ["wellness"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       },
       {
         "Title": "Track sleep",
@@ -464,14 +464,14 @@
         "Labels": ["health", "sleep"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       }
     ]
   },
   {
     "Title": "Family Events",
     "Colour": "#CCFF99",
-    "UserId": 3,
+    "UserId": "33333333-3333-3333-3333-333333333333",
     "Items": [
       {
         "Title": "Family dinner",
@@ -483,7 +483,7 @@
         "Labels": ["family", "event"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       },
       {
         "Title": "Call parents",
@@ -495,7 +495,7 @@
         "Labels": ["family"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       },
       {
         "Title": "Plan birthday party",
@@ -507,7 +507,7 @@
         "Labels": ["family", "birthday"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       },
       {
         "Title": "Visit grandparents",
@@ -519,7 +519,7 @@
         "Labels": ["family", "visit"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       },
       {
         "Title": "Game night",
@@ -531,14 +531,14 @@
         "Labels": ["family", "fun"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       }
     ]
   },
   {
     "Title": "Finance",
     "Colour": "#FF5733",
-    "UserId": 3,
+    "UserId": "33333333-3333-3333-3333-333333333333",
     "Items": [
       {
         "Title": "Review budget",
@@ -550,7 +550,7 @@
         "Labels": ["finance", "budget"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       },
       {
         "Title": "Pay credit card",
@@ -562,7 +562,7 @@
         "Labels": ["finance", "urgent"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       },
       {
         "Title": "Check investments",
@@ -574,7 +574,7 @@
         "Labels": ["finance", "investments"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       },
       {
         "Title": "File taxes",
@@ -586,7 +586,7 @@
         "Labels": ["finance", "taxes"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       },
       {
         "Title": "Set savings goal",
@@ -598,7 +598,7 @@
         "Labels": ["finance", "savings"],
         "CompletedAt": null,
         "Done": false,
-        "UserId": 3
+        "UserId": "33333333-3333-3333-3333-333333333333"
       }
     ]
   }

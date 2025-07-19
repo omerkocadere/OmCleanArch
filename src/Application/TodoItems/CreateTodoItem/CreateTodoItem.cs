@@ -35,7 +35,7 @@ public class CreateTodoItemCommandHandler(IApplicationDbContext context, IMapper
         var entity = mapper.Map<TodoItem>(request);
         entity.UserId = user.Id;
 
-        entity.AddDomainEvent(new TodoItemCreatedEvent(entity));
+        entity.AddDomainEvent(new TodoItemCreatedEvent(Guid.NewGuid(), entity));
 
         context.TodoItems.Add(entity);
         await context.SaveChangesAsync(cancellationToken);

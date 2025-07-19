@@ -24,7 +24,7 @@ public sealed class TodoItem : BaseAuditableEntity<int>
         {
             if (value && !_done)
             {
-                AddDomainEvent(new TodoItemCompletedEvent(this));
+                AddDomainEvent(new TodoItemCompletedEvent(Guid.NewGuid(), this));
             }
 
             _done = value;

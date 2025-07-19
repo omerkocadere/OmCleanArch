@@ -18,8 +18,11 @@ public class CreateUser(IApplicationDbContext context, IMapper mapper) : IComman
 {
     public async Task<Result<UserDto>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        var passwordHash = HashPassword(request.Password);
-        var user = User.Create(request.Email, request.FirstName, request.LastName, passwordHash);
+        var user = mapper.Map<User>(request);
+        user.Id = Guid.NewGuid();
+        user.PasswordHash = HashPassword(request.Password);
+
+        user.AddDomainEvent(new UserCreatedDomainEvent(Guid.NewGuid(), user));
 
         context.Users.Add(user);
         await context.SaveChangesAsync(cancellationToken);

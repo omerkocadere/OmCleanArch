@@ -22,9 +22,12 @@ To use Aspire orchestration and dashboard features, install the Aspire CLI tool 
  docker compose up -d
 ```
 
+## Run Azure SQL Edge container
 
+docker run -e "ACCEPT_EULA=1" -e "MSSQL_SA_PASSWORD=Aa123456!" \
+ -p 1433:1433 --name azure-sql \
+ -d mcr.microsoft.com/azure-sql-edge
 
 docker cp infra-web-api-1:/app ./local-directory
-
 
 For more info: https://learn.microsoft.com/en-us/dotnet/aspire/get-started/aspire-cli

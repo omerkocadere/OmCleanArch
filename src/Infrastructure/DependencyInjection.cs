@@ -1,7 +1,9 @@
 ﻿using CleanArch.Application.Common.Interfaces;
 using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
+using CleanArch.Infrastructure.Idempotence;
 using CleanArch.Infrastructure.Services;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,7 +22,8 @@ public static class DependencyInjection
             .AddServices()
             .AddDatabase(env, configuration)
             // .AddBackgroundJobs(configuration)
-            .AddAuthenticationInternal();
+            .AddAuthenticationInternal()
+            .AddMediatRDecorators();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -33,6 +36,17 @@ public static class DependencyInjection
     private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
+        return services;
+    }
+
+    /// <summary>
+    /// Registers MediatR decorators using Scrutor for cross-cutting concerns.
+    /// This ensures all domain event handlers are wrapped with idempotency logic.
+    /// </summary>
+    private static IServiceCollection AddMediatRDecorators(this IServiceCollection services)
+    {
+        services.Decorate(typeof(INotificationHandler<>), typeof(IdempotentDomainEventHandler<>));
+
         return services;
     }
 }

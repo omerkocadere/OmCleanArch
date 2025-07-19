@@ -9,15 +9,9 @@ public record DeleteTodoItemCommand(int Id) : IRequest<Result>;
 public class DeleteTodoItemCommandHandler(IApplicationDbContext context)
     : IRequestHandler<DeleteTodoItemCommand, Result>
 {
-    public async Task<Result> Handle(
-        DeleteTodoItemCommand request,
-        CancellationToken cancellationToken
-    )
+    public async Task<Result> Handle(DeleteTodoItemCommand request, CancellationToken cancellationToken)
     {
-        TodoItem? todoItem = await context.TodoItems.SingleOrDefaultAsync(
-            t => t.Id == request.Id,
-            cancellationToken
-        );
+        TodoItem? todoItem = await context.TodoItems.SingleOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
 
         if (todoItem is null)
         {
@@ -26,7 +20,7 @@ public class DeleteTodoItemCommandHandler(IApplicationDbContext context)
 
         context.TodoItems.Remove(todoItem);
 
-        todoItem.AddDomainEvent(new TodoItemDeletedEvent(todoItem));
+        todoItem.AddDomainEvent(new TodoItemDeletedEvent(Guid.NewGuid(), todoItem));
 
         await context.SaveChangesAsync(cancellationToken);
 
