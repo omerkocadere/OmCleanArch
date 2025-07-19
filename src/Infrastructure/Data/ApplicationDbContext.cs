@@ -13,12 +13,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         IApplicationDbContext
 {
     public DbSet<TodoList> TodoLists => Set<TodoList>();
-
     public DbSet<TodoItem> TodoItems => Set<TodoItem>();
-
     public DbSet<User> Users => Set<User>();
-
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+    public DbSet<OutboxMessageConsumer> OutboxMessageConsumers => Set<OutboxMessageConsumer>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
