@@ -56,9 +56,6 @@ app.MapHealthChecks("/health");
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
-app.UseAuthorization();
-
 app.UseRequestContextLogging();
 
 //app.UseSerilogRequestLogging();
