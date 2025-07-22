@@ -11,10 +11,7 @@ public sealed record GetUserByEmailQuery(string Email) : IQuery<UserDto>;
 internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context)
     : IQueryHandler<GetUserByEmailQuery, UserDto>
 {
-    public async Task<Result<UserDto>> Handle(
-        GetUserByEmailQuery query,
-        CancellationToken cancellationToken
-    )
+    public async Task<Result<UserDto>> Handle(GetUserByEmailQuery query, CancellationToken cancellationToken)
     {
         UserDto? user = await context
             .Users.Where(u => u.Email == query.Email)
@@ -24,6 +21,7 @@ internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context)
                 FirstName = u.FirstName,
                 LastName = u.LastName,
                 Email = u.Email,
+                DisplayName = u.DisplayName,
             })
             .SingleOrDefaultAsync(cancellationToken);
 

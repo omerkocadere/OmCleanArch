@@ -1,4 +1,6 @@
 ﻿using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Authentication;
+using CleanArch.Infrastructure.Authentication;
 using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Idempotence;
@@ -36,6 +38,9 @@ public static class DependencyInjection
     private static IServiceCollection AddAuthenticationInternal(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
+        services.AddScoped<IUserContext, UserContext>();
+        services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        services.AddSingleton<ITokenProvider, TokenProvider>();
         return services;
     }
 

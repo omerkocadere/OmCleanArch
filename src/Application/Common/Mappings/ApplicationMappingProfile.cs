@@ -1,3 +1,4 @@
+using AutoMapper;
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.TodoItems.CreateTodoItem;
 using CleanArch.Application.TodoItems.DTOs;
@@ -34,7 +35,7 @@ public class ApplicationMappingProfile : Profile
 
         CreateMap<User, UserDto>();
         CreateMap<CreateUserCommand, User>();
-
+        
         #endregion
     }
 }

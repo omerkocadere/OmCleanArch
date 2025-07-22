@@ -20,6 +20,7 @@ internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context) : I
                 FirstName = u.FirstName,
                 LastName = u.LastName,
                 Email = u.Email,
+                DisplayName = u.DisplayName,
             })
             .SingleOrDefaultAsync(cancellationToken);
 

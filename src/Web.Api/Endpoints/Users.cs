@@ -3,6 +3,7 @@ using CleanArch.Application.Users.Create;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Application.Users.GetByEmail;
 using CleanArch.Application.Users.GetById;
+using CleanArch.Application.Users.Login;
 using CleanArch.Web.Api.Extensions;
 
 namespace CleanArch.Web.Api.Endpoints;
@@ -11,17 +12,25 @@ public class Users : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
-        app.MapGroup(this).MapGet(GetById, "{id:guid}").MapGet(GetByEmail, "by-email/{email}").MapPost(CreateUser);
+        app.MapGroup(this)
+            .MapPost(Register, "register")
+            .MapPost(Login, "login")
+            .MapGet(GetById, "{id:guid}")
+            .MapGet(GetByEmail, "by-email/{email}");
     }
 
-    public async Task<IResult> CreateUser(ISender sender, CreateUserCommand command)
+    public async Task<IResult> Login(ISender sender, LoginCommand command)
     {
         Result<UserDto> result = await sender.Send(command);
 
-        return result.Match(
-            dto => Results.CreatedAtRoute(nameof(GetById), new { id = dto.Id }, dto),
-            CustomResults.Problem
-        );
+        return result.Match(user => Results.Ok(user), CustomResults.Problem);
+    }
+
+    public async Task<IResult> Register(ISender sender, CreateUserCommand command)
+    {
+        Result<Guid> result = await sender.Send(command);
+
+        return result.Match(id => Results.CreatedAtRoute(nameof(GetById), new { id }, id), CustomResults.Problem);
     }
 
     public async Task<IResult> GetById(ISender sender, Guid id)
