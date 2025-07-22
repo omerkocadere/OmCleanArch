@@ -23,7 +23,10 @@ public class ValidationBehaviour<TRequest, TResponse>(IEnumerable<IValidator<TRe
         }
 
         ValidationError error = CreateValidationError(validationFailures);
-        return (TResponse)TResponse.CreateFailure(error);
+
+        IOperationResult result = TResponse.CreateFailure(error);
+
+        return (TResponse)result;
     }
 
     private static async Task<List<ValidationFailure>> ValidateAsync(

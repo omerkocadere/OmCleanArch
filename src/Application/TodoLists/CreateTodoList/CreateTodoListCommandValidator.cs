@@ -12,7 +12,10 @@ public class CreateTodoListCommandValidator : AbstractValidator<CreateTodoListCo
 
         RuleFor(v => v.Title)
             .NotEmpty()
+            .MinimumLength(3)
             .MaximumLength(200)
+            .Matches("^[a-zA-Z]+$")
+            .WithMessage("Only letters are allowed.")
             .MustAsync(BeUniqueTitle)
             .WithMessage("'{PropertyName}' must be unique.")
             .WithErrorCode("Unique");

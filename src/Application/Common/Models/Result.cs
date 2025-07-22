@@ -44,7 +44,7 @@ public class Result : IOperationResult
     public static IOperationResult CreateFailure(Error error) => Failure(error);
 }
 
-public class Result<TValue>(TValue? value, bool isSuccess, Error error) : Result(isSuccess, error)
+public class Result<TValue>(TValue? value, bool isSuccess, Error error) : Result(isSuccess, error), IOperationResult
 {
     public TValue Value =>
         IsSuccess ? value! : throw new InvalidOperationException("The value of a failure result can't be accessed.");
