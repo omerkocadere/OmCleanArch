@@ -28,9 +28,12 @@ public class Users : EndpointGroupBase
 
     public async Task<IResult> Register(ISender sender, CreateUserCommand command)
     {
-        Result<Guid> result = await sender.Send(command);
+        Result<UserDto> result = await sender.Send(command);
 
-        return result.Match(id => Results.CreatedAtRoute(nameof(GetById), new { id }, id), CustomResults.Problem);
+        return result.Match(
+            dto => Results.CreatedAtRoute(nameof(GetById), new { id = dto.Id }, dto),
+            CustomResults.Problem
+        );
     }
 
     public async Task<IResult> GetById(ISender sender, Guid id)

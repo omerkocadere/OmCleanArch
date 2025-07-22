@@ -25,7 +25,7 @@ internal sealed class LoginCommandHandler(
     public async Task<Result<UserDto>> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
         var user = await context.Users.SingleOrDefaultAsync(
-            x => x.Email.Equals(command.Email, StringComparison.CurrentCultureIgnoreCase),
+            u => u.Email.ToLower() == command.Email.ToLower(),
             cancellationToken
         );
 

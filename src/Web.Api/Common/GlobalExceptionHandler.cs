@@ -34,7 +34,7 @@ public class GlobalExceptionHandler(
             (int?)exceptionType.GetProperty("StatusCode")?.GetValue(exception)
             ?? StatusCodes.Status500InternalServerError;
 
-        var title = exceptionType.GetProperty("Title")?.GetValue(exception)?.ToString() ?? exception.Message;
+        var title = exceptionType.GetProperty("Title")?.GetValue(exception)?.ToString();
 
         return await problemDetailsService.TryWriteAsync(
             new ProblemDetailsContext

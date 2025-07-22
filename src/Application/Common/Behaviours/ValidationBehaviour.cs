@@ -38,9 +38,7 @@ public class ValidationBehaviour<TRequest, TResponse>(IEnumerable<IValidator<TRe
 
         var context = new ValidationContext<TRequest>(request);
 
-        ValidationResult[] validationResults = await Task.WhenAll(
-            validators.Select(v => v.ValidateAsync(context))
-        );
+        ValidationResult[] validationResults = await Task.WhenAll(validators.Select(v => v.ValidateAsync(context)));
 
         List<ValidationFailure> validationFailures =
         [
@@ -52,7 +50,6 @@ public class ValidationBehaviour<TRequest, TResponse>(IEnumerable<IValidator<TRe
         return validationFailures;
     }
 
-    private static ValidationError CreateValidationError(
-        List<ValidationFailure> validationFailures
-    ) => new([.. validationFailures.Select(f => Error.Validation(f.ErrorCode, f.ErrorMessage))]);
+    private static ValidationError CreateValidationError(List<ValidationFailure> validationFailures) =>
+        new([.. validationFailures.Select(f => Error.Validation(f.ErrorCode, f.ErrorMessage))]);
 }
