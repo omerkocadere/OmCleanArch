@@ -1,11 +1,12 @@
-﻿using CleanArch.Domain.Common;
+﻿using CleanArch.Application.Common.Interfaces.Authentication;
+using CleanArch.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace CleanArch.Infrastructure.Data.Interceptors;
 
-public class AuditableEntityInterceptor(TimeProvider dateTime) : SaveChangesInterceptor
+public class AuditableEntityInterceptor(IUserContext user, TimeProvider dateTime) : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
@@ -37,10 +38,10 @@ public class AuditableEntityInterceptor(TimeProvider dateTime) : SaveChangesInte
                 var utcNow = dateTime.GetUtcNow();
                 if (entry.State == EntityState.Added)
                 {
-                    entry.Entity.CreatedBy = null;
+                    entry.Entity.CreatedBy = user.UserId;
                     entry.Entity.Created = utcNow;
                 }
-                entry.Entity.LastModifiedBy = null;
+                entry.Entity.LastModifiedBy = user.UserId;
                 entry.Entity.LastModified = utcNow;
             }
         }

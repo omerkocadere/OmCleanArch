@@ -1,10 +1,11 @@
-﻿using CleanArch.Application.Common.Models;
+﻿using CleanArch.Application.Common.Interfaces.Authentication;
+using CleanArch.Application.Common.Models;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
 
 namespace CleanArch.Application.Common.Behaviours;
 
-public class LoggingBehaviour<TRequest, TResponse>(ILogger<TRequest> logger)
+public class LoggingBehaviour<TRequest, TResponse>(ILogger<TRequest> logger, IUserContext user)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
     where TResponse : Result
@@ -16,7 +17,9 @@ public class LoggingBehaviour<TRequest, TResponse>(ILogger<TRequest> logger)
     )
     {
         var requestName = typeof(TRequest).Name;
-        logger.LogInformation("Processing request: {Name} {@Request}", requestName, request);
+        var userId = user.UserId;
+
+        logger.LogInformation("Processing request: {Name} {@UserId} {@Request}", requestName, userId, request);
 
         var result = await next(cancellationToken);
 
