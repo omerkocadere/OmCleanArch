@@ -1,4 +1,5 @@
 ﻿using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.TodoItems.DTOs;
 using CleanArch.Domain.TodoItems;
@@ -18,14 +19,14 @@ public record CreateTodoItemCommand() : IRequest<Result<TodoItemDto>>
     public List<string> Labels { get; set; } = [];
 }
 
-public class CreateTodoItemCommandHandler(IApplicationDbContext context, IMapper mapper)
+public class CreateTodoItemCommandHandler(IApplicationDbContext context, IMapper mapper, IUserContext userContext)
     : IRequestHandler<CreateTodoItemCommand, Result<TodoItemDto>>
 {
     public async Task<Result<TodoItemDto>> Handle(CreateTodoItemCommand request, CancellationToken cancellationToken)
     {
         User? user = await context
             .Users.AsNoTracking()
-            .SingleOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+            .SingleOrDefaultAsync(u => u.Id == request.UserId && u.Id == userContext.UserId, cancellationToken);
 
         if (user is null)
         {
