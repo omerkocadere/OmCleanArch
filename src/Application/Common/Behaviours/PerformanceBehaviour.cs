@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CleanArch.Application.Common.Interfaces.Authentication;
+using Microsoft.Extensions.Logging;
 
 namespace CleanArch.Application.Common.Behaviours;
 
 public class PerformanceBehaviour<TRequest, TResponse>(
     ILogger<TRequest> logger,
-    TimeProvider timeProvider
+    TimeProvider timeProvider,
+    IUserContext user
 ) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {
@@ -26,11 +28,13 @@ public class PerformanceBehaviour<TRequest, TResponse>(
         if (elapsedMilliseconds > LongRunningThresholdMs)
         {
             var requestName = typeof(TRequest).Name;
+            var userId = user.UserId;
 
             logger.LogWarning(
-                "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@Request}",
+                "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@Request}",
                 requestName,
                 elapsedMilliseconds,
+                userId,
                 request
             );
         }
