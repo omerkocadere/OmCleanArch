@@ -8,7 +8,7 @@ namespace CleanArch.Application.Common.Behaviours;
 public class LoggingBehaviour<TRequest, TResponse>(ILogger<TRequest> logger, IUserContext user)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
-    where TResponse : Result
+    where TResponse : IOperationResult
 {
     public async Task<TResponse> Handle(
         TRequest request,

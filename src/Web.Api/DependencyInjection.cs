@@ -1,9 +1,6 @@
 ﻿using CleanArch.Infrastructure.Data;
 using CleanArch.Web.Api.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace CleanArch.Web.Api;
 

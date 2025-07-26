@@ -35,6 +35,11 @@ public static class DependencyInjection
     {
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<ITelemetryService, TelemetryService>();
+
+        // Add Memory Cache services
+        services.AddMemoryCache();
+        services.AddScoped<ICacheService, MemoryCacheService>();
+
         return services;
     }
 
