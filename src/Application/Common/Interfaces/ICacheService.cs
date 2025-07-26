@@ -12,7 +12,7 @@ public interface ICacheService
     /// <param name="key">The cache key.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The cached value if found, otherwise null.</returns>
-    Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
+    ValueTask<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
         where T : class;
 
     /// <summary>
@@ -24,7 +24,7 @@ public interface ICacheService
     /// <param name="expiration">Cache expiration time. If null, uses default expiration.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The cached or newly created value.</returns>
-    Task<T> GetOrCreateAsync<T>(
+    ValueTask<T> GetOrCreateAsync<T>(
         string key,
         Func<Task<T>> factory,
         TimeSpan? expiration = null,
@@ -40,7 +40,12 @@ public interface ICacheService
     /// <param name="value">The value to cache.</param>
     /// <param name="expiration">Cache expiration time. If null, uses default expiration.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    Task SetAsync<T>(string key, T value, TimeSpan? expiration = null, CancellationToken cancellationToken = default)
+    ValueTask SetAsync<T>(
+        string key,
+        T value,
+        TimeSpan? expiration = null,
+        CancellationToken cancellationToken = default
+    )
         where T : class;
 
     /// <summary>
@@ -48,12 +53,12 @@ public interface ICacheService
     /// </summary>
     /// <param name="key">The cache key.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    Task RemoveAsync(string key, CancellationToken cancellationToken = default);
+    ValueTask RemoveAsync(string key, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Removes all cached values that start with the specified prefix.
     /// </summary>
     /// <param name="prefix">The key prefix.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    Task RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default);
+    ValueTask RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default);
 }
