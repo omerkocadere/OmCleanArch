@@ -1,3 +1,4 @@
+using CleanArch.Application.Tests.Common;
 using CleanArch.Application.Users.Create;
 
 namespace CleanArch.Application.Tests.Users.Create;
@@ -13,31 +14,40 @@ public class CreateUserCommandHandlerTests
     {
         _mockContext = new Mock<IApplicationDbContext>();
         _mockPasswordHasher = new Mock<IPasswordHasher>();
-
+        _mapper = MapperFactory.Create();
         _handler = new CreateUserCommandHandler(_mockContext.Object, _mockPasswordHasher.Object, _mapper);
+    }
+
+    private Mock<DbSet<User>> SetupMockContext(List<User>? existingUsers = null)
+    {
+        existingUsers ??= [];
+        var mockUsersDbSet = existingUsers.BuildMockDbSet();
+        _mockContext.Setup(x => x.Users).Returns(mockUsersDbSet.Object);
+        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        return mockUsersDbSet;
+    }
+
+    private static CreateUserCommand CreateValidCommand(string email = "test@example.com")
+    {
+        return new CreateUserCommand
+        {
+            Email = email,
+            DisplayName = "Test User",
+            FirstName = "Test",
+            LastName = "User",
+            Password = "password123",
+        };
     }
 
     [Fact]
     public async Task Handle_WithValidCommand_ShouldCreateUserSuccessfully()
     {
         // Arrange
-        var command = new CreateUserCommand
-        {
-            Email = "test@example.com",
-            DisplayName = "Test User",
-            FirstName = "Test",
-            LastName = "User",
-            Password = "password123",
-        };
-
+        var command = CreateValidCommand();
         var hashedPassword = "hashed_password123";
-        _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns(hashedPassword);
 
-        // Setup Users DbSet with no existing users
-        var users = new List<User>();
-        Mock<DbSet<User>> mockUsersDbSet = users.BuildMockDbSet();
-        _mockContext.Setup(x => x.Users).Returns(mockUsersDbSet.Object);
-        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns(hashedPassword);
+        var mockUsersDbSet = SetupMockContext();
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -51,13 +61,9 @@ public class CreateUserCommandHandlerTests
         result.Value.FirstName.Should().Be(command.FirstName);
         result.Value.LastName.Should().Be(command.LastName);
 
-        // Verify password was hashed
+        // Verify interactions
         _mockPasswordHasher.Verify(x => x.Hash(command.Password), Times.Once);
-
-        // Verify user was added to context
         mockUsersDbSet.Verify(x => x.Add(It.IsAny<User>()), Times.Once);
-
-        // Verify SaveChangesAsync was called
         _mockContext.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -65,29 +71,20 @@ public class CreateUserCommandHandlerTests
     public async Task Handle_WithExistingEmail_ShouldReturnEmailNotUniqueError()
     {
         // Arrange
-        var command = new CreateUserCommand
-        {
-            Email = "existing@example.com",
-            DisplayName = "Test User",
-            FirstName = "Test",
-            LastName = "User",
-            Password = "password123",
-        };
+        var existingEmail = "existing@example.com";
+        var command = CreateValidCommand(existingEmail);
 
-        // Setup Users DbSet with existing user
         var existingUser = new User
         {
             Id = Guid.NewGuid(),
-            Email = "existing@example.com",
+            Email = existingEmail,
             DisplayName = "Existing User",
             FirstName = "Existing",
             LastName = "User",
             PasswordHash = "existinghashedpassword",
         };
 
-        var users = new List<User> { existingUser };
-        var mockUsersDbSet = users.BuildMockDbSet();
-        _mockContext.Setup(x => x.Users).Returns(mockUsersDbSet.Object);
+        SetupMockContext([existingUser]);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -97,13 +94,8 @@ public class CreateUserCommandHandlerTests
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().Be(UserErrors.EmailNotUnique);
 
-        // Verify password hasher was not called
+        // Verify no side effects occurred
         _mockPasswordHasher.Verify(x => x.Hash(It.IsAny<string>()), Times.Never);
-
-        // Verify user was not added
-        mockUsersDbSet.Verify(x => x.Add(It.IsAny<User>()), Times.Never);
-
-        // Verify SaveChangesAsync was not called
         _mockContext.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -123,10 +115,7 @@ public class CreateUserCommandHandlerTests
         var hashedPassword = "hashed_securepassword";
         _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns(hashedPassword);
 
-        var users = new List<User>();
-        var mockUsersDbSet = users.BuildMockDbSet();
-        _mockContext.Setup(x => x.Users).Returns(mockUsersDbSet.Object);
-        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        var mockUsersDbSet = SetupMockContext();
 
         User? capturedUser = null;
         mockUsersDbSet.Setup(x => x.Add(It.IsAny<User>())).Callback<User>(user => capturedUser = user);
@@ -150,21 +139,10 @@ public class CreateUserCommandHandlerTests
     public async Task Handle_WithValidCommand_ShouldAddDomainEvent()
     {
         // Arrange
-        var command = new CreateUserCommand
-        {
-            Email = "event@example.com",
-            DisplayName = "Event User",
-            FirstName = "Event",
-            LastName = "User",
-            Password = "password123",
-        };
-
+        var command = CreateValidCommand("event@example.com");
         _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns("hashed_password");
 
-        var users = new List<User>();
-        var mockUsersDbSet = users.BuildMockDbSet();
-        _mockContext.Setup(x => x.Users).Returns(mockUsersDbSet.Object);
-        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        var mockUsersDbSet = SetupMockContext();
 
         User? capturedUser = null;
         mockUsersDbSet.Setup(x => x.Add(It.IsAny<User>())).Callback<User>(user => capturedUser = user);
@@ -191,22 +169,11 @@ public class CreateUserCommandHandlerTests
     public async Task Handle_WithCancellationToken_ShouldPassTokenThroughToContext()
     {
         // Arrange
-        var command = new CreateUserCommand
-        {
-            Email = "cancel@example.com",
-            DisplayName = "Cancel User",
-            FirstName = "Cancel",
-            LastName = "User",
-            Password = "password123",
-        };
-
+        var command = CreateValidCommand("cancel@example.com");
         var cancellationToken = new CancellationToken();
-        _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns("hashed_password");
 
-        var users = new List<User>();
-        var mockUsersDbSet = users.BuildMockDbSet();
-        _mockContext.Setup(x => x.Users).Returns(mockUsersDbSet.Object);
-        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns("hashed_password");
+        var mockUsersDbSet = SetupMockContext();
 
         // Act
         var result = await _handler.Handle(command, cancellationToken);
@@ -214,7 +181,9 @@ public class CreateUserCommandHandlerTests
         // Assert
         result.IsSuccess.Should().BeTrue();
 
-        // Verify that the cancellation token was passed to SaveChangesAsync
+        // Verify interactions
+        _mockPasswordHasher.Verify(x => x.Hash(command.Password), Times.Once);
+        mockUsersDbSet.Verify(x => x.Add(It.IsAny<User>()), Times.Once);
         _mockContext.Verify(x => x.SaveChangesAsync(cancellationToken), Times.Once);
     }
 
@@ -222,16 +191,8 @@ public class CreateUserCommandHandlerTests
     public async Task Handle_WithEmailCaseInsensitiveMatch_ShouldReturnEmailNotUniqueError()
     {
         // Arrange
-        var command = new CreateUserCommand
-        {
-            Email = "TEST@EXAMPLE.COM", // Uppercase email
-            DisplayName = "Test User",
-            FirstName = "Test",
-            LastName = "User",
-            Password = "password123",
-        };
+        var command = CreateValidCommand("TEST@EXAMPLE.COM"); // Uppercase email
 
-        // Setup Users DbSet with existing user with lowercase email
         var existingUser = new User
         {
             Id = Guid.NewGuid(),
@@ -242,9 +203,7 @@ public class CreateUserCommandHandlerTests
             PasswordHash = "existinghashedpassword",
         };
 
-        var users = new List<User> { existingUser };
-        var mockUsersDbSet = users.BuildMockDbSet();
-        _mockContext.Setup(x => x.Users).Returns(mockUsersDbSet.Object);
+        SetupMockContext([existingUser]);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
