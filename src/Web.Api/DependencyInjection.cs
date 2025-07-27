@@ -1,6 +1,8 @@
 ﻿using CleanArch.Infrastructure.Data;
 using CleanArch.Web.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using NSwag;
+using NSwag.Generation.Processors.Security;
 
 namespace CleanArch.Web.Api;
 
@@ -28,7 +30,27 @@ public static class DependencyInjection
         services.AddEndpointsApiExplorer();
 
         // This service relies on the metadata collected by AddEndpointsApiExplorer() to build a comprehensive OpenAPI (Swagger) specification document,
-        services.AddOpenApiDocument();
+        services.AddOpenApiDocument(
+            (configure, sp) =>
+            {
+                configure.Title = "JasonCA API";
+
+                // Add JWT
+                configure.AddSecurity(
+                    "JWT",
+                    [],
+                    new OpenApiSecurityScheme
+                    {
+                        Type = OpenApiSecuritySchemeType.ApiKey,
+                        Name = "Authorization",
+                        In = OpenApiSecurityApiKeyLocation.Header,
+                        Description = "Type into the textbox: Bearer {your JWT token}.",
+                    }
+                );
+
+                configure.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
+            }
+        );
 
         // Add typed HttpClient for Dummy API
         services.AddHttpClient<DummyApiClient>(
