@@ -13,12 +13,14 @@ public class Users : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
-        app.MapGroup(this)
+        var group = app.MapGroup(this)
             .MapPost(Register, "register")
             .MapPost(Login, "login")
-            .MapGet(GetAll, "")
             .MapGet(GetById, "{id:guid}")
             .MapGet(GetByEmail, "by-email/{email}");
+
+        var protectedGroup = app.MapGroup(this).RequireAuthorization();
+        protectedGroup.MapGet(GetAll, "");
     }
 
     public async Task<IResult> Login(ISender sender, LoginCommand command)
