@@ -1,6 +1,7 @@
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.Create;
 using CleanArch.Application.Users.DTOs;
+using CleanArch.Application.Users.GetAll;
 using CleanArch.Application.Users.GetByEmail;
 using CleanArch.Application.Users.GetById;
 using CleanArch.Application.Users.Login;
@@ -15,6 +16,7 @@ public class Users : EndpointGroupBase
         app.MapGroup(this)
             .MapPost(Register, "register")
             .MapPost(Login, "login")
+            .MapGet(GetAll, "")
             .MapGet(GetById, "{id:guid}")
             .MapGet(GetByEmail, "by-email/{email}");
     }
@@ -46,6 +48,13 @@ public class Users : EndpointGroupBase
     public async Task<IResult> GetByEmail(ISender sender, string email)
     {
         var result = await sender.Send(new GetUserByEmailQuery(email));
+
+        return result.Match(Results.Ok, CustomResults.Problem);
+    }
+
+    public async Task<IResult> GetAll(ISender sender)
+    {
+        var result = await sender.Send(new GetAllUsersQuery());
 
         return result.Match(Results.Ok, CustomResults.Problem);
     }
