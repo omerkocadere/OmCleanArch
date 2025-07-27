@@ -8,7 +8,7 @@ namespace CleanArch.Application.Users.GetAll;
 public sealed record GetAllUsersQuery : IQuery<IEnumerable<UserDto>>, ICacheableQuery
 {
     public string CacheKey => "users:all";
-    public TimeSpan? Expiration => TimeSpan.FromMinutes(15);
+    public TimeSpan? Expiration => TimeSpan.FromMinutes(1);
 }
 
 internal sealed class GetAllUsersQueryHandler(IApplicationDbContext context)
