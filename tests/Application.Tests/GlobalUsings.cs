@@ -1,0 +1,17 @@
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using AutoMapper;
+global using CleanArch.Application.Common.Interfaces;
+global using CleanArch.Application.Common.Interfaces.Authentication;
+global using CleanArch.Application.Common.Models;
+global using CleanArch.Application.Users.DTOs;
+global using CleanArch.Domain.Common;
+global using CleanArch.Domain.Users;
+global using FluentAssertions;
+global using Microsoft.EntityFrameworkCore;
+global using MockQueryable.Moq;
+global using Moq;
+global using Xunit;

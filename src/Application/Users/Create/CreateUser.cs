@@ -16,7 +16,7 @@ public sealed record CreateUserCommand : ICommand<UserDto>
     public required string Password { get; set; }
 }
 
-public class CreateUser(IApplicationDbContext context, IPasswordHasher passwordHasher, IMapper mapper)
+public class CreateUserCommandHandler(IApplicationDbContext context, IPasswordHasher passwordHasher, IMapper mapper)
     : ICommandHandler<CreateUserCommand, UserDto>
 {
     public async Task<Result<UserDto>> Handle(CreateUserCommand command, CancellationToken cancellationToken)
