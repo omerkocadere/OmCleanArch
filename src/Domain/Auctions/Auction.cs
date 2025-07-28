@@ -2,7 +2,7 @@ using CleanArch.Domain.Items;
 
 namespace CleanArch.Domain.Auctions;
 
-public class Auction : BaseAuditableEntity
+public class Auction : BaseAuditableEntity<int>
 {
     public int ReservePrice { get; set; }
     public required string Seller { get; set; }
