@@ -1,5 +1,8 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using CleanArch.Domain.Auctions;
+using CleanArch.Domain.Products;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
 using CleanArch.Domain.ValueObjects;
@@ -31,7 +34,7 @@ public static class ApplicationDbContextInitialiser
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
-        Converters = { new ColourJsonConverter() },
+        Converters = { new ColourJsonConverter(), new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
     };
 
     public static async Task InitialiseAsync(ApplicationDbContext context, ILogger logger)
@@ -74,6 +77,8 @@ public static class ApplicationDbContextInitialiser
 
         var usersJsonPath = Path.Combine(seedDir, "users.json");
         var listsJsonPath = Path.Combine(seedDir, "todolists.json");
+        var productsJsonPath = Path.Combine(seedDir, "products.json");
+        var auctionsJsonPath = Path.Combine(seedDir, "auctions.json");
         logger.LogInformation("Users JSON path: {UsersJsonPath}", usersJsonPath);
         logger.LogInformation("TodoLists JSON path: {ListsJsonPath}", listsJsonPath);
 
@@ -118,6 +123,36 @@ public static class ApplicationDbContextInitialiser
                 await context.SaveChangesAsync();
                 logger.LogInformation("Seeded {ListCount} lists.", listsData.Count);
             }
+        }
+        if (!context.Products.Any() && File.Exists(productsJsonPath))
+        {
+            logger.LogInformation("Seeding products from {Path}", productsJsonPath);
+            var productsJson = await File.ReadAllTextAsync(productsJsonPath);
+            var products = JsonSerializer.Deserialize<List<Product>>(productsJson, _jsonOptions);
+            if (products is null || products.Count == 0)
+            {
+                logger.LogWarning("No data found in products.json");
+                return;
+            }
+            context.Products.AddRange(products);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Seeded {ProductCount} products.", products.Count);
+        }
+
+        if (!context.Auctions.Any() && File.Exists(auctionsJsonPath))
+        {
+            logger.LogInformation("Seeding auctions from {Path}", auctionsJsonPath);
+            var auctionsJson = await File.ReadAllTextAsync(auctionsJsonPath);
+            var auctions = JsonSerializer.Deserialize<List<Auction>>(auctionsJson, _jsonOptions);
+            if (auctions is null || auctions.Count == 0)
+            {
+                logger.LogWarning("No data found in auctions.json");
+                return;
+            }
+
+            context.Auctions.AddRange(auctions);
+            await context.SaveChangesAsync();
+            logger.LogInformation("Seeded {AuctionCount} auctions.", auctions.Count);
         }
     }
 }

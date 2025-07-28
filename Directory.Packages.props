@@ -20,6 +20,7 @@
     <PackageVersion Include="Microsoft.Extensions.AI" Version="9.7.1" />
     <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="9.7.1-preview.1.25365.4" />
     <PackageVersion Include="PuppeteerSharp" Version="20.2.2" />
+    <PackageVersion Include="MongoDB.Entities" Version="24.1.1" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <!-- Infrastructure -->
     <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
@@ -54,6 +55,8 @@
     <PackageVersion Include="FluentAssertions" Version="8.5.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EfcoreVersion)" />
     <PackageVersion Include="MockQueryable.Moq" Version="8.0.0" />
+    <!--SearchService AppHost-->
+    <PackageVersion Include="Microsoft.Extensions.Http.Polly" Version="$(AspnetVersion)" />
     <!--Aspire AppHost-->
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Docker" Version="9.3.1-preview.1.25305.6" />
