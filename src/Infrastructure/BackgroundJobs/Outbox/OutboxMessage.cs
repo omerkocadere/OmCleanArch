@@ -14,10 +14,10 @@ public class OutboxMessage : BaseEntity<Guid>
 {
     public string Type { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
-    public DateTimeOffset OccuredOnUtc { get; set; }
-    public DateTimeOffset? ProcessedOnUtc { get; set; }
+    public DateTime OccuredOnUtc { get; set; }
+    public DateTime? ProcessedOnUtc { get; set; }
     public string? Error { get; set; }
     public OutboxMessageStatus Status { get; set; } = OutboxMessageStatus.Pending;
-    public DateTimeOffset? ProcessingStartedAt { get; set; }
+    public DateTime? ProcessingStartedAt { get; set; }
     public int RetryCount { get; set; }
 }

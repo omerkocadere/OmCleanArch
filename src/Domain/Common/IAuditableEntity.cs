@@ -2,8 +2,8 @@ namespace CleanArch.Domain.Common;
 
 public interface IAuditableEntity
 {
-    DateTimeOffset Created { get; set; }
+    DateTime Created { get; set; }
     Guid? CreatedBy { get; set; }
-    DateTimeOffset LastModified { get; set; }
+    DateTime LastModified { get; set; }
     Guid? LastModifiedBy { get; set; }
 }
