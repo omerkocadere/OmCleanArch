@@ -213,4 +213,42 @@ public class CreateUserCommandHandlerTests
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().Be(UserErrors.EmailNotUnique);
     }
+
+    [Fact]
+    public void CreateUserCommand_ShouldSupportRecordFeatures()
+    {
+        // Arrange
+        var command1 = new CreateUserCommand
+        {
+            Email = "test@example.com",
+            DisplayName = "Test User",
+            FirstName = "John",
+            LastName = "Doe",
+            Password = "password123",
+        };
+
+        // Act & Assert for 'with' expression (covers the <Clone>$ method)
+        var command2 = command1 with
+        {
+            Email = "new@example.com",
+        };
+
+        command2.Should().NotBe(command1); // Should be different objects
+        command2.Email.Should().Be("new@example.com");
+        command2.DisplayName.Should().Be(command1.DisplayName); // Other properties should remain the same
+
+        // Test record equality and hash codes
+        var command3 = new CreateUserCommand
+        {
+            Email = "test@example.com",
+            DisplayName = "Test User",
+            FirstName = "John",
+            LastName = "Doe",
+            Password = "password123",
+        };
+
+        command1.Should().Be(command3); // Should be equal
+        command1.GetHashCode().Should().Be(command3.GetHashCode());
+        command1.ToString().Should().NotBeEmpty();
+    }
 }
