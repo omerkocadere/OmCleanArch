@@ -4,6 +4,10 @@
         <form #registerForm="ngForm" class="flex flex-col gap-4 w-full" (ngSubmit)="register()">
             <input class="input w-full" name="email" 
                 [(ngModel)]="creds.email" placeholder="Email">
+            <input class="input w-full" name="firstName" 
+                [(ngModel)]="creds.firstName" placeholder="First name">
+            <input class="input w-full" name="lastName" 
+                [(ngModel)]="creds.lastName" placeholder="Last name">
             <input class="input w-full" name="displayName" 
                 [(ngModel)]="creds.displayName" placeholder="Display name">
             <input type="password" class="input w-full" name="password" 

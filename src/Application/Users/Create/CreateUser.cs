@@ -9,11 +9,11 @@ namespace CleanArch.Application.Users.Create;
 
 public sealed record CreateUserCommand : ICommand<UserDto>
 {
-    public required string Email { get; set; }
-    public required string DisplayName { get; set; }
-    public required string FirstName { get; set; }
-    public required string LastName { get; set; }
-    public required string Password { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }
 
 public class CreateUserCommandHandler(IApplicationDbContext context, IPasswordHasher passwordHasher, IMapper mapper)

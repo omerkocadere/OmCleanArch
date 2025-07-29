@@ -4,8 +4,8 @@ using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.OpenTelemetry;
 using CleanArch.Web.Api;
-using CleanArch.Web.Api.Playground.Services;
 using CleanArch.Web.Api.Extensions;
+using CleanArch.Web.Api.Playground.Services;
 using Hangfire;
 using Serilog;
 
@@ -36,7 +36,7 @@ builder.Services.AddCors(options =>
         "LocalCorsPolicy",
         policy =>
         {
-            policy.WithOrigins("http://localhost:4000", "https://localhost:4000").AllowAnyHeader().AllowAnyMethod();
+            policy.WithOrigins("http://localhost:4200", "https://localhost:4200").AllowAnyHeader().AllowAnyMethod();
         }
     );
 });
