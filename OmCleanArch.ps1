@@ -6,17 +6,10 @@ function Log {
 }
 
 # Set paths
-$dotnetApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\src\Web.Api"
-$dotnetApi2Path = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\Dummy.Api"
-$dotnetApi3Path = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\SearchService"
 $angularClientPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\client"
-
-# Start .NET API in a new terminal
-Log "Starting .NET API in '$dotnetApiPath'..."
-# wt -w 0 nt -p PowerShell -d "$dotnetApiPath" -c dotnet watch -t ".NET API"
-wt -w 0 -d "$dotnetApiPath" --title ".NET API" pwsh -NoExit -Command "dotnet watch"
-wt -w 0 -d "$dotnetApi2Path" --title ".NET API" pwsh -NoExit -Command "dotnet watch"
-wt -w 0 -d "$dotnetApi3Path" --title ".NET API" pwsh -NoExit -Command "dotnet watch"
+$WebApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\src\Web.Api"
+$DummyApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\Dummy.Api"
+$SearchApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\SearchService"
 
 # Start Angular Client
 Log "Checking Angular dependencies in '$angularClientPath'..."
@@ -27,11 +20,13 @@ if (!(Test-Path "node_modules")) {
 }
 
 Log "Starting Angular client with npm run dev..."
-wt -w 0 -d "$angularClientPath" --title "Angular Client" pwsh -NoExit -Command "npm start"
+wt -w 0 -d "$angularClientPath" --title "Angular Client" pwsh -NoExit -Command "npm start"	
 
-	
-# npm start
-# wt -w 0  -d "$angularClientPath" --title "React Client" pwsh -ExecutionPolicy Bypass -Command "npm run dev"
+# Start .NET API in a new terminal
+Log "Starting .NET APIs ..."
+wt -w 0 -d "$WebApiPath" --title "WebApiPath" pwsh -NoExit -Command "dotnet watch"
+wt -w 0 -d "$DummyApiPath" --title "DummyApi" pwsh -NoExit -Command "dotnet watch"
+wt -w 0 -d "$SearchApiPath" --title "SearchApi" pwsh -NoExit -Command "dotnet watch"
 
 Log "All processes started successfully."
 Read-Host "Press Enter to exit"
