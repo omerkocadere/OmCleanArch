@@ -13,7 +13,11 @@ namespace CleanArch.Infrastructure.Data;
 
 public static class DatabaseConfiguration
 {
-    public static IServiceCollection AddDatabase(this IServiceCollection services, IHostEnvironment env, IConfiguration configuration)
+    public static IServiceCollection AddDatabase(
+        this IServiceCollection services,
+        IHostEnvironment env,
+        IConfiguration configuration
+    )
     {
         services.ConfigureOptions<DatabaseOptionsSetup>();
 
@@ -36,7 +40,9 @@ public static class DatabaseConfiguration
                         options.UseNpgsql(databaseOptions.PostgresConnectionString);
                         break;
                     default:
-                        throw new InvalidOperationException($"Unsupported database provider: {databaseOptions.Provider}");
+                        throw new InvalidOperationException(
+                            $"Unsupported database provider: {databaseOptions.Provider}"
+                        );
                 }
 
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
@@ -72,6 +78,8 @@ public static class DatabaseConfiguration
     private static void ValidateConnectionString(string? connectionString, DbProvider provider)
     {
         if (string.IsNullOrWhiteSpace(connectionString))
-            throw new InvalidOperationException($"Database connection string for '{provider}' is missing in configuration.");
+            throw new InvalidOperationException(
+                $"Database connection string for '{provider}' is missing in configuration."
+            );
     }
 }

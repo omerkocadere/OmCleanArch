@@ -22,7 +22,7 @@ public class CreateTodoListCommandHandler(IApplicationDbContext context, IMapper
             return Result.Failure<TodoListDto>(UserErrors.NotFound(request.UserId));
         }
 
-        var entity = new TodoList { Title = request.Title, UserId = request.UserId };
+        var entity = new TodoList { Title = request.Title, User = user };
 
         context.TodoLists.Add(entity);
 

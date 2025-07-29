@@ -1,4 +1,5 @@
 ﻿using CleanArch.Domain.TodoLists;
+using CleanArch.Domain.Users;
 
 namespace CleanArch.Domain.TodoItems;
 
@@ -10,7 +11,6 @@ public sealed class TodoItem : BaseAuditableEntity<int>
     public PriorityLevel Priority { get; set; }
     public DateTime? Reminder { get; set; }
 
-    public Guid UserId { get; set; }
     public string? Description { get; set; }
     public DateTime? DueDate { get; set; }
     public List<string> Labels { get; set; } = [];
@@ -31,5 +31,7 @@ public sealed class TodoItem : BaseAuditableEntity<int>
         }
     }
 
+    public Guid UserId { get; set; }
+    public required User User { get; set; }
     public TodoList List { get; set; } = null!;
 }
