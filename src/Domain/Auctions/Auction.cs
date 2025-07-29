@@ -1,7 +1,9 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using CleanArch.Domain.Items;
 
 namespace CleanArch.Domain.Auctions;
 
+[Table("Auctions", Schema = "carsties")]
 public class Auction : BaseAuditableEntity<int>
 {
     public int ReservePrice { get; set; }

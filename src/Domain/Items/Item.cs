@@ -3,7 +3,7 @@ using CleanArch.Domain.Auctions;
 
 namespace CleanArch.Domain.Items;
 
-[Table("Items")]
+[Table("Items", Schema = "carsties")]
 public class Item : BaseEntity<int>
 {
     public required string Make { get; set; }
