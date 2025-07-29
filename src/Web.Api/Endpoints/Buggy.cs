@@ -6,9 +6,9 @@ namespace CleanArch.Web.Api.Endpoints;
 
 public class Buggy : EndpointGroupBase
 {
-    public override void Map(WebApplication app)
+    public override void Map(RouteGroupBuilder groupBuilder)
     {
-        app.MapGroup(this)
+        groupBuilder
             .MapGet(GetNotFoundCustom, "not-found-custom")
             .MapGet(GetBadRequestCustom, "bad-request-custom")
             .MapGet(GetUnauthorizedCustom, "unauthorized-custom")

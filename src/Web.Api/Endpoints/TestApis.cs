@@ -10,9 +10,9 @@ namespace CleanArch.Web.Api.Endpoints;
 
 public class TestApis : EndpointGroupBase
 {
-    public override void Map(WebApplication app)
+    public override void Map(RouteGroupBuilder groupBuilder)
     {
-        app.MapGroup(this)
+        groupBuilder
             .MapGet(GetWeatherForecasts, "{id:int}")
             .MapPost(CreateEmail, "create-email")
             .MapGet(GetDummyMessage, "dummy-message")

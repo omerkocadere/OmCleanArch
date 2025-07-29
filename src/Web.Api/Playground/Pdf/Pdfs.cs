@@ -9,9 +9,11 @@ namespace CleanArch.Web.Api.Playground.Pdf;
 
 public class Pdfs : EndpointGroupBase
 {
-    public override void Map(WebApplication app)
+    public override string? GroupName => "[Play]";
+
+    public override void Map(RouteGroupBuilder groupBuilder)
     {
-        app.MapGroup(this, "[Play]").MapGet(CreateInvoiceReport);
+        groupBuilder.MapGet(CreateInvoiceReport);
     }
 
     public async Task<IResult> CreateInvoiceReport(InvoiceFactory invoiceFactory, ILogger<Pdfs> logger)

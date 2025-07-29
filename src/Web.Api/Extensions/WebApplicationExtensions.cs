@@ -4,12 +4,11 @@ namespace CleanArch.Web.Api.Extensions;
 
 public static class WebApplicationExtensions
 {
-    public static RouteGroupBuilder MapGroup(this WebApplication app, EndpointGroupBase group, string? groupName = null)
+    public static RouteGroupBuilder MapGroup(this WebApplication app, EndpointGroupBase group)
     {
-        var className = groupName ?? group.GetType().Name;
-        // var resolvedGroupName = groupName != null ? groupName + "-" + className : className;
+        var groupName = group.GroupName ?? group.GetType().Name;
 
-        return app.MapGroup($"/api/{className}").WithGroupName(className).WithTags(className);
+        return app.MapGroup($"/api/{groupName}").WithGroupName(groupName).WithTags(groupName);
     }
 
     public static WebApplication MapEndpoints(this WebApplication app)
@@ -24,7 +23,7 @@ public static class WebApplicationExtensions
         {
             if (Activator.CreateInstance(type) is EndpointGroupBase instance)
             {
-                instance.Map(app);
+                instance.Map(app.MapGroup(instance));
             }
         }
 

@@ -11,9 +11,9 @@ namespace CleanArch.Web.Api.Endpoints;
 
 public class Auctions : EndpointGroupBase
 {
-    public override void Map(WebApplication app)
+    public override void Map(RouteGroupBuilder groupBuilder)
     {
-        app.MapGroup(this)
+        groupBuilder
             .MapGet(GetAuctions)
             .MapGet(GetAuctionById, "{id:int}")
             .MapPost(CreateAuction)

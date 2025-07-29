@@ -6,9 +6,9 @@ namespace CleanArch.Web.Api.Endpoints;
 
 public class Products : EndpointGroupBase
 {
-    public override void Map(WebApplication app)
+    public override void Map(RouteGroupBuilder groupBuilder)
     {
-        app.MapGroup(this).MapGet(GetProducts).MapGet(GetProductById, "{id}");
+        groupBuilder.MapGet(GetProducts).MapGet(GetProductById, "{id}");
     }
 
     public async Task<IResult> GetProducts(ISender sender)

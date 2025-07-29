@@ -12,9 +12,9 @@ namespace CleanArch.Web.Api.Endpoints;
 
 public class TodoItems : EndpointGroupBase
 {
-    public override void Map(WebApplication app)
+    public override void Map(RouteGroupBuilder groupBuilder)
     {
-        app.MapGroup(this)
+        groupBuilder
             .RequireAuthorization()
             .MapGet(GetTodoItemsWithPagination)
             .MapGet(GetTodoItemById, "{id:int}")

@@ -6,9 +6,11 @@ namespace CleanArch.Web.Api.Playground.AI;
 
 public class AIs : EndpointGroupBase
 {
-    public override void Map(WebApplication app)
+    public override string? GroupName => "[Play]";
+
+    public override void Map(RouteGroupBuilder groupBuilder)
     {
-        app.MapGroup(this, "[Play]").MapGet(ChatMessage, "chat-message");
+        groupBuilder.MapGet(ChatMessage, "chat-message");
     }
 
     public async Task<IResult> ChatMessage(IChatClient chatClient)

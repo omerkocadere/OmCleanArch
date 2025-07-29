@@ -11,11 +11,11 @@ namespace CleanArch.Web.Api.Endpoints;
 
 public class Users : EndpointGroupBase
 {
-    public override void Map(WebApplication app)
+    public override void Map(RouteGroupBuilder groupBuilder)
     {
-        var group = app.MapGroup(this).MapPost(Register, "register").MapPost(Login, "login");
+        var group = groupBuilder.MapPost(Register, "register").MapPost(Login, "login");
 
-        var protectedGroup = app.MapGroup(this)
+        var protectedGroup = groupBuilder
             .RequireAuthorization()
             .MapGet(GetById, "{id:guid}")
             .MapGet(GetByEmail, "by-email/{email}")

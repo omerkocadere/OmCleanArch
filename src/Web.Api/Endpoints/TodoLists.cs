@@ -9,11 +9,11 @@ namespace CleanArch.Web.Api.Endpoints;
 
 public class TodoLists : EndpointGroupBase
 {
-    public override void Map(WebApplication app)
+    public override void Map(RouteGroupBuilder groupBuilder)
     {
-        app.MapGroup(this)
+        groupBuilder
             .RequireAuthorization()
-            .MapGet(GetTodoLists)
+            .MapGet(GetTodoLists, "{userId:guid}")
             .MapPost(CreateTodoList)
             .MapPut(UpdateTodoList, "{id}")
             .MapDelete(DeleteTodoList, "{id}");
