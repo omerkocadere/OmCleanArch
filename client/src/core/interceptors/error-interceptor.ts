@@ -1,15 +1,8 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError } from 'rxjs';
-import { ToastService } from '../services/toast-service';
 import { NavigationExtras, Router } from '@angular/router';
-
-// Centralized logging utility
-const logRequest = (args: string | FetchArgs) => {
-  const url = typeof args === 'string' ? args : args.url;
-  const method = typeof args === 'string' ? 'GET' : args.method || 'GET';
-  console.log(`🚀 API Request: ${method} ${API_BASE_URL}/${url}`);
-};
+import { catchError, tap } from 'rxjs';
+import { ToastService } from '../services/toast-service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(ToastService);
@@ -18,25 +11,21 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   logRequest(req);
 
   return next(req).pipe(
-    catchError((error) => {
+    tap((response) => {
+      logResponse(req, undefined, response);
+    }),
+    catchError((error: HttpErrorResponse) => {
+      logResponse(req, error);
+
       if (error) {
+        const errorMessage = getErrorMessage(error);
+
         switch (error.status) {
           case 400:
-            toast.error(error.error.detail);
-            // if (error.error.errors) {
-            //   const modelStateErrors = [];
-            //   for (const key in error.error.errors) {
-            //     if (error.error.errors[key]) {
-            //       modelStateErrors.push(error.error.errors[key])
-            //     }
-            //   }
-            //   throw modelStateErrors.flat();
-            // } else {
-            //   toast.error(error.error)
-            // }
+            toast.error(errorMessage);
             break;
           case 401:
-            toast.error('Unauthorized');
+            toast.error(errorMessage);
             break;
           case 404:
             router.navigateByUrl('/not-found');
@@ -56,13 +45,46 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   );
 };
 
-export interface ValidationError {
+const logRequest = (req: HttpRequest<any>) => {
+  console.log(`🚀 API Request: ${req.method} ${req.url}`);
+};
+
+const logResponse = (req: HttpRequest<any>, error?: HttpErrorResponse, responseData?: any) => {
+  if (error) {
+    console.error(`❌ API Error: ${req.method} ${req.url}`, error);
+  } else {
+    console.log(`✅ API Success: ${req.method} ${req.url}`, responseData);
+  }
+};
+
+const getErrorMessage = (error: HttpErrorResponse): string => {
+  // Check if error.error matches ProblemDetails structure
+  const problemDetails = error.error as ProblemDetails;
+
+  // If there are validation errors, return them as a formatted string
+  if (problemDetails?.errors && problemDetails.errors.length > 0) {
+    return problemDetails.errors
+      .map((err: ValidationError) => err.description || err.code)
+      .join(', ');
+  }
+
+  if (problemDetails?.detail) {
+    return problemDetails.detail;
+  }
+  if (problemDetails?.title) {
+    return problemDetails.title;
+  }
+
+  return 'Request failed, no details available';
+};
+
+interface ValidationError {
   code: string;
   description: string;
   type: string;
 }
 
-export interface ProblemDetails {
+interface ProblemDetails {
   type?: string;
   title?: string;
   status?: number;
