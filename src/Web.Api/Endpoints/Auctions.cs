@@ -13,12 +13,11 @@ public class Auctions : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {
-        groupBuilder
-            .MapGet(GetAuctions)
-            .MapGet(GetAuctionById, "{id:int}")
-            .MapPost(CreateAuction)
-            .MapPut(UpdateAuction, "{id:int}")
-            .MapDelete(DeleteAuction, "{id:int}");
+        groupBuilder.MapGet(GetAuctions);
+        groupBuilder.MapGet(GetAuctionById, "{id:int}");
+        groupBuilder.MapPost(CreateAuction);
+        groupBuilder.MapPut(UpdateAuction, "{id:int}");
+        groupBuilder.MapDelete(DeleteAuction, "{id:int}");
     }
 
     public async Task<IResult> GetAuctions(ISender sender, string? date)

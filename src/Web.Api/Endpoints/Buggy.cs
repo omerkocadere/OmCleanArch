@@ -8,18 +8,17 @@ public class Buggy : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {
-        groupBuilder
-            .MapGet(GetNotFoundCustom, "not-found-custom")
-            .MapGet(GetBadRequestCustom, "bad-request-custom")
-            .MapGet(GetUnauthorizedCustom, "unauthorized-custom")
-            .MapGet(GetValidationErrorCustom, "validation-error-custom")
-            .MapGet(GetFailureCustom, "failure-custom")
-            .MapGet(GetExceptionCustom, "server-error-custom")
-            .MapGet(GetNotFound, "not-found")
-            .MapGet(GetBadRequest, "bad-request")
-            .MapGet(GetUnauthorized, "unauthorized")
-            .MapGet(GetValidationError, "validation-error")
-            .MapGet(GetServerError, "server-error");
+        groupBuilder.MapGet(GetNotFoundCustom, "not-found-custom");
+        groupBuilder.MapGet(GetBadRequestCustom, "bad-request-custom");
+        groupBuilder.MapGet(GetUnauthorizedCustom, "unauthorized-custom");
+        groupBuilder.MapGet(GetValidationErrorCustom, "validation-error-custom");
+        groupBuilder.MapGet(GetFailureCustom, "failure-custom");
+        groupBuilder.MapGet(GetExceptionCustom, "server-error-custom");
+        groupBuilder.MapGet(GetNotFound, "not-found");
+        groupBuilder.MapGet(GetBadRequest, "bad-request");
+        groupBuilder.MapGet(GetUnauthorized, "unauthorized");
+        groupBuilder.MapGet(GetValidationError, "validation-error");
+        groupBuilder.MapGet(GetServerError, "server-error");
     }
 
     public IResult GetNotFoundCustom()

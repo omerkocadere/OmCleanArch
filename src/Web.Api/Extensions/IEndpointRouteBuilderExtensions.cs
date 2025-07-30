@@ -4,7 +4,7 @@ namespace CleanArch.Web.Api.Extensions;
 
 public static class IEndpointRouteBuilderExtensions
 {
-    public static IEndpointRouteBuilder MapGet(
+    public static RouteHandlerBuilder MapGet(
         this IEndpointRouteBuilder builder,
         Delegate handler,
         [StringSyntax("Route")] string pattern = ""
@@ -12,12 +12,10 @@ public static class IEndpointRouteBuilderExtensions
     {
         EnsureNotAnonymous(handler);
 
-        builder.MapGet(pattern, handler).WithName(handler.Method.Name);
-
-        return builder;
+        return builder.MapGet(pattern, handler).WithName(handler.Method.Name);
     }
 
-    public static IEndpointRouteBuilder MapPost(
+    public static RouteHandlerBuilder MapPost(
         this IEndpointRouteBuilder builder,
         Delegate handler,
         [StringSyntax("Route")] string pattern = ""
@@ -25,12 +23,10 @@ public static class IEndpointRouteBuilderExtensions
     {
         EnsureNotAnonymous(handler);
 
-        builder.MapPost(pattern, handler).WithName(handler.Method.Name);
-
-        return builder;
+        return builder.MapPost(pattern, handler).WithName(handler.Method.Name);
     }
 
-    public static IEndpointRouteBuilder MapPut(
+    public static RouteHandlerBuilder MapPut(
         this IEndpointRouteBuilder builder,
         Delegate handler,
         [StringSyntax("Route")] string pattern
@@ -38,12 +34,10 @@ public static class IEndpointRouteBuilderExtensions
     {
         EnsureNotAnonymous(handler);
 
-        builder.MapPut(pattern, handler).WithName(handler.Method.Name);
-
-        return builder;
+        return builder.MapPut(pattern, handler).WithName(handler.Method.Name);
     }
 
-    public static IEndpointRouteBuilder MapDelete(
+    public static RouteHandlerBuilder MapDelete(
         this IEndpointRouteBuilder builder,
         Delegate handler,
         [StringSyntax("Route")] string pattern
@@ -51,9 +45,7 @@ public static class IEndpointRouteBuilderExtensions
     {
         EnsureNotAnonymous(handler);
 
-        builder.MapDelete(pattern, handler).WithName(handler.Method.Name);
-
-        return builder;
+        return builder.MapDelete(pattern, handler).WithName(handler.Method.Name);
     }
 
     private static void EnsureNotAnonymous(Delegate handler)

@@ -2,8 +2,7 @@
 
 namespace CleanArch.Domain.Common;
 
-public abstract class BaseEntity<T> : IEquatable<BaseEntity<T>>, IHasDomainEvents
-    where T : IEquatable<T>
+public abstract class BaseEntity<T> : IHasDomainEvents
 {
     public T Id { get; set; } = default!;
 
@@ -25,45 +24,5 @@ public abstract class BaseEntity<T> : IEquatable<BaseEntity<T>>, IHasDomainEvent
     public void ClearDomainEvents()
     {
         _domainEvents.Clear();
-    }
-
-    public static bool operator ==(BaseEntity<T>? left, BaseEntity<T>? right)
-    {
-        return left is not null && right is not null && left.Equals(right);
-    }
-
-    public static bool operator !=(BaseEntity<T>? left, BaseEntity<T>? right)
-    {
-        return !(left == right);
-    }
-
-    public bool Equals(BaseEntity<T>? other)
-    {
-        if (other is null)
-            return false;
-
-        if (other.GetType() != GetType())
-            return false;
-
-        return EqualityComparer<T>.Default.Equals(Id, other.Id);
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj is null)
-            return false;
-
-        if (obj is not BaseEntity<T> entity)
-            return false;
-
-        if (obj.GetType() != GetType())
-            return false;
-
-        return EqualityComparer<T>.Default.Equals(Id, entity.Id);
-    }
-
-    public override int GetHashCode()
-    {
-        return Id?.GetHashCode() ?? 0;
     }
 }

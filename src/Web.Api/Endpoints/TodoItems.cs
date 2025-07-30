@@ -14,14 +14,12 @@ public class TodoItems : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {
-        groupBuilder
-            .RequireAuthorization()
-            .MapGet(GetTodoItemsWithPagination)
-            .MapGet(GetTodoItemById, "{id:int}")
-            .MapPost(CreateTodoItem)
-            .MapPut(UpdateTodoItem, "{id:int}")
-            .MapPut(UpdateTodoItemDetail, "UpdateDetail/{id:int}")
-            .MapDelete(DeleteTodoItem, "{id:int}");
+        groupBuilder.MapGet(GetTodoItemsWithPagination).RequireAuthorization();
+        groupBuilder.MapGet(GetTodoItemById, "{id:int}").RequireAuthorization();
+        groupBuilder.MapPost(CreateTodoItem).RequireAuthorization();
+        groupBuilder.MapPut(UpdateTodoItem, "{id:int}").RequireAuthorization();
+        groupBuilder.MapPut(UpdateTodoItemDetail, "UpdateDetail/{id:int}").RequireAuthorization();
+        groupBuilder.MapDelete(DeleteTodoItem, "{id:int}").RequireAuthorization();
     }
 
     public async Task<IResult> GetTodoItemsWithPagination(

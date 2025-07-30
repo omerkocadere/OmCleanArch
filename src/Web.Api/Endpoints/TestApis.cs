@@ -12,11 +12,10 @@ public class TestApis : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {
-        groupBuilder
-            .MapGet(GetWeatherForecasts, "{id:int}")
-            .MapPost(CreateEmail, "create-email")
-            .MapGet(GetDummyMessage, "dummy-message")
-            .MapGet(GetToDoItemsFromDummyApi, "todo-items");
+        groupBuilder.MapGet(GetWeatherForecasts, "{id:int}");
+        groupBuilder.MapPost(CreateEmail, "create-email");
+        groupBuilder.MapGet(GetDummyMessage, "dummy-message");
+        groupBuilder.MapGet(GetToDoItemsFromDummyApi, "todo-items");
     }
 
     public async Task<IResult> GetWeatherForecasts(ISender sender, int id)
