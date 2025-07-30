@@ -2,6 +2,7 @@ import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/comm
 import { inject } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { catchError, tap } from 'rxjs';
+import { ProblemDetails, ValidationError } from '../../types/error';
 import { ToastService } from '../services/toast-service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
@@ -31,7 +32,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             router.navigateByUrl('/not-found');
             break;
           case 500:
-            const navigationExtras: NavigationExtras = { state: { error: error.error } };
+            const navigationExtras: NavigationExtras = {
+              state: { problemDetails: error.error as ProblemDetails },
+            };
             router.navigateByUrl('/server-error', navigationExtras);
             break;
           default:
@@ -77,20 +80,3 @@ const getErrorMessage = (error: HttpErrorResponse): string => {
 
   return 'Request failed, no details available';
 };
-
-interface ValidationError {
-  code: string;
-  description: string;
-  type: string;
-}
-
-interface ProblemDetails {
-  type?: string;
-  title?: string;
-  status?: number;
-  detail?: string;
-  instance?: string;
-  traceId?: string;
-  errors?: ValidationError[]; // Validation errors array
-  [key: string]: unknown; // Allow additional properties
-}

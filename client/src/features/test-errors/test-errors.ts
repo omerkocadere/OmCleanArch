@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
+import { ProblemDetails } from '../../core/interceptors/error-interceptor';
 
 @Component({
   selector: 'app-test-errors',
@@ -45,7 +46,10 @@ export class TestErrors {
       next: (response) => console.log(response),
       error: (error) => {
         console.log(error);
-        this.validationErrors.set(error);
+        const problemDetails = error.error as ProblemDetails;
+        if (problemDetails.errors && problemDetails.errors.length > 0) {
+          this.validationErrors.set(problemDetails.errors.map((e) => e.description));
+        }
       },
     });
   }
