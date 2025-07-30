@@ -43,8 +43,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseCors("LocalCorsPolicy");
-
 app.MapDefaultEndpoints();
 
 app.UseExceptionHandler();
@@ -65,11 +63,13 @@ else
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
+app.UseCors("LocalCorsPolicy");
+
 app.UseRequestContextLogging();
 
 //app.UseSerilogRequestLogging();
-
-app.UseStaticFiles();
 
 app.Map("/", () => Results.Redirect("/api"));
 app.MapEndpoints();
