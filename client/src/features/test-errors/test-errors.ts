@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
-import { ProblemDetails } from '../../core/interceptors/error-interceptor';
+import { ProblemDetails } from '../../types/error';
 
 @Component({
   selector: 'app-test-errors',

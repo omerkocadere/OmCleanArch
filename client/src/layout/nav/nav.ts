@@ -24,9 +24,6 @@ export class Nav {
         this.toast.success('Logged in successfully');
         this.creds = { email: '', password: '' };
       },
-      error: (error) => {
-        this.toast.error(error.error);
-      },
     });
   }
 
