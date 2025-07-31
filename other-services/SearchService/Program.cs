@@ -7,6 +7,7 @@ using Polly.Extensions.Http;
 using SearchService.Consumers;
 using SearchService.Data;
 using SearchService.Endpoints;
+using SearchService.Models;
 using SearchService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,9 @@ builder.Services.ConfigureHttpClientDefaults(http =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiDocument();
+
+// Configure Mapster
+TypeAdapterConfig.GlobalSettings.Default.NameMatchingStrategy(NameMatchingStrategy.IgnoreCase);
 
 builder.Services.AddMassTransit(x =>
 {
