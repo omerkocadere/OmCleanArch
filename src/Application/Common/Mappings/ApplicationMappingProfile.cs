@@ -3,6 +3,7 @@ using CleanArch.Application.Auctions.DTOs;
 using CleanArch.Application.TodoItems.DTOs;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.TodoItems;
+using Contracts;
 using Mapster;
 
 namespace CleanArch.Application.Common.Mappings;
@@ -45,6 +46,7 @@ public static class MappingConfig
 
         // Auction -> AuctionDto: Flattening ve Status conversion
         TypeAdapterConfig<Auction, AuctionDto>.NewConfig().Map(dest => dest, src => src.Item);
+        TypeAdapterConfig<Auction, AuctionCreated>.NewConfig().Map(dest => dest, src => src.Item);
 
         // CreateAuctionCommand -> Auction: Item property mapping
         TypeAdapterConfig<CreateAuctionCommand, Auction>

@@ -22,6 +22,7 @@
     <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="9.7.1-preview.1.25365.4" />
     <PackageVersion Include="PuppeteerSharp" Version="20.2.2" />
     <PackageVersion Include="MongoDB.Entities" Version="24.1.1" />
+    <PackageVersion Include="MassTransit.RabbitMQ" Version="8.5.1" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <!-- Infrastructure -->
     <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />

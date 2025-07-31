@@ -3,6 +3,8 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Auctions;
+using Contracts;
+using MassTransit;
 
 namespace CleanArch.Application.Auctions.CreateAuction;
 
@@ -18,7 +20,7 @@ public record CreateAuctionCommand : ICommand<AuctionDto>
     public DateTime AuctionEnd { get; init; }
 }
 
-public class CreateAuctionCommandHandler(IApplicationDbContext context)
+public class CreateAuctionCommandHandler(IApplicationDbContext context, IPublishEndpoint publishEndpoint)
     : ICommandHandler<CreateAuctionCommand, AuctionDto>
 {
     public async Task<Result<AuctionDto>> Handle(CreateAuctionCommand request, CancellationToken cancellationToken)
@@ -28,6 +30,10 @@ public class CreateAuctionCommandHandler(IApplicationDbContext context)
 
         context.Auctions.Add(auction);
         await context.SaveChangesAsync(cancellationToken);
+
+        var omer = auction.Adapt<AuctionCreated>();
+
+        await publishEndpoint.Publish(omer, cancellationToken);
 
         var auctionDto = auction.Adapt<AuctionDto>();
         return auctionDto;
