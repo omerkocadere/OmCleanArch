@@ -41,6 +41,15 @@ app.Lifetime.ApplicationStarted.Register(async () =>
 
 app.Run();
 
+// NOTE: Commented out in favor of AddStandardResilienceHandler() which provides:
+// - Better resilience with circuit breaker, rate limiter, and timeouts
+// - Finite retry attempts (3) instead of infinite retries
+// - Exponential backoff with jitter for better performance
+// - Built on Polly v8 with zero-allocation optimizations
+// - Handles more HTTP error conditions (500+, 408, 429) out of the box
+// - Prevents potential infinite retry loops that could overwhelm services
+
+/*
 static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
 {
     return HttpPolicyExtensions
@@ -48,3 +57,4 @@ static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
         .OrResult(msg => msg.StatusCode == HttpStatusCode.NotFound)
         .WaitAndRetryForeverAsync(_ => TimeSpan.FromSeconds(3));
 }
+*/
