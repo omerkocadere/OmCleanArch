@@ -2,7 +2,7 @@ namespace CleanArch.Application.Auctions.DTOs;
 
 public class AuctionDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public int ReservePrice { get; set; }
     public required string Seller { get; set; }
     public string? Winner { get; set; }

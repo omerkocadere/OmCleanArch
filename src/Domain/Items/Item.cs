@@ -15,5 +15,5 @@ public class Item : BaseEntity<Guid>
 
     // navigation properties
     public Auction Auction { get; set; } = null!;
-    public int AuctionId { get; set; }
+    public Guid AuctionId { get; set; }
 }

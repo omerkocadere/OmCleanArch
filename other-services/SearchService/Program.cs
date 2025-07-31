@@ -36,7 +36,15 @@ app.MapSearchEndpoints();
 
 app.Lifetime.ApplicationStarted.Register(async () =>
 {
-    await app.InitDb();
+    try
+    {
+        await app.InitDb();
+    }
+    catch (Exception ex)
+    {
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Failed to initialize database. Application will continue running.");
+    }
 });
 
 app.Run();
