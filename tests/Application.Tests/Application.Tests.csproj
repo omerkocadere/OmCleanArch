@@ -21,7 +21,6 @@
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <PackageReference Include="MockQueryable.Moq" />
-    <PackageReference Include="AutoMapper" />
   </ItemGroup>
 
   <ItemGroup>

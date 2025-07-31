@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using CleanArch.Application.Common.Behaviours;
+using CleanArch.Application.Common.Mappings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanArch.Application;
@@ -8,7 +9,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        // Configure Mapster
+        MappingConfig.Configure();
 
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 

@@ -19,7 +19,7 @@ public record CreateTodoItemCommand() : IRequest<Result<TodoItemDto>>
     public List<string> Labels { get; set; } = [];
 }
 
-public class CreateTodoItemCommandHandler(IApplicationDbContext context, IMapper mapper, IUserContext userContext)
+public class CreateTodoItemCommandHandler(IApplicationDbContext context, IUserContext userContext)
     : IRequestHandler<CreateTodoItemCommand, Result<TodoItemDto>>
 {
     public async Task<Result<TodoItemDto>> Handle(CreateTodoItemCommand request, CancellationToken cancellationToken)
@@ -33,7 +33,7 @@ public class CreateTodoItemCommandHandler(IApplicationDbContext context, IMapper
             return Result.Failure<TodoItemDto>(UserErrors.NotFound(request.UserId));
         }
 
-        var entity = mapper.Map<TodoItem>(request);
+        var entity = request.Adapt<TodoItem>();
         entity.UserId = user.Id;
 
         entity.AddDomainEvent(new TodoItemCreatedEvent(Guid.NewGuid(), entity));
@@ -41,7 +41,7 @@ public class CreateTodoItemCommandHandler(IApplicationDbContext context, IMapper
         context.TodoItems.Add(entity);
         await context.SaveChangesAsync(cancellationToken);
 
-        var dto = mapper.Map<TodoItemDto>(entity);
+        var dto = entity.Adapt<TodoItemDto>();
         return dto;
     }
 }

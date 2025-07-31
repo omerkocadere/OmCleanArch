@@ -16,7 +16,7 @@ public sealed record CreateUserCommand : ICommand<UserDto>
     public string Password { get; set; } = string.Empty;
 }
 
-public class CreateUserCommandHandler(IApplicationDbContext context, IPasswordHasher passwordHasher, IMapper mapper)
+public class CreateUserCommandHandler(IApplicationDbContext context, IPasswordHasher passwordHasher)
     : ICommandHandler<CreateUserCommand, UserDto>
 {
     public async Task<Result<UserDto>> Handle(CreateUserCommand command, CancellationToken cancellationToken)
@@ -31,7 +31,7 @@ public class CreateUserCommandHandler(IApplicationDbContext context, IPasswordHa
             return Result.Failure<UserDto>(UserErrors.EmailNotUnique);
         }
 
-        var user = mapper.Map<User>(command);
+        var user = command.Adapt<User>();
         user.Id = Guid.NewGuid();
         user.PasswordHash = passwordHasher.Hash(command.Password);
 
@@ -40,6 +40,6 @@ public class CreateUserCommandHandler(IApplicationDbContext context, IPasswordHa
         context.Users.Add(user);
         await context.SaveChangesAsync(cancellationToken);
 
-        return mapper.Map<UserDto>(user);
+        return user.Adapt<UserDto>();
     }
 }

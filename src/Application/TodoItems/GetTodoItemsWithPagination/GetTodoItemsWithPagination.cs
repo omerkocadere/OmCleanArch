@@ -12,7 +12,7 @@ public record GetTodoItemsWithPaginationQuery : IRequest<Result<PaginatedList<To
     public int PageSize { get; init; } = 10;
 }
 
-public class GetTodoItemsWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper)
+public class GetTodoItemsWithPaginationQueryHandler(IApplicationDbContext context)
     : IRequestHandler<GetTodoItemsWithPaginationQuery, Result<PaginatedList<TodoItemDto>>>
 {
     public async Task<Result<PaginatedList<TodoItemDto>>> Handle(
@@ -23,7 +23,7 @@ public class GetTodoItemsWithPaginationQueryHandler(IApplicationDbContext contex
         var result = await context
             .TodoItems.Where(x => x.ListId == request.ListId)
             .OrderBy(x => x.Title)
-            .ProjectTo<TodoItemDto>(mapper.ConfigurationProvider)
+            .ProjectToType<TodoItemDto>()
             .PaginatedListAsync(request.PageNumber, request.PageSize);
 
         return result;

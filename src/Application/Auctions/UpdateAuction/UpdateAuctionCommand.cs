@@ -16,7 +16,7 @@ public record UpdateAuctionCommand : IQuery<AuctionDto>
     public int? Mileage { get; init; }
 }
 
-public class UpdateAuctionCommandHandler(IApplicationDbContext context, IMapper mapper)
+public class UpdateAuctionCommandHandler(IApplicationDbContext context)
     : IQueryHandler<UpdateAuctionCommand, AuctionDto>
 {
     public async Task<Result<AuctionDto>> Handle(UpdateAuctionCommand request, CancellationToken cancellationToken)
@@ -41,7 +41,7 @@ public class UpdateAuctionCommandHandler(IApplicationDbContext context, IMapper 
 
         await context.SaveChangesAsync(cancellationToken);
 
-        var auctionDto = mapper.Map<AuctionDto>(auction);
+        var auctionDto = auction.Adapt<AuctionDto>();
         return auctionDto;
     }
 }

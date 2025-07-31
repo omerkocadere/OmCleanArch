@@ -1,55 +1,57 @@
-using AutoMapper;
 using CleanArch.Application.Auctions.CreateAuction;
 using CleanArch.Application.Auctions.DTOs;
-using CleanArch.Application.Common.Models;
-using CleanArch.Application.TodoItems.CreateTodoItem;
 using CleanArch.Application.TodoItems.DTOs;
-using CleanArch.Application.TodoLists.GetTodos;
-using CleanArch.Application.Users.Create;
-using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Auctions;
-using CleanArch.Domain.Items;
 using CleanArch.Domain.TodoItems;
-using CleanArch.Domain.TodoLists;
-using CleanArch.Domain.Users;
+using Mapster;
 
 namespace CleanArch.Application.Common.Mappings;
 
-public class ApplicationMappingProfile : Profile
+public static class MappingConfig
 {
-    public ApplicationMappingProfile()
+    public static void Configure()
     {
+        // Global DateTimeOffset -> DateTime mapping
+        TypeAdapterConfig<DateTimeOffset, DateTime>
+            .NewConfig()
+            .MapWith(src => src.DateTime);
+
         #region TodoItems
 
-        CreateMap<CreateTodoItemCommand, TodoItem>();
-        CreateMap<TodoItem, TodoItemDto>().ForMember(d => d.Priority, opt => opt.MapFrom(s => (int)s.Priority));
-        CreateMap<TodoItem, LookupDto>();
+        // CreateTodoItemCommand -> TodoItem: Otomatik (property isimleri aynı)
+        // TodoItem -> LookupDto: Otomatik (property isimleri aynı)
+
+        // Sadece Priority için özel mapping gerekli (enum -> int)
+        TypeAdapterConfig<TodoItem, TodoItemDto>.NewConfig().Map(dest => dest.Priority, src => (int)src.Priority);
 
         #endregion
 
         #region TodoLists
 
-        CreateMap<TodoList, TodoListDto>();
-        CreateMap<TodoItem, TodoItemDto>().ForMember(d => d.Priority, opt => opt.MapFrom(s => (int)s.Priority));
-        CreateMap<TodoList, LookupDto>();
+        // TodoList -> TodoListDto: Otomatik
+        // TodoList -> LookupDto: Otomatik
+        // TodoItem -> TodoItemDto zaten yukarıda tanımlandı
 
         #endregion
 
         #region Users
 
-        CreateMap<User, UserDto>();
-        CreateMap<CreateUserCommand, User>();
+        // User -> UserDto: Otomatik
+        // CreateUserCommand -> User: Otomatik
 
         #endregion
 
         #region Auctions
 
-        CreateMap<Auction, AuctionDto>()
-            .IncludeMembers(x => x.Item)
-            .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()));
-        CreateMap<Item, AuctionDto>();
-        CreateMap<CreateAuctionCommand, Auction>().ForMember(dest => dest.Item, opt => opt.MapFrom(src => src));
-        CreateMap<CreateAuctionCommand, Item>();
+        // Auction -> AuctionDto: Flattening ve Status conversion
+        TypeAdapterConfig<Auction, AuctionDto>.NewConfig().Map(dest => dest, src => src.Item);
+
+        // CreateAuctionCommand -> Auction: Item property mapping
+        TypeAdapterConfig<CreateAuctionCommand, Auction>
+            .NewConfig()
+            .Map(dest => dest.Item, src => src);
+
+        // CreateAuctionCommand -> Item: Otomatik
 
         #endregion
     }

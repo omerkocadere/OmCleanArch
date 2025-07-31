@@ -7,8 +7,7 @@ namespace CleanArch.Application.Auctions.GetAuctions;
 
 public record GetAuctionsQuery(string? Date) : IQuery<List<AuctionDto>>;
 
-public class GetAuctionsQueryHandler(IApplicationDbContext context, IMapper mapper)
-    : IQueryHandler<GetAuctionsQuery, List<AuctionDto>>
+public class GetAuctionsQueryHandler(IApplicationDbContext context) : IQueryHandler<GetAuctionsQuery, List<AuctionDto>>
 {
     public async Task<Result<List<AuctionDto>>> Handle(GetAuctionsQuery request, CancellationToken cancellationToken)
     {
@@ -19,9 +18,7 @@ public class GetAuctionsQueryHandler(IApplicationDbContext context, IMapper mapp
             query = query.Where(x => x.LastModified.CompareTo(DateTime.Parse(request.Date).ToUniversalTime()) > 0);
         }
 
-        var auctionDtos = await query
-            .ProjectTo<AuctionDto>(mapper.ConfigurationProvider)
-            .ToListAsync(cancellationToken);
+        var auctionDtos = await query.ProjectToType<AuctionDto>().ToListAsync(cancellationToken);
 
         return auctionDtos;
     }

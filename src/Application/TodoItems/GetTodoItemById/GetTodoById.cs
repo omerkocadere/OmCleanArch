@@ -8,14 +8,14 @@ namespace CleanArch.Application.TodoItems.GetTodoItemById;
 
 public sealed record GetTodoItemByIdQuery(int TodoItemId) : IRequest<Result<TodoItemDto>>;
 
-public class GetTodoItemByIdQueryHandler(IApplicationDbContext context, IMapper mapper, IUserContext userContext)
+public class GetTodoItemByIdQueryHandler(IApplicationDbContext context, IUserContext userContext)
     : IRequestHandler<GetTodoItemByIdQuery, Result<TodoItemDto>>
 {
     public async Task<Result<TodoItemDto>> Handle(GetTodoItemByIdQuery query, CancellationToken cancellationToken)
     {
-        TodoItemDto? todo = await context
+        var todo = await context
             .TodoItems.Where(todoItem => todoItem.Id == query.TodoItemId && todoItem.UserId == userContext.UserId)
-            .ProjectTo<TodoItemDto>(mapper.ConfigurationProvider)
+            .ProjectToType<TodoItemDto>()
             .SingleOrDefaultAsync(cancellationToken);
 
         if (todo is null)

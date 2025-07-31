@@ -1,4 +1,3 @@
-using CleanArch.Application.Tests.Common;
 using CleanArch.Application.Users.Create;
 
 namespace CleanArch.Application.Tests.Users.Create;
@@ -7,15 +6,13 @@ public class CreateUserCommandHandlerTests
 {
     private readonly Mock<IApplicationDbContext> _mockContext;
     private readonly Mock<IPasswordHasher> _mockPasswordHasher;
-    private readonly IMapper _mapper;
     private readonly CreateUserCommandHandler _handler;
 
     public CreateUserCommandHandlerTests()
     {
         _mockContext = new Mock<IApplicationDbContext>();
         _mockPasswordHasher = new Mock<IPasswordHasher>();
-        _mapper = MapperFactory.Create();
-        _handler = new CreateUserCommandHandler(_mockContext.Object, _mockPasswordHasher.Object, _mapper);
+        _handler = new CreateUserCommandHandler(_mockContext.Object, _mockPasswordHasher.Object);
     }
 
     private Mock<DbSet<User>> SetupMockContext(List<User>? existingUsers = null)

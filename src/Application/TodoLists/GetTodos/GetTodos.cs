@@ -10,7 +10,7 @@ namespace CleanArch.Application.TodoLists.GetTodos;
 [Authorize]
 public record GetTodosQuery(Guid UserId) : IRequest<Result<TodosVm>>;
 
-public class GetTodosQueryHandler(IApplicationDbContext context, IMapper mapper, IUserContext userContext)
+public class GetTodosQueryHandler(IApplicationDbContext context, IUserContext userContext)
     : IRequestHandler<GetTodosQuery, Result<TodosVm>>
 {
     public async Task<Result<TodosVm>> Handle(GetTodosQuery request, CancellationToken cancellationToken)
@@ -30,7 +30,7 @@ public class GetTodosQueryHandler(IApplicationDbContext context, IMapper mapper,
             Lists = await context
                 .TodoLists.AsNoTracking()
                 .Where(l => l.UserId == request.UserId)
-                .ProjectTo<TodoListDto>(mapper.ConfigurationProvider)
+                .ProjectToType<TodoListDto>()
                 .OrderBy(t => t.Title)
                 .ToListAsync(cancellationToken),
         };

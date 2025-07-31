@@ -18,8 +18,7 @@ public sealed record LoginCommand : ICommand<UserDto>
 internal sealed class LoginCommandHandler(
     IApplicationDbContext context,
     IPasswordHasher passwordHasher,
-    ITokenProvider tokenProvider,
-    IMapper mapper
+    ITokenProvider tokenProvider
 ) : ICommandHandler<LoginCommand, UserDto>
 {
     public async Task<Result<UserDto>> Handle(LoginCommand command, CancellationToken cancellationToken)
@@ -41,7 +40,7 @@ internal sealed class LoginCommandHandler(
         }
 
         string token = tokenProvider.Create(user);
-        var userDto = mapper.Map<UserDto>(user);
+        var userDto = user.Adapt<UserDto>();
         userDto.Token = token;
 
         return userDto;

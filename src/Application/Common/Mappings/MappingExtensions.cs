@@ -12,10 +12,6 @@ public static class MappingExtensions
         where TDestination : class =>
         PaginatedList<TDestination>.CreateAsync(queryable.AsNoTracking(), pageNumber, pageSize);
 
-    public static Task<List<TDestination>> ProjectToListAsync<TDestination>(
-        this IQueryable queryable,
-        IConfigurationProvider configuration
-    )
-        where TDestination : class =>
-        queryable.ProjectTo<TDestination>(configuration).AsNoTracking().ToListAsync();
+    public static Task<List<TDestination>> ProjectToListAsync<TDestination>(this IQueryable queryable)
+        where TDestination : class => queryable.ProjectToType<TDestination>().AsNoTracking().ToListAsync();
 }

@@ -8,7 +8,7 @@ namespace CleanArch.Application.TodoLists.CreateTodoList;
 
 public record CreateTodoListCommand(string Title, Guid UserId) : IRequest<Result<TodoListDto>>;
 
-public class CreateTodoListCommandHandler(IApplicationDbContext context, IMapper mapper)
+public class CreateTodoListCommandHandler(IApplicationDbContext context)
     : IRequestHandler<CreateTodoListCommand, Result<TodoListDto>>
 {
     public async Task<Result<TodoListDto>> Handle(CreateTodoListCommand request, CancellationToken cancellationToken)
@@ -28,7 +28,7 @@ public class CreateTodoListCommandHandler(IApplicationDbContext context, IMapper
 
         await context.SaveChangesAsync(cancellationToken);
 
-        var dto = mapper.Map<TodoListDto>(entity);
+        var dto = entity.Adapt<TodoListDto>();
         return dto;
     }
 }

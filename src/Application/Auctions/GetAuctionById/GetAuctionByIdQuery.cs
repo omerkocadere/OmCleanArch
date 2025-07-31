@@ -8,8 +8,7 @@ namespace CleanArch.Application.Auctions.GetAuctionById;
 
 public sealed record GetAuctionByIdQuery(int AuctionId) : IQuery<AuctionDto>;
 
-public class GetAuctionByIdQueryHandler(IApplicationDbContext context, IMapper mapper)
-    : IQueryHandler<GetAuctionByIdQuery, AuctionDto>
+public class GetAuctionByIdQueryHandler(IApplicationDbContext context) : IQueryHandler<GetAuctionByIdQuery, AuctionDto>
 {
     public async Task<Result<AuctionDto>> Handle(GetAuctionByIdQuery query, CancellationToken cancellationToken)
     {
@@ -23,7 +22,7 @@ public class GetAuctionByIdQueryHandler(IApplicationDbContext context, IMapper m
             return Result.Failure<AuctionDto>(AuctionErrors.NotFound(query.AuctionId));
         }
 
-        var auctionDto = mapper.Map<AuctionDto>(auction);
+        var auctionDto = auction.Adapt<AuctionDto>();
         return auctionDto;
     }
 }

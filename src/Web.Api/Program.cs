@@ -9,6 +9,7 @@ using CleanArch.Web.Api.Playground.Services;
 using Hangfire;
 using Serilog;
 
+Console.WriteLine("Application starting...");
 EnvironmentInspector.LoadAndPrintAll();
 
 var builder = WebApplication.CreateBuilder(args);

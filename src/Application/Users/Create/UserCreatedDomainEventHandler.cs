@@ -5,11 +5,8 @@ using Microsoft.Extensions.Logging;
 
 namespace CleanArch.Application.Users.Create;
 
-public class UserCreatedLoggingHandler(
-    ILogger<UserCreatedLoggingHandler> logger,
-    ITelemetryService telemetryService,
-    IMapper mapper
-) : INotificationHandler<UserCreatedDomainEvent>
+public class UserCreatedLoggingHandler(ILogger<UserCreatedLoggingHandler> logger, ITelemetryService telemetryService)
+    : INotificationHandler<UserCreatedDomainEvent>
 {
     public Task Handle(UserCreatedDomainEvent notification, CancellationToken cancellationToken)
     {
@@ -24,7 +21,7 @@ public class UserCreatedLoggingHandler(
         );
 
         // Record telemetry
-        var userDto = mapper.Map<UserDto>(user);
+        var userDto = user.Adapt<UserDto>();
         telemetryService.RecordUserCreated(userDto);
 
         // Here you could add business logic like:
