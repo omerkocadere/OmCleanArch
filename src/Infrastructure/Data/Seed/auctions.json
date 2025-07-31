@@ -1,5 +1,6 @@
 [
   {
+    "id": "b1e1e1a1-1111-4a1a-8a1a-111111111111",
     "status": "Live",
     "reservePrice": 20000,
     "seller": "bob",
@@ -14,6 +15,7 @@
     }
   },
   {
+    "id": "b1e1e1a2-2222-4a2a-8a2a-222222222222",
     "status": "Live",
     "reservePrice": 90000,
     "seller": "alice",
@@ -28,6 +30,7 @@
     }
   },
   {
+    "id": "b1e1e1a3-3333-4a3a-8a3a-333333333333",
     "status": "Live",
     "seller": "bob",
     "auctionEnd": "2025-07-17T00:00:00Z",
@@ -41,6 +44,7 @@
     }
   },
   {
+    "id": "b1e1e1a4-4444-4a4a-8a4a-444444444444",
     "status": "ReserveNotMet",
     "reservePrice": 50000,
     "seller": "tom",
@@ -55,6 +59,7 @@
     }
   },
   {
+    "id": "b1e1e1a5-5555-4a5a-8a5a-555555555555",
     "status": "Live",
     "reservePrice": 20000,
     "seller": "alice",
@@ -69,6 +74,7 @@
     }
   },
   {
+    "id": "b1e1e1a6-6666-4a6a-8a6a-666666666666",
     "status": "Live",
     "reservePrice": 20000,
     "seller": "bob",
@@ -83,6 +89,7 @@
     }
   },
   {
+    "id": "b1e1e1a7-7777-4a7a-8a7a-777777777777",
     "status": "Live",
     "reservePrice": 150000,
     "seller": "alice",
@@ -97,6 +104,7 @@
     }
   },
   {
+    "id": "b1e1e1a8-8888-4a8a-8a8a-888888888888",
     "status": "Live",
     "seller": "bob",
     "auctionEnd": "2025-08-01T00:00:00Z",
@@ -110,6 +118,7 @@
     }
   },
   {
+    "id": "b1e1e1a9-9999-4a9a-8a9a-999999999999",
     "status": "Live",
     "reservePrice": 20000,
     "seller": "tom",
@@ -124,6 +133,7 @@
     }
   },
   {
+    "id": "b1e1e1b0-aaaa-4b0a-8b0a-000000000000",
     "status": "Live",
     "reservePrice": 20000,
     "seller": "bob",

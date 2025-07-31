@@ -8,7 +8,7 @@ namespace CleanArch.Application.Auctions.UpdateAuction;
 
 public record UpdateAuctionCommand : IQuery<AuctionDto>
 {
-    public int Id { get; init; }
+    public Guid Id { get; init; }
     public string? Make { get; init; }
     public string? Model { get; init; }
     public int? Year { get; init; }

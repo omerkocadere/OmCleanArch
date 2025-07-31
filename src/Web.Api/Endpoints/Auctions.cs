@@ -26,7 +26,7 @@ public class Auctions : EndpointGroupBase
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    public async Task<IResult> GetAuctionById(ISender sender, int id)
+    public async Task<IResult> GetAuctionById(ISender sender, Guid id)
     {
         var result = await sender.Send(new GetAuctionByIdQuery(id));
         return result.Match(Results.Ok, CustomResults.Problem);
@@ -42,7 +42,7 @@ public class Auctions : EndpointGroupBase
         );
     }
 
-    public async Task<IResult> UpdateAuction(ISender sender, int id, UpdateAuctionCommand command)
+    public async Task<IResult> UpdateAuction(ISender sender, Guid id, UpdateAuctionCommand command)
     {
         command = command with { Id = id }; // Set the Id for the command
 
@@ -51,7 +51,7 @@ public class Auctions : EndpointGroupBase
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    public async Task<IResult> DeleteAuction(ISender sender, int id)
+    public async Task<IResult> DeleteAuction(ISender sender, Guid id)
     {
         Result result = await sender.Send(new DeleteAuctionCommand(id));
         return result.Match(Results.NoContent, CustomResults.Problem);

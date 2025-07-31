@@ -4,7 +4,7 @@ using CleanArch.Domain.Items;
 namespace CleanArch.Domain.Auctions;
 
 [Table("Auctions", Schema = "carsties")]
-public class Auction : BaseAuditableEntity<int>
+public class Auction : BaseAuditableEntity<Guid>
 {
     public int ReservePrice { get; set; }
     public required string Seller { get; set; }
