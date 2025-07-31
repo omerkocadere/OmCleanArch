@@ -1,3 +1,4 @@
+using CleanArch.Application.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -40,6 +41,7 @@ public static class OpenTelemetryConfiguration
             {
                 tracing
                     .AddSource(builder.Environment.ApplicationName)
+                    .AddSource(DiagnosticsConfig.ActivitySource.Name)
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddEntityFrameworkCoreInstrumentation()

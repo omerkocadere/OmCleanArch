@@ -9,7 +9,7 @@ public class TelemetryService(ILogger<TelemetryService> logger) : ITelemetryServ
 {
     public void RecordUserCreated(UserDto user)
     {
-        DiagnosticsConfig.CreatedUserCounter.Add(
+        DiagnosticsConfigLegacy.CreatedUserCounter.Add(
             1,
             new KeyValuePair<string, object?>("user.name", user.FirstName),
             new KeyValuePair<string, object?>("user.id", user.Id),

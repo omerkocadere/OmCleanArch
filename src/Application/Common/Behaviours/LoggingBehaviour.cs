@@ -16,6 +16,11 @@ public class LoggingBehaviour<TRequest, TResponse>(ILogger<TRequest> logger, IUs
         CancellationToken cancellationToken
     )
     {
+        using var activity = DiagnosticsConfig.ActivitySource.StartActivity("Request Logging Started");
+
+        activity?.SetTag("logging.request.type", typeof(TRequest).Name);
+        activity?.SetTag("logging.user.id", user.UserId);
+
         var requestName = typeof(TRequest).Name;
         var userId = user.UserId;
 

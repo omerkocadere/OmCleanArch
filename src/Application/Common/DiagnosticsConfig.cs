@@ -1,13 +1,13 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
-namespace CleanArch.Infrastructure.OpenTelemetry;
+namespace CleanArch.Application.Common;
 
-public static class DiagnosticsConfigLegacy
+public static class DiagnosticsConfig
 {
     private static Meter? _meter;
     private static Counter<int>? _createdUserCounter;
-    public static readonly ActivitySource ActivitySource = new("CleanArch");
+    public static readonly ActivitySource ActivitySource = new("CleanArch.Application.Common");
 
     private static void EnsureInitialized()
     {
