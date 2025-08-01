@@ -29,11 +29,8 @@ public class CreateAuctionCommandHandler(IApplicationDbContext context, IPublish
         auction.Seller = "test"; // TODO: Get current user
 
         context.Auctions.Add(auction);
+        await publishEndpoint.Publish(auction.Adapt<AuctionCreated>(), cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
-
-        var omer = auction.Adapt<AuctionCreated>();
-
-        await publishEndpoint.Publish(omer, cancellationToken);
 
         var auctionDto = auction.Adapt<AuctionDto>();
         return auctionDto;

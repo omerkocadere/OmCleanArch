@@ -6,6 +6,7 @@ using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
 using CleanArch.Infrastructure.BackgroundJobs.Outbox;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Infrastructure.Data;
@@ -25,5 +26,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        // Add MassTransit outbox tables under auction schema
+        builder.AddInboxStateEntity(cfg => cfg.ToTable("InboxState", "auction"));
+        builder.AddOutboxMessageEntity(cfg => cfg.ToTable("OutboxMessage", "auction"));
+        builder.AddOutboxStateEntity(cfg => cfg.ToTable("OutboxState", "auction"));
     }
 }

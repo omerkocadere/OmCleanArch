@@ -6,6 +6,7 @@ using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Idempotence;
 using CleanArch.Infrastructure.Services;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
@@ -28,7 +29,8 @@ public static class DependencyInjection
             .AddDatabase(env, configuration)
             .AddBackgroundJobsConditionally(configuration)
             .AddAuthenticationInternal(configuration)
-            .AddMediatRDecorators();
+            .AddMediatRDecorators()
+            .AddMassTransitServices();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -76,6 +78,31 @@ public static class DependencyInjection
     private static IServiceCollection AddMediatRDecorators(this IServiceCollection services)
     {
         services.Decorate(typeof(INotificationHandler<>), typeof(IdempotentDomainEventHandler<>));
+
+        return services;
+    }
+
+    /// <summary>
+    /// Configures MassTransit with RabbitMQ and EntityFramework outbox pattern.
+    /// </summary>
+    private static IServiceCollection AddMassTransitServices(this IServiceCollection services)
+    {
+        services.AddMassTransit(x =>
+        {
+            x.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
+            {
+                o.QueryDelay = TimeSpan.FromMinutes(5); // 10 dakika delay
+                o.UsePostgres();
+                o.UseBusOutbox();
+            });
+
+            x.UsingRabbitMq(
+                (context, cfg) =>
+                {
+                    cfg.ConfigureEndpoints(context);
+                }
+            );
+        });
 
         return services;
     }

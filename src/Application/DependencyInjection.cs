@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using CleanArch.Application.Common.Behaviours;
+using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Mappings;
-using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanArch.Application;
@@ -23,16 +23,6 @@ public static class DependencyInjection
             cfg.AddOpenBehavior(typeof(ValidationBehaviour<,>));
             cfg.AddOpenBehavior(typeof(PerformanceBehaviour<,>));
             cfg.AddOpenBehavior(typeof(CachingBehaviour<,>));
-        });
-
-        services.AddMassTransit(x =>
-        {
-            x.UsingRabbitMq(
-                (context, cfg) =>
-                {
-                    cfg.ConfigureEndpoints(context);
-                }
-            );
         });
 
         return services;
