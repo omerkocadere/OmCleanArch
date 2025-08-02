@@ -2,6 +2,7 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Auctions;
+using Contracts;
 using MassTransit;
 
 namespace CleanArch.Application.Auctions.DeleteAuction;
@@ -23,7 +24,7 @@ public class DeleteAuctionCommandHandler(IApplicationDbContext context, IPublish
         // TODO: Check if seller is the same as current user
 
         context.Auctions.Remove(auction);
-        await publishEndpoint.Publish(new { Id = auction.Id.ToString() }, cancellationToken);
+        await publishEndpoint.Publish<AuctionDeleted>(new { Id = auction.Id.ToString() }, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

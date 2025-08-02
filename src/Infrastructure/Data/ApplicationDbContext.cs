@@ -28,8 +28,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         // Add MassTransit outbox tables under auction schema
-        builder.AddInboxStateEntity(cfg => cfg.ToTable("InboxState", "auction"));
-        builder.AddOutboxMessageEntity(cfg => cfg.ToTable("OutboxMessage", "auction"));
-        builder.AddOutboxStateEntity(cfg => cfg.ToTable("OutboxState", "auction"));
+        builder.AddInboxStateEntity(cfg => cfg.ToTable("InboxState", "carsties"));
+        builder.AddOutboxMessageEntity(cfg => cfg.ToTable("OutboxMessage", "carsties"));
+        builder.AddOutboxStateEntity(cfg => cfg.ToTable("OutboxState", "carsties"));
     }
 }

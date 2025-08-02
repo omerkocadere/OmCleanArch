@@ -47,6 +47,7 @@ public static class MappingConfig
         // Auction -> AuctionDto: Flattening ve Status conversion
         TypeAdapterConfig<Auction, AuctionDto>.NewConfig().Map(dest => dest, src => src.Item);
         TypeAdapterConfig<Auction, AuctionCreated>.NewConfig().Map(dest => dest, src => src.Item);
+        TypeAdapterConfig<Auction, AuctionUpdated>.NewConfig().Map(dest => dest, src => src.Item);
 
         // CreateAuctionCommand -> Auction: Item property mapping
         TypeAdapterConfig<CreateAuctionCommand, Auction>
