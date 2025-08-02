@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using CleanArch.Application.Auctions.Consumers;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Infrastructure.Authentication;
@@ -91,10 +92,13 @@ public static class DependencyInjection
         {
             x.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
             {
-                o.QueryDelay = TimeSpan.FromMinutes(5); // 10 dakika delay
+                o.QueryDelay = TimeSpan.FromMinutes(5);
                 o.UsePostgres();
                 o.UseBusOutbox();
             });
+
+            x.AddConsumersFromNamespaceContaining<AuctionCreatedFaultConsumer>();
+            x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
 
             x.UsingRabbitMq(
                 (context, cfg) =>
