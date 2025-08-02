@@ -1,4 +1,3 @@
-using System;
 using Contracts;
 using Mapster;
 using MassTransit;
@@ -11,7 +10,7 @@ public class AuctionUpdatedConsumer : IConsumer<AuctionUpdated>
 {
     public async Task Consume(ConsumeContext<AuctionUpdated> context)
     {
-        Console.WriteLine($"Auction updated: {context.Message.Id}");
+        Console.WriteLine($"--> Auction updated: {context.Message.Id}");
 
         var item = context.Message.Adapt<Item>();
 

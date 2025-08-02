@@ -3,6 +3,8 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Auctions;
+using Contracts;
+using MassTransit;
 
 namespace CleanArch.Application.Auctions.UpdateAuction;
 
@@ -16,7 +18,7 @@ public record UpdateAuctionCommand : IQuery<AuctionDto>
     public int? Mileage { get; init; }
 }
 
-public class UpdateAuctionCommandHandler(IApplicationDbContext context)
+public class UpdateAuctionCommandHandler(IApplicationDbContext context, IPublishEndpoint publishEndpoint)
     : IQueryHandler<UpdateAuctionCommand, AuctionDto>
 {
     public async Task<Result<AuctionDto>> Handle(UpdateAuctionCommand request, CancellationToken cancellationToken)
@@ -39,6 +41,7 @@ public class UpdateAuctionCommandHandler(IApplicationDbContext context)
         auction.Item.Color = request.Color ?? auction.Item.Color;
         auction.Item.Mileage = request.Mileage ?? auction.Item.Mileage;
 
+        await publishEndpoint.Publish(auction.Adapt<AuctionUpdated>(), cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
         var auctionDto = auction.Adapt<AuctionDto>();

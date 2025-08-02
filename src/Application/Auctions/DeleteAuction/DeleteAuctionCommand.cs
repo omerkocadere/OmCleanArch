@@ -2,12 +2,14 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Auctions;
+using MassTransit;
 
 namespace CleanArch.Application.Auctions.DeleteAuction;
 
 public record DeleteAuctionCommand(Guid Id) : ICommand;
 
-public class DeleteAuctionCommandHandler(IApplicationDbContext context) : ICommandHandler<DeleteAuctionCommand>
+public class DeleteAuctionCommandHandler(IApplicationDbContext context, IPublishEndpoint publishEndpoint)
+    : ICommandHandler<DeleteAuctionCommand>
 {
     public async Task<Result> Handle(DeleteAuctionCommand request, CancellationToken cancellationToken)
     {
@@ -21,6 +23,7 @@ public class DeleteAuctionCommandHandler(IApplicationDbContext context) : IComma
         // TODO: Check if seller is the same as current user
 
         context.Auctions.Remove(auction);
+        await publishEndpoint.Publish(new { Id = auction.Id.ToString() }, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
