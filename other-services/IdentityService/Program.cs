@@ -14,14 +14,18 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Host.UseSerilog((ctx, lc) => lc
-        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", formatProvider: CultureInfo.InvariantCulture)
-        .Enrich.FromLogContext()
-        .ReadFrom.Configuration(ctx.Configuration));
+    builder.Host.UseSerilog(
+        (ctx, lc) =>
+            lc
+                .WriteTo.Console(
+                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}",
+                    formatProvider: CultureInfo.InvariantCulture
+                )
+                .Enrich.FromLogContext()
+                .ReadFrom.Configuration(ctx.Configuration)
+    );
 
-    var app = builder
-        .ConfigureServices()
-        .ConfigurePipeline();
+    var app = builder.ConfigureServices().ConfigurePipeline();
 
     // this seeding is only for the template to bootstrap the DB and users.
     // in production you will likely want a different approach.
@@ -43,7 +47,7 @@ try
         });
     }
 
-    app.Run();
+    await app.RunAsync();
 }
 catch (Exception ex) when (ex is not HostAbortedException)
 {
@@ -52,7 +56,7 @@ catch (Exception ex) when (ex is not HostAbortedException)
 finally
 {
     Log.Information("Shut down complete");
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }
 
 static string Summary(LicenseUsageSummary usage)

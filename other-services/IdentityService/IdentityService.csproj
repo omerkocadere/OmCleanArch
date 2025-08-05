@@ -9,7 +9,6 @@
 	<ItemGroup>
 		<PackageReference Include="Duende.IdentityServer.AspNetIdentity" />
 
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
 		<PackageReference Include="Serilog.AspNetCore" />
 
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" />

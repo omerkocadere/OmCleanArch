@@ -54,7 +54,6 @@
     <PackageVersion Include="Microsoft.Extensions.Http.Polly" Version="$(AspnetVersion)" />
     <!--Identity Service-->
     <PackageVersion Include="Duende.IdentityServer.AspNetIdentity" Version="7.2.4" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.Google" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspnetVersion)" />
     <!-- Testing -->
