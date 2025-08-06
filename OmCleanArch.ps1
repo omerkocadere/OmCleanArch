@@ -10,6 +10,7 @@ $angularClientPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\client"
 $WebApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\src\Web.Api"
 $DummyApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\Dummy.Api"
 $SearchApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\SearchService"
+$IdentityApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\IdentityService"
 
 # Start Angular Client
 Log "Checking Angular dependencies in '$angularClientPath'..."
@@ -25,8 +26,12 @@ wt -w 0 -d "$angularClientPath" --title "Angular Client" pwsh -NoExit -Command "
 # Start .NET API in a new terminal
 Log "Starting .NET APIs ..."
 wt -w 0 -d "$WebApiPath" --title "WebApi" pwsh -NoExit -Command "dotnet watch --launch-profile https"
+Start-Sleep -Milliseconds 100
 wt -w 0 -d "$DummyApiPath" --title "DummyApi" pwsh -NoExit -Command "dotnet watch"
+Start-Sleep -Milliseconds 100
 wt -w 0 -d "$SearchApiPath" --title "SearchApi" pwsh -NoExit -Command "dotnet watch"
+Start-Sleep -Milliseconds 100
+wt -w 0 -d "$IdentityApiPath" --title "IdentityService" pwsh -NoExit -Command "dotnet watch"
 
 Log "All processes started successfully."
 Read-Host "Press Enter to exit"
