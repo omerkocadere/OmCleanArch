@@ -4,6 +4,7 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Infrastructure.Authentication;
 using CleanArch.Infrastructure.BackgroundJobs;
+using CleanArch.Infrastructure.Configuration;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Idempotence;
 using CleanArch.Infrastructure.Services;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CleanArch.Infrastructure;
@@ -51,25 +53,66 @@ public static class DependencyInjection
         IConfiguration configuration
     )
     {
-        services
-            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(o =>
-            {
-                o.RequireHttpsMetadata = false;
-                o.TokenValidationParameters = new TokenValidationParameters
-                {
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!)),
-                    ValidIssuer = configuration["Jwt:Issuer"],
-                    ValidAudience = configuration["Jwt:Audience"],
-                    ClockSkew = TimeSpan.Zero,
-                };
-            });
+        services.Configure<AuthenticationOptions>(configuration.GetSection(AuthenticationOptions.SectionName));
+
+        // Get authentication options for immediate use
+        var authOptions =
+            configuration.GetSection(AuthenticationOptions.SectionName).Get<AuthenticationOptions>()
+            ?? throw new InvalidOperationException("Authentication configuration is missing or invalid.");
+
+        // Configure authentication based on provider
+        switch (authOptions.Provider)
+        {
+            case AuthenticationProvider.IdentityServer:
+                ConfigureIdentityServerAuthentication(services, authOptions.IdentityServer);
+                break;
+
+            case AuthenticationProvider.Jwt:
+                ConfigureJwtAuthentication(services, authOptions.Jwt);
+                break;
+
+            default:
+                throw new InvalidOperationException($"Unsupported authentication provider: {authOptions.Provider}");
+        }
 
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<ITokenProvider, TokenProvider>();
         return services;
+    }
+
+    private static void ConfigureJwtAuthentication(IServiceCollection services, JwtOptions jwtOptions)
+    {
+        services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret)),
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidAudience = jwtOptions.Audience,
+                    ClockSkew = jwtOptions.ClockSkew,
+                };
+            });
+    }
+
+    private static void ConfigureIdentityServerAuthentication(
+        IServiceCollection services,
+        IdentityServerOptions identityServerOptions
+    )
+    {
+        services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.Authority = identityServerOptions.Authority;
+                options.RequireHttpsMetadata = identityServerOptions.RequireHttpsMetadata;
+                options.TokenValidationParameters.ValidateAudience = identityServerOptions.ValidateAudience;
+                options.TokenValidationParameters.NameClaimType = identityServerOptions.NameClaimType;
+            });
     }
 
     /// <summary>
