@@ -2,6 +2,11 @@
 
 public static class UserErrors
 {
+    public static readonly Error Forbidden = Error.Forbidden(
+        "Users.Forbidden",
+        "You do not have permission to perform this action."
+    );
+
     public static Error NotFound(Guid userId) =>
         Error.NotFound("Users.NotFound", $"The user with the Id = '{userId}' was not found");
 

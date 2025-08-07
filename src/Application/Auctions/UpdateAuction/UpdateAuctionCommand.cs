@@ -1,8 +1,10 @@
 using CleanArch.Application.Auctions.DTOs;
 using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Auctions;
+using CleanArch.Domain.Users;
 using Contracts;
 using MassTransit;
 
@@ -18,8 +20,11 @@ public record UpdateAuctionCommand : IQuery<AuctionDto>
     public int? Mileage { get; init; }
 }
 
-public class UpdateAuctionCommandHandler(IApplicationDbContext context, IPublishEndpoint publishEndpoint)
-    : IQueryHandler<UpdateAuctionCommand, AuctionDto>
+public class UpdateAuctionCommandHandler(
+    IApplicationDbContext context,
+    IPublishEndpoint publishEndpoint,
+    IUserContext userContext
+) : IQueryHandler<UpdateAuctionCommand, AuctionDto>
 {
     public async Task<Result<AuctionDto>> Handle(UpdateAuctionCommand request, CancellationToken cancellationToken)
     {
@@ -32,7 +37,10 @@ public class UpdateAuctionCommandHandler(IApplicationDbContext context, IPublish
             return Result.Failure<AuctionDto>(AuctionErrors.NotFound(request.Id));
         }
 
-        // TODO: Check if seller is the same as current user
+        if (auction.Seller != userContext.UserName)
+        {
+            return Result.Failure<AuctionDto>(UserErrors.Forbidden);
+        }
 
         // Elegant property update with null-coalescing
         auction.Item.Make = request.Make ?? auction.Item.Make;

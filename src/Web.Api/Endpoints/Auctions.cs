@@ -15,9 +15,9 @@ public class Auctions : EndpointGroupBase
     {
         groupBuilder.MapGet(GetAuctions);
         groupBuilder.MapGet(GetAuctionById, "{id:Guid}");
-        groupBuilder.MapPost(CreateAuction);
-        groupBuilder.MapPut(UpdateAuction, "{id:Guid}");
-        groupBuilder.MapDelete(DeleteAuction, "{id:Guid}");
+        groupBuilder.MapPost(CreateAuction).RequireAuthorization();
+        groupBuilder.MapPut(UpdateAuction, "{id:Guid}").RequireAuthorization();
+        groupBuilder.MapDelete(DeleteAuction, "{id:Guid}").RequireAuthorization();
     }
 
     public async Task<IResult> GetAuctions(ISender sender, string? date)
