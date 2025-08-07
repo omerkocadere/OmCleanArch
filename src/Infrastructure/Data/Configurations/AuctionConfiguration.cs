@@ -9,10 +9,10 @@ public class AuctionConfiguration : IEntityTypeConfiguration<Auction>
 {
     public void Configure(EntityTypeBuilder<Auction> builder)
     {
-        builder
-            .HasOne(x => x.Item)
-            .WithOne(x => x.Auction)
-            .HasForeignKey<Item>(x => x.AuctionId)
-            .OnDelete(DeleteBehavior.Restrict);
+        // builder
+        //     .HasOne(x => x.Item)
+        //     .WithOne(x => x.Auction)
+        //     .HasForeignKey<Item>(x => x.AuctionId)
+        //     .OnDelete(DeleteBehavior.Restrict);
     }
 }
