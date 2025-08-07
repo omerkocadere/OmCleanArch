@@ -14,7 +14,7 @@ namespace CleanArch.Infrastructure.OpenTelemetry;
 
 public static class OpenTelemetryConfiguration
 {
-    public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder, IConfiguration configuration)
+    public static TBuilder ConfigureOpenTelemetryInHouse<TBuilder>(this TBuilder builder)
         where TBuilder : IHostApplicationBuilder
     {
         builder.Logging.AddOpenTelemetry(logging =>
@@ -49,38 +49,25 @@ public static class OpenTelemetryConfiguration
                     .AddProcessor(new HangfireTaggerProcessor());
             });
 
-        builder.AddOpenTelemetryExporters(configuration);
+        builder.AddOpenTelemetryExporters();
 
         return builder;
     }
 
-    private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder, IConfiguration configuration)
+    private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder)
         where TBuilder : IHostApplicationBuilder
     {
-        var options = configuration.GetSection(OpenTelemetryOptions.SectionName).Get<OpenTelemetryOptions>();
-
-        var otlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
-        var useOtlpExporter = !string.IsNullOrWhiteSpace(otlpEndpoint);
+        var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
 
         if (useOtlpExporter)
         {
             builder.Services.AddOpenTelemetry().UseOtlpExporter();
         }
-        else if (!string.IsNullOrWhiteSpace(options?.Endpoint))
-        {
-            var protocol = options.Protocol switch
-            {
-                OtlpProtocol.Grpc => OtlpExportProtocol.Grpc,
-                OtlpProtocol.HttpProtobuf => OtlpExportProtocol.HttpProtobuf,
-                _ => OtlpExportProtocol.Grpc,
-            };
-            builder.Services.AddOpenTelemetry().UseOtlpExporter(protocol, new Uri(options.Endpoint));
-        }
         else
         {
             var loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
             var logger = loggerFactory?.CreateLogger("OpenTelemetryConfiguration");
-            logger?.LogError("No OTLP endpoint configuration found.");
+            logger?.LogWarning("No OTLP endpoint configuration found.");
         }
 
         return builder;

@@ -1,6 +1,6 @@
+using CleanArch.Application.Common;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Users.DTOs;
-using CleanArch.Infrastructure.OpenTelemetry;
 using Microsoft.Extensions.Logging;
 
 namespace CleanArch.Infrastructure.Services;
@@ -9,7 +9,7 @@ public class TelemetryService(ILogger<TelemetryService> logger) : ITelemetryServ
 {
     public void RecordUserCreated(UserDto user)
     {
-        DiagnosticsConfigLegacy.CreatedUserCounter.Add(
+        DiagnosticsConfig.CreatedUserCounter.Add(
             1,
             new KeyValuePair<string, object?>("user.name", user.FirstName),
             new KeyValuePair<string, object?>("user.id", user.Id),

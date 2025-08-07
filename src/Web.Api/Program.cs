@@ -13,7 +13,7 @@ Console.WriteLine("Application starting...");
 EnvironmentInspector.LoadAndPrintAll();
 
 var builder = WebApplication.CreateBuilder(args);
-builder.ConfigureOpenTelemetry(builder.Configuration);
+builder.ConfigureOpenTelemetryInHouse();
 
 // builder.AddServiceDefaults();
 builder.AddSeqEndpoint("om-seq");
