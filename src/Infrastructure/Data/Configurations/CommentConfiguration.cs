@@ -44,17 +44,5 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
         builder.HasIndex(c => c.Status);
         builder.HasIndex(c => c.IsDeleted);
         builder.HasIndex(c => c.Created);
-
-        // Filtered index for better performance on non-deleted comments
-        builder
-            .HasIndex(c => c.IsDeleted)
-            .HasFilter("IsDeleted = false")
-            .HasDatabaseName("IX_Comments_IsDeleted_Filtered");
-
-        // Composite index for active comments by post
-        builder
-            .HasIndex(c => new { c.PostId, c.IsDeleted })
-            .HasFilter("IsDeleted = false")
-            .HasDatabaseName("IX_Comments_PostId_Active");
     }
 }

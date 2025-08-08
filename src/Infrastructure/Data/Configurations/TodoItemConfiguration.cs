@@ -10,6 +10,11 @@ public class TodoItemConfiguration : IEntityTypeConfiguration<TodoItem>
     {
         builder.Property(t => t.Title).HasMaxLength(200).IsRequired();
 
+        // Soft delete global query filter
         builder.HasQueryFilter(t => !t.IsDeleted);
+
+        // Indexes for performance
+        builder.HasIndex(t => t.IsDeleted);
+        builder.HasIndex(t => t.Created);
     }
 }
