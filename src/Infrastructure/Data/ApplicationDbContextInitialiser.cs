@@ -1,6 +1,8 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CleanArch.Application.Common.Interfaces.Authentication;
+using CleanArch.Application.Users.Create;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Products;
 using CleanArch.Domain.TodoLists;
@@ -23,9 +25,10 @@ public static class InitialiserExtensions
             .ServiceProvider.GetRequiredService<ILoggerFactory>()
             .CreateLogger(nameof(ApplicationDbContextInitialiser));
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
 
         await ApplicationDbContextInitialiser.InitialiseAsync(context, logger);
-        await ApplicationDbContextInitialiser.SeedAsync(context, logger);
+        await ApplicationDbContextInitialiser.SeedAsync(context, logger, passwordHasher);
     }
 }
 
@@ -50,11 +53,11 @@ public static class ApplicationDbContextInitialiser
         }
     }
 
-    public static async Task SeedAsync(ApplicationDbContext context, ILogger logger)
+    public static async Task SeedAsync(ApplicationDbContext context, ILogger logger, IPasswordHasher passwordHasher)
     {
         try
         {
-            await TrySeedAsync(context, logger);
+            await TrySeedAsync(context, logger, passwordHasher);
         }
         catch (Exception ex)
         {
@@ -63,7 +66,7 @@ public static class ApplicationDbContextInitialiser
         }
     }
 
-    private static async Task TrySeedAsync(ApplicationDbContext context, ILogger logger)
+    private static async Task TrySeedAsync(ApplicationDbContext context, ILogger logger, IPasswordHasher passwordHasher)
     {
         // Get the directory where the currently executing assembly is located
         var assemblyLocation = Assembly.GetExecutingAssembly().Location;
@@ -82,6 +85,8 @@ public static class ApplicationDbContextInitialiser
         logger.LogInformation("Users JSON path: {UsersJsonPath}", usersJsonPath);
         logger.LogInformation("TodoLists JSON path: {ListsJsonPath}", listsJsonPath);
 
+        // Seed Users first and collect their IDs
+        List<Guid> createdUserIds = new();
         if (!context.Users.Any())
         {
             if (!File.Exists(usersJsonPath))
@@ -92,18 +97,44 @@ public static class ApplicationDbContextInitialiser
             {
                 logger.LogInformation("Seeding users from {Path}", usersJsonPath);
                 var usersJson = await File.ReadAllTextAsync(usersJsonPath);
-                var users = JsonSerializer.Deserialize<List<User>>(usersJson, _jsonOptions);
-                if (users is null || users.Count == 0)
+                var usersData = JsonSerializer.Deserialize<List<User>>(usersJson, _jsonOptions);
+                if (usersData is null || usersData.Count == 0)
                 {
                     logger.LogWarning("No data found in users.json");
                     return;
                 }
-                context.Users.AddRange(users);
-                await context.SaveChangesAsync();
-                logger.LogInformation("Seeded {UserCount} users.", users.Count);
+                var handler = new CreateUserCommandHandler(context, passwordHasher);
+                int successCount = 0;
+                foreach (var user in usersData)
+                {
+                    var command = new CreateUserCommand
+                    {
+                        Email = user.Email,
+                        DisplayName = user.DisplayName,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Password = "111111",
+                    };
+                    var result = await handler.Handle(command, default);
+                    if (result.IsSuccess)
+                    {
+                        successCount++;
+                        // Get the created user's ID from database
+                        var createdUser = await context.Users.FirstOrDefaultAsync(u => u.Email == command.Email);
+                        if (createdUser != null)
+                            createdUserIds.Add(createdUser.Id);
+                    }
+                }
+                logger.LogInformation("Seeded {UserCount} users via CreateUserCommandHandler.", successCount);
             }
         }
-        if (!context.TodoLists.Any())
+        else
+        {
+            // Users already exist, get their IDs
+            createdUserIds = await context.Users.Select(u => u.Id).ToListAsync();
+        }
+
+        if (!context.TodoLists.Any() && createdUserIds.Any())
         {
             if (!File.Exists(listsJsonPath))
             {
@@ -119,9 +150,25 @@ public static class ApplicationDbContextInitialiser
                     logger.LogWarning("No data found in todolists.json");
                     return;
                 }
+
+                // Assign real User IDs to TodoLists cyclically
+                for (int i = 0; i < listsData.Count; i++)
+                {
+                    listsData[i].UserId = createdUserIds[i % createdUserIds.Count];
+
+                    // Also assign User IDs to TodoItems if they exist
+                    if (listsData[i].Items?.Any() == true)
+                    {
+                        foreach (var item in listsData[i].Items)
+                        {
+                            item.UserId = listsData[i].UserId; // Same user as the list
+                        }
+                    }
+                }
+
                 context.TodoLists.AddRange(listsData);
                 await context.SaveChangesAsync();
-                logger.LogInformation("Seeded {ListCount} lists.", listsData.Count);
+                logger.LogInformation("Seeded {ListCount} lists with proper User IDs.", listsData.Count);
             }
         }
         if (!context.Products.Any() && File.Exists(productsJsonPath))
