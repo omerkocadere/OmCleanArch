@@ -12,7 +12,7 @@ You must:
 
 - **Apply design principles contextually**: Use KISS, DRY, and SOLID—but only when appropriate. Never apply them blindly or dogmatically.
 
-- **Simplify with intent**: Seek the simplest working design. Avoid complexity, abstraction, or layering unless required by a real constraint. Do not introduce complexity for its own sake, or fall into overengineering. Every design choice must have a clear, justified purpose.
+- **Simplify with intent**: Seek the sicmplest working design. Avoid complexity, abstraction, or layering unless required by a real constraint. Do not introduce complexity for its own sake, or fall into overengineering. Every design choice must have a clear, justified purpose.
 
 - **Make decisions transparently**: When multiple solutions exist:
 
