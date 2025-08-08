@@ -31,19 +31,20 @@ public class AuditableEntityInterceptor(IUserContext user, TimeProvider dateTime
         if (context == null)
             return;
 
-        foreach (var entry in context.ChangeTracker.Entries<IAuditableEntity>())
+        foreach (
+            var entry in context
+                .ChangeTracker.Entries<IAuditableEntity>()
+                .Where(e => e.State is EntityState.Added or EntityState.Modified || e.HasChangedOwnedEntities())
+        )
         {
-            if (entry.State is EntityState.Added or EntityState.Modified || entry.HasChangedOwnedEntities())
+            var utcNow = dateTime.GetUtcNow();
+            if (entry.State == EntityState.Added)
             {
-                var utcNow = dateTime.GetUtcNow();
-                if (entry.State == EntityState.Added)
-                {
-                    entry.Entity.CreatedBy = user.UserId;
-                    entry.Entity.Created = utcNow;
-                }
-                entry.Entity.LastModifiedBy = user.UserId;
-                entry.Entity.LastModified = utcNow;
+                entry.Entity.CreatedBy = user.UserId;
+                entry.Entity.Created = utcNow;
             }
+            entry.Entity.LastModifiedBy = user.UserId;
+            entry.Entity.LastModified = utcNow;
         }
     }
 }

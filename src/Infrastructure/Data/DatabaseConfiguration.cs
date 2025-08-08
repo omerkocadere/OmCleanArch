@@ -58,6 +58,7 @@ public static class DatabaseConfiguration
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+        services.AddScoped<ISaveChangesInterceptor, SoftDeleteInterceptor>();
         // services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, ConvertDomainEventsToOutputMessagesInterceptor>();
         AddConditionalHealthChecks(services, configuration);

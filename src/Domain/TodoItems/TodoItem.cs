@@ -3,7 +3,7 @@ using CleanArch.Domain.Users;
 
 namespace CleanArch.Domain.TodoItems;
 
-public sealed class TodoItem : BaseAuditableEntity<int>
+public sealed class TodoItem : FullAuditableEntity<int>
 {
     public int ListId { get; set; }
     public required string Title { get; set; }

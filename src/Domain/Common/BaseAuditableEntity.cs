@@ -1,7 +1,6 @@
 ﻿namespace CleanArch.Domain.Common;
 
 public abstract class BaseAuditableEntity<T> : BaseEntity<T>, IAuditableEntity
-    where T : IEquatable<T>
 {
     public DateTimeOffset Created { get; set; }
 
