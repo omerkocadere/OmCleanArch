@@ -21,13 +21,20 @@ public static class DatabaseConfiguration
     {
         services.ConfigureOptions<DatabaseOptionsSetup>();
 
+        // Log database provider selection once during startup
+        var dbOptions = configuration.GetSection(DatabaseOptionsSetup.ConfigurationSectionName).Get<DatabaseOptions>();
+        if (dbOptions != null)
+        {
+            // Create a temporary logger for startup logging
+            using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+            var logger = loggerFactory.CreateLogger(nameof(DatabaseConfiguration));
+            logger.LogInformation("Selected database provider: {Provider}", dbOptions.Provider);
+        }
+
         services.AddDbContext<ApplicationDbContext>(
             (sp, options) =>
             {
                 var databaseOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-                var logger = sp.GetRequiredService<ILogger<ApplicationDbContext>>();
-
-                logger.LogInformation("Selected database provider: {Provider}", databaseOptions.Provider);
 
                 switch (databaseOptions.Provider)
                 {
