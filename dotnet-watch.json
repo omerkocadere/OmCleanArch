@@ -1,0 +1,6 @@
+{
+  "watch": {
+    "include": ["src/**"],
+    "exclude": ["client/**", "seq-data/**", "**/bin/**", "**/obj/**", "**/*.log", ".git/**"]
+  }
+}

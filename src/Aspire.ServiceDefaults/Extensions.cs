@@ -1,9 +1,11 @@
+using System.Text.Json;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ServiceDiscovery;
 using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
@@ -122,6 +124,32 @@ public static class Extensions
         {
             // All health checks must pass for app to be considered ready to accept traffic after starting
             app.MapHealthChecks("/health");
+            app.MapHealthChecks(
+                "/health-detailed",
+                new HealthCheckOptions
+                {
+                    ResponseWriter = async (context, report) =>
+                    {
+                        context.Response.ContentType = "application/json";
+                        var result = new
+                        {
+                            status = report.Status.ToString(),
+                            checks = report.Entries.Select(entry => new
+                            {
+                                name = entry.Key,
+                                status = entry.Value.Status.ToString(),
+                                exception = entry.Value.Exception?.Message,
+                                data = entry.Value.Data,
+                            }),
+                        };
+                        await context.Response.WriteAsync(JsonSerializer.Serialize(result));
+                    },
+                }
+            );
+            app.MapHealthChecks(
+                "/health-ui",
+                new HealthCheckOptions { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse }
+            );
 
             // Only health checks tagged with the "live" tag must pass for app to be considered alive
             app.MapHealthChecks("/alive", new HealthCheckOptions { Predicate = r => r.Tags.Contains("live") });

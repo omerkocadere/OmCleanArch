@@ -25,11 +25,13 @@ builder.AddSeqEndpoint("om-seq");
 //     }
 // );
 
+
 builder
     .Services.AddApplicationServices()
     .AddInfrastructureServices(builder.Environment, builder.Configuration)
     .AddWebServices(builder.Configuration)
-    .AddPlayServices(builder.Configuration);
+    .AddPlayServices(builder.Configuration)
+    .AddRateLimiting();
 
 builder.Services.AddCors(options =>
 {
@@ -43,6 +45,7 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+app.UseRateLimiter();
 
 app.MapDefaultEndpoints();
 
@@ -78,4 +81,4 @@ app.MapControllers();
 
 app.InitializeBackgroundJobsConditionally();
 
-app.Run();
+await app.RunAsync();
