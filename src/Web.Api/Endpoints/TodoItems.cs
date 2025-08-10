@@ -14,7 +14,7 @@ public class TodoItems : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {
-        groupBuilder.MapGet(GetTodoItemsWithPagination).RequireAuthorization();
+        groupBuilder.MapGet(GetTodoItemsWithPagination).RequireAuthorization().RequireRateLimiting("per-user");
         groupBuilder.MapGet(GetTodoItemById, "{id:int}").RequireAuthorization();
         groupBuilder.MapPost(CreateTodoItem).RequireAuthorization();
         groupBuilder.MapPut(UpdateTodoItem, "{id:int}").RequireAuthorization();
