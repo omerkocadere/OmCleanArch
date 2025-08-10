@@ -22,7 +22,7 @@ public class TodoItems : EndpointGroupBase
         groupBuilder.MapDelete(DeleteTodoItem, "{id:int}").RequireAuthorization();
     }
 
-    public async Task<IResult> GetTodoItemsWithPagination(
+    public static async Task<IResult> GetTodoItemsWithPagination(
         ISender sender,
         [AsParameters] GetTodoItemsWithPaginationQuery query
     )
@@ -32,13 +32,13 @@ public class TodoItems : EndpointGroupBase
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    public async Task<IResult> GetTodoItemById(ISender sender, int id)
+    public static async Task<IResult> GetTodoItemById(ISender sender, int id)
     {
         var result = await sender.Send(new GetTodoItemByIdQuery(id));
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    public async Task<IResult> CreateTodoItem(ISender sender, CreateTodoItemCommand command)
+    public static async Task<IResult> CreateTodoItem(ISender sender, CreateTodoItemCommand command)
     {
         Result<TodoItemDto> result = await sender.Send(command);
 
@@ -48,14 +48,14 @@ public class TodoItems : EndpointGroupBase
         );
     }
 
-    public async Task<IResult> UpdateTodoItem(ISender sender, int id, bool done)
+    public static async Task<IResult> UpdateTodoItem(ISender sender, int id, bool done)
     {
         Result result = await sender.Send(new UpdateTodoItemCommand(id, done));
 
         return result.Match(Results.NoContent, CustomResults.Problem);
     }
 
-    public async Task<IResult> UpdateTodoItemDetail(ISender sender, int id, UpdateTodoItemDetailCommand command)
+    public static async Task<IResult> UpdateTodoItemDetail(ISender sender, int id, UpdateTodoItemDetailCommand command)
     {
         if (id != command.Id)
             return TypedResults.BadRequest();
@@ -65,7 +65,7 @@ public class TodoItems : EndpointGroupBase
         return result.Match(Results.NoContent, CustomResults.Problem);
     }
 
-    public async Task<IResult> DeleteTodoItem(ISender sender, int id)
+    public static async Task<IResult> DeleteTodoItem(ISender sender, int id)
     {
         Result result = await sender.Send(new DeleteTodoItemCommand(id));
 

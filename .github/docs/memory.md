@@ -159,3 +159,44 @@ app.MapDefaultEndpoints();
 - `/health` - Returns JSON with healthy status ✅
 - `/health-detailed` - Detailed health check information ✅
 - `/alive` - Basic liveness check (Aspire default) ✅
+
+## ⏱ Dotnet Watch Startup Delay Investigation (August 10, 2025)
+
+### Symptom
+
+`dotnet watch run` in PowerShell shows: build succeeds, then ~60s pause before the very first line in `Program.cs` (`Console.WriteLine("Application starting...")`) appears. Running via VS debugger starts immediately.
+
+### Key Observations
+
+- Delay occurs BEFORE application code executes (since first line is delayed) => root cause is pre-launch tasks of `dotnet watch` (file enumeration, project evaluation, watcher setup), not runtime code (EF, MassTransit, OpenTelemetry, Hangfire) which run after the first line.
+- Repo contains large `client` frontend (≈21k files) plus backend (≈1.6k). Default `dotnet watch` globs traverse directories unless excluded; large file count + Windows Defender scanning can produce ~minute latency.
+- VS F5 likely uses different fast-path (design-time build already warm, maybe narrower watch set) so no delay.
+- No heavy static constructors or ModuleInitializer usage; first executed code is trivial.
+- OpenTelemetry, MassTransit, Hangfire registration is after the delayed phase.
+
+### Primary Hypothesis (Most Likely)
+
+File system scanning + MSBuild project evaluation across many files (especially in `client/`) combined with antivirus I/O overhead cause the 60s delay before launching the process in `dotnet watch`.
+
+### Secondary Factors to Rule Out / Less Likely
+
+- Dev HTTPS certificate generation (would show specific cert logs; not recurring every run).
+- Locked / network share paths (repo appears local).
+- Environment variable enumeration (fast, insignificant).
+
+### Recommended Mitigations / Experiments
+
+1. Limit watch scope: create `dotnet-watch.json` in solution root or project folder excluding `client`, `seq-data`, `**/bin`, `**/obj`.
+2. Set env var `DOTNET_WATCH_TRACE=1` for one run to confirm time spent in file enumeration.
+3. Run with `--no-hot-reload` to see if hot reload instrumentation adds cost.
+4. Temporarily rename `client` folder to test startup time delta.
+5. Add Windows Defender exclusion for repo path (if corporate policy allows) and re-measure.
+6. Compare `dotnet run` (no watch) baseline to isolate watch overhead.
+
+### Confirming Root Cause
+
+If excluding large folders or renaming `client` reduces delay dramatically (e.g., from 60s to a few seconds), the cause is confirmed as file watch enumeration overhead.
+
+### Next Actions
+
+Implement watch exclusion config and document results. If still slow, capture trace (`dotnet-trace collect --providers Microsoft-DotNet-Watch`) to inspect phases.

@@ -8,8 +8,8 @@ namespace CleanArch.Application.TodoItems.GetTodoItemsWithPagination;
 public record GetTodoItemsWithPaginationQuery : IRequest<Result<PaginatedList<TodoItemDto>>>
 {
     public int ListId { get; init; }
-    public int PageNumber { get; init; } = 1;
-    public int PageSize { get; init; } = 10;
+    public int? PageNumber { get; init; }
+    public int? PageSize { get; init; }
 }
 
 public class GetTodoItemsWithPaginationQueryHandler(IApplicationDbContext context)
@@ -20,11 +20,14 @@ public class GetTodoItemsWithPaginationQueryHandler(IApplicationDbContext contex
         CancellationToken cancellationToken
     )
     {
+        var pageNumber = request.PageNumber ?? 1;
+        var pageSize = request.PageSize ?? 10;
+
         var result = await context
             .TodoItems.Where(x => x.ListId == request.ListId)
             .OrderBy(x => x.Title)
             .ProjectToType<TodoItemDto>()
-            .PaginatedListAsync(request.PageNumber, request.PageSize);
+            .PaginatedListAsync(pageNumber, pageSize);
 
         return result;
     }
