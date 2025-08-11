@@ -2,8 +2,9 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CleanArch.Application.Common.Interfaces.Authentication;
-using CleanArch.Application.Users.Create;
 using CleanArch.Domain.Auctions;
+using CleanArch.Domain.Members;
+using CleanArch.Domain.Photos;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
 using CleanArch.Domain.ValueObjects;
@@ -94,6 +95,7 @@ public static class ApplicationDbContextInitialiser
         string usersJsonPath
     )
     {
+        var culture = System.Globalization.CultureInfo.InvariantCulture;
         List<Guid> createdUserIds = new();
         if (await context.Users.AnyAsync())
         {
@@ -109,21 +111,60 @@ public static class ApplicationDbContextInitialiser
 
         logger.LogInformation("Seeding users from {Path}", usersJsonPath);
         var usersJson = await File.ReadAllTextAsync(usersJsonPath);
-        var usersData = JsonSerializer.Deserialize<List<User>>(usersJson, _jsonOptions);
-        if (usersData is null || usersData.Count == 0)
+        var userData = JsonSerializer.Deserialize<List<UserSeedDto>>(usersJson, _jsonOptions);
+        if (userData is null || userData.Count == 0)
         {
             logger.LogWarning("No data found in users.json");
             return createdUserIds;
         }
 
-        foreach (var user in usersData)
+        foreach (var userDto in userData)
         {
-            user.PasswordHash = passwordHasher.Hash("111111");
+            var user = new User
+            {
+                Id = userDto.Id,
+                Email = userDto.Email,
+                DisplayName = userDto.DisplayName,
+                FirstName = userDto.FirstName,
+                LastName = userDto.LastName,
+                PasswordHash = passwordHasher.Hash("111111"),
+                Member = new Member
+                {
+                    Id = userDto.Id,
+                    DateOfBirth = DateOnly.Parse(userDto.DateOfBirth, culture),
+                    ImageUrl = userDto.ImageUrl,
+                    DisplayName = userDto.DisplayName,
+                    LastActive = DateTime.Parse(userDto.LastActive, culture),
+                    Gender = userDto.Gender,
+                    Description = userDto.Description,
+                    City = userDto.City,
+                    Country = userDto.Country,
+                    User = null!, // Will be set by EF Core
+                },
+            };
+
+            // Create a photo for this member using their ImageUrl
+            if (!string.IsNullOrEmpty(userDto.ImageUrl))
+            {
+                var photo = new Photo
+                {
+                    Url = userDto.ImageUrl,
+                    MemberId = userDto.Id,
+                    Member = user.Member,
+                };
+
+                context.Photos.Add(photo);
+            }
+
+            context.Users.Add(user);
         }
 
-        context.Users.AddRange(usersData);
         await context.SaveChangesAsync();
-        logger.LogInformation("Seeded {UserCount} users.", usersData.Count);
+
+        // Collect the created user IDs
+        createdUserIds = [.. userData.Select(u => u.Id)];
+
+        logger.LogInformation("Seeded {UserCount} users with corresponding members and photos.", userData.Count);
         return createdUserIds;
     }
 
@@ -188,4 +229,22 @@ public static class ApplicationDbContextInitialiser
         await context.SaveChangesAsync();
         logger.LogInformation("Seeded {AuctionCount} auctions.", auctions.Count);
     }
+}
+
+// DTO for seeding users from JSON
+public class UserSeedDto
+{
+    public required Guid Id { get; set; }
+    public required string Email { get; set; }
+    public required string Gender { get; set; }
+    public required string DateOfBirth { get; set; }
+    public required string DisplayName { get; set; }
+    public required string FirstName { get; set; }
+    public required string LastName { get; set; }
+    public required string Created { get; set; }
+    public required string LastActive { get; set; }
+    public required string Description { get; set; }
+    public required string City { get; set; }
+    public required string Country { get; set; }
+    public required string ImageUrl { get; set; }
 }

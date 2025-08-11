@@ -79,6 +79,16 @@ public class CreateUserCommandHandlerTests
             FirstName = "Existing",
             LastName = "User",
             PasswordHash = "existinghashedpassword",
+            Member = new Member
+            {
+                Id = Guid.NewGuid(),
+                DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-25)),
+                DisplayName = "Existing User",
+                Gender = "male",
+                City = "Test City",
+                Country = "Test Country",
+                User = null!,
+            },
         };
 
         SetupMockContext([existingUser]);
@@ -198,6 +208,16 @@ public class CreateUserCommandHandlerTests
             FirstName = "Existing",
             LastName = "User",
             PasswordHash = "existinghashedpassword",
+            Member = new Member
+            {
+                Id = Guid.NewGuid(),
+                DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-25)),
+                DisplayName = "Existing User",
+                Gender = "male",
+                City = "Test City",
+                Country = "Test Country",
+                User = null!,
+            },
         };
 
         SetupMockContext([existingUser]);

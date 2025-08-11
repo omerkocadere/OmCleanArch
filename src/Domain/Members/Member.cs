@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using API.Entities;
+using CleanArch.Domain.Photos;
 using CleanArch.Domain.Users;
 
 namespace CleanArch.Domain.Members;

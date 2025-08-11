@@ -12,5 +12,5 @@ public sealed class User : FullAuditableEntity<Guid> // Aggregate Root - ISoftDe
     public required string PasswordHash { get; set; }
 
     // Navigation property
-    public Member Member { get; set; } = null!;
+    public required Member Member { get; set; }
 }
