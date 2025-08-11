@@ -1,5 +1,6 @@
 ﻿using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Comments;
+using CleanArch.Domain.Members;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
@@ -12,6 +13,7 @@ public interface IApplicationDbContext
     DbSet<TodoList> TodoLists { get; }
     DbSet<TodoItem> TodoItems { get; }
     DbSet<Auction> Auctions { get; }
+    DbSet<Member> Members { get; }
     DbSet<Comment> Comments { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
