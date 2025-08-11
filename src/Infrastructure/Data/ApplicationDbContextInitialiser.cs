@@ -129,6 +129,7 @@ public static class ApplicationDbContextInitialiser
                 DisplayName = userDto.DisplayName,
                 FirstName = userDto.FirstName,
                 LastName = userDto.LastName,
+                ImageUrl = userDto.ImageUrl,
                 PasswordHash = passwordHasher.Hash("111111"),
                 Member = new Member
                 {
