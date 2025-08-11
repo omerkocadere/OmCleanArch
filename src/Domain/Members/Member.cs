@@ -17,10 +17,8 @@ public class Member : BaseAuditableEntity<Guid> // Dependent Entity - ISoftDelet
     public required string Country { get; set; }
 
     // Navigation property
-    [JsonIgnore]
     public List<Photo> Photos { get; set; } = [];
 
-    [JsonIgnore]
     [ForeignKey(nameof(Id))]
-    public User User { get; set; } = null!;
+    public required User User { get; set; }
 }

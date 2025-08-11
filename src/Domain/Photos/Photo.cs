@@ -9,7 +9,6 @@ public class Photo : BaseEntity<Guid>
     public string? PublicId { get; set; }
 
     // Navigation property
-    [JsonIgnore]
     public required Member Member { get; set; }
     public required Guid MemberId { get; set; }
 }
