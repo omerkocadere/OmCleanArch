@@ -54,6 +54,13 @@ public static class DatabaseConfiguration
 
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
 
+                // Suppress EF Core warnings about global query filters on required relationships
+                // This is the industry standard approach for Aggregate Root pattern
+                options.ConfigureWarnings(warnings =>
+                {
+                    warnings.Ignore(CoreEventId.PossibleIncorrectRequiredNavigationWithQueryFilterInteractionWarning);
+                });
+
                 if (env.IsDevelopment() || env.IsEnvironment("Docker"))
                 {
                     options.EnableSensitiveDataLogging();

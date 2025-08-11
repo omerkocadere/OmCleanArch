@@ -5,7 +5,7 @@ using CleanArch.Domain.Users;
 
 namespace CleanArch.Domain.Members;
 
-public class Member : BaseAuditableEntity<Guid>
+public class Member : BaseAuditableEntity<Guid> // Dependent Entity - ISoftDelete YOK
 {
     public DateOnly DateOfBirth { get; set; }
     public string? ImageUrl { get; set; }

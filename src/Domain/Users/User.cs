@@ -2,7 +2,7 @@
 
 namespace CleanArch.Domain.Users;
 
-public sealed class User : FullAuditableEntity<Guid>
+public sealed class User : FullAuditableEntity<Guid> // Aggregate Root - ISoftDelete var
 {
     public required string Email { get; set; }
     public string? ImageUrl { get; set; }
@@ -12,5 +12,5 @@ public sealed class User : FullAuditableEntity<Guid>
     public required string PasswordHash { get; set; }
 
     // Navigation property
-    public required Member Member { get; set; }
+    public Member Member { get; set; } = null!;
 }

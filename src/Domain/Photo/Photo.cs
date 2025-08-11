@@ -13,5 +13,5 @@ public class Photo
     // Navigation property
     [JsonIgnore]
     public required Member Member { get; set; }
-    public required string MemberId { get; set; }
+    public required Guid MemberId { get; set; }  // Guid olarak değiştirdim
 }
