@@ -22,5 +22,5 @@ public class Member : BaseAuditableEntity<Guid> // Dependent Entity - ISoftDelet
 
     [JsonIgnore]
     [ForeignKey(nameof(Id))]
-    public required User User { get; set; }
+    public User User { get; set; } = null!;
 }

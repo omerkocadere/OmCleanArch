@@ -32,6 +32,6 @@ public sealed class TodoItem : FullAuditableEntity<int>
     }
 
     public Guid UserId { get; set; }
-    public User User { get; set; } = null!;
-    public TodoList List { get; set; } = null!;
+    public required User User { get; set; }
+    public required TodoList List { get; set; }
 }

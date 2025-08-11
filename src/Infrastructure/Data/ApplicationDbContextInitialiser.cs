@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -5,6 +6,7 @@ using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Photos;
+using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
 using CleanArch.Domain.ValueObjects;
@@ -131,10 +133,12 @@ public static class ApplicationDbContextInitialiser
                 Member = new Member
                 {
                     Id = userDto.Id,
-                    DateOfBirth = DateOnly.Parse(userDto.DateOfBirth, culture),
+                    DateOfBirth = DateOnly.FromDateTime(
+                        DateTime.SpecifyKind(DateTime.Parse(userDto.DateOfBirth, culture), DateTimeKind.Utc)
+                    ),
                     ImageUrl = userDto.ImageUrl,
                     DisplayName = userDto.DisplayName,
-                    LastActive = DateTime.Parse(userDto.LastActive, culture),
+                    LastActive = DateTime.SpecifyKind(DateTime.Parse(userDto.LastActive, culture), DateTimeKind.Utc),
                     Gender = userDto.Gender,
                     Description = userDto.Description,
                     City = userDto.City,
@@ -175,7 +179,7 @@ public static class ApplicationDbContextInitialiser
         List<Guid> createdUserIds
     )
     {
-        if (await context.TodoLists.AnyAsync() || !createdUserIds.Any())
+        if (await context.TodoLists.AnyAsync() || createdUserIds.Count == 0)
             return;
 
         if (!File.Exists(listsJsonPath))
@@ -186,27 +190,57 @@ public static class ApplicationDbContextInitialiser
 
         logger.LogInformation("Seeding todolists from {Path}", listsJsonPath);
         var listsJson = await File.ReadAllTextAsync(listsJsonPath);
-        var listsData = JsonSerializer.Deserialize<List<TodoList>>(listsJson, _jsonOptions);
+        var listsData = JsonSerializer.Deserialize<List<TodoListSeedDto>>(listsJson, _jsonOptions);
         if (listsData is null || listsData.Count == 0)
         {
             logger.LogWarning("No data found in todolists.json");
             return;
         }
 
+        var users = await context.Users.ToDictionaryAsync(u => u.Id);
+
         for (int i = 0; i < listsData.Count; i++)
         {
-            listsData[i].UserId = createdUserIds[i % createdUserIds.Count];
+            var listDto = listsData[i];
+            // Assign users in round-robin fashion
+            var userId = createdUserIds[i % createdUserIds.Count];
 
-            if (listsData[i].Items?.Any() == true)
+            var todoList = new TodoList
             {
-                foreach (var item in listsData[i].Items)
+                Title = listDto.Title,
+                Colour = Colour.From(listDto.Colour),
+                UserId = userId,
+                User = users[userId],
+            };
+
+            // Add items to the list
+            if (listDto.Items?.Any() is true)
+            {
+                foreach (var itemDto in listDto.Items)
                 {
-                    item.UserId = listsData[i].UserId;
+                    var todoItem = new TodoItem
+                    {
+                        Title = itemDto.Title,
+                        Note = itemDto.Note,
+                        Priority = (PriorityLevel)itemDto.Priority,
+                        Reminder = itemDto.Reminder?.ToUniversalTime(),
+                        Description = itemDto.Description,
+                        DueDate = itemDto.DueDate?.ToUniversalTime(),
+                        Labels = itemDto.Labels ?? [],
+                        Done = itemDto.Done,
+                        CompletedAt = itemDto.CompletedAt?.ToUniversalTime(),
+                        UserId = userId,
+                        User = users[userId],
+                        List = todoList,
+                    };
+
+                    todoList.Items.Add(todoItem);
                 }
             }
+
+            context.TodoLists.Add(todoList);
         }
 
-        context.TodoLists.AddRange(listsData);
         await context.SaveChangesAsync();
         logger.LogInformation("Seeded {ListCount} lists with proper User IDs.", listsData.Count);
     }
@@ -247,4 +281,26 @@ public class UserSeedDto
     public required string City { get; set; }
     public required string Country { get; set; }
     public required string ImageUrl { get; set; }
+}
+
+// DTO for seeding TodoLists from JSON
+public class TodoListSeedDto
+{
+    public required string Title { get; set; }
+    public required string Colour { get; set; }
+    public List<TodoItemSeedDto>? Items { get; set; }
+}
+
+// DTO for seeding TodoItems from JSON
+public class TodoItemSeedDto
+{
+    public required string Title { get; set; }
+    public string? Note { get; set; }
+    public int Priority { get; set; }
+    public DateTime? Reminder { get; set; }
+    public string? Description { get; set; }
+    public DateTime? DueDate { get; set; }
+    public List<string>? Labels { get; set; }
+    public DateTime? CompletedAt { get; set; }
+    public bool Done { get; set; }
 }

@@ -2,7 +2,6 @@
   {
     "Title": "Personal Tasks",
     "Colour": "#FFFFFF",
-    "UserId": "11111111-1111-1111-1111-111111111111",
     "Items": [
       {
         "Title": "Buy groceries",
@@ -13,8 +12,7 @@
         "DueDate": "2025-06-27T18:00:00Z",
         "Labels": ["shopping", "home"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": false
       },
       {
         "Title": "Call plumber",
@@ -25,8 +23,7 @@
         "DueDate": "2025-06-28T12:00:00Z",
         "Labels": ["urgent", "home"],
         "CompletedAt": "2025-06-26T15:00:00Z",
-        "Done": true,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": true
       },
       {
         "Title": "Read a book",
@@ -37,8 +34,7 @@
         "DueDate": "2025-07-01T20:00:00Z",
         "Labels": ["leisure", "personal"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": false
       },
       {
         "Title": "Pay electricity bill",
@@ -49,8 +45,7 @@
         "DueDate": "2025-06-28T23:59:00Z",
         "Labels": ["finance", "urgent"],
         "CompletedAt": "2025-06-27T11:00:00Z",
-        "Done": true,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": true
       },
       {
         "Title": "Walk the dog",
@@ -61,15 +56,13 @@
         "DueDate": "2025-06-25T20:00:00Z",
         "Labels": ["pets", "health"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": false
       }
     ]
   },
   {
     "Title": "Work Projects",
     "Colour": "#6666FF",
-    "UserId": "11111111-1111-1111-1111-111111111111",
     "Items": [
       {
         "Title": "Team meeting",
@@ -80,8 +73,7 @@
         "DueDate": "2025-06-26T10:30:00Z",
         "Labels": ["work", "meeting"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": false
       },
       {
         "Title": "Send report",
@@ -92,8 +84,7 @@
         "DueDate": "2025-06-26T17:00:00Z",
         "Labels": ["work", "urgent"],
         "CompletedAt": "2025-06-26T16:30:00Z",
-        "Done": true,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": true
       },
       {
         "Title": "Update resume",
@@ -104,8 +95,7 @@
         "DueDate": "2025-07-05T18:00:00Z",
         "Labels": ["career", "personal"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": false
       },
       {
         "Title": "Book dentist",
@@ -116,8 +106,7 @@
         "DueDate": "2025-07-02T09:00:00Z",
         "Labels": ["health"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": false
       },
       {
         "Title": "Plan vacation",
@@ -128,15 +117,13 @@
         "DueDate": "2025-07-10T12:00:00Z",
         "Labels": ["travel", "leisure"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": false
       }
     ]
   },
   {
     "Title": "Shopping List",
     "Colour": "#CCFF99",
-    "UserId": "11111111-1111-1111-1111-111111111111",
     "Items": [
       {
         "Title": "Car service",
@@ -147,8 +134,7 @@
         "DueDate": "2025-06-30T10:00:00Z",
         "Labels": ["car", "maintenance"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": false
       },
       {
         "Title": "Buy birthday gift",
@@ -159,8 +145,7 @@
         "DueDate": "2025-07-03T18:00:00Z",
         "Labels": ["shopping", "gift"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": false
       },
       {
         "Title": "Organize files",
@@ -171,8 +156,7 @@
         "DueDate": "2025-07-01T21:00:00Z",
         "Labels": ["personal", "work"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": false
       },
       {
         "Title": "Water plants",
@@ -183,8 +167,7 @@
         "DueDate": "2025-06-26T08:00:00Z",
         "Labels": ["home", "garden"],
         "CompletedAt": "2025-06-26T08:10:00Z",
-        "Done": true,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": true
       },
       {
         "Title": "Renew insurance",
@@ -195,15 +178,13 @@
         "DueDate": "2025-07-05T23:59:00Z",
         "Labels": ["finance", "car"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "11111111-1111-1111-1111-111111111111"
+        "Done": false
       }
     ]
   },
   {
     "Title": "Home Maintenance",
     "Colour": "#FF5733",
-    "UserId": "22222222-2222-2222-2222-222222222222",
     "Items": [
       {
         "Title": "Fix leaky faucet",
@@ -214,8 +195,7 @@
         "DueDate": "2025-06-29T12:00:00Z",
         "Labels": ["plumbing", "urgent"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       },
       {
         "Title": "Clean gutters",
@@ -226,8 +206,7 @@
         "DueDate": "2025-07-01T18:00:00Z",
         "Labels": ["maintenance"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       },
       {
         "Title": "Test smoke alarms",
@@ -238,8 +217,7 @@
         "DueDate": "2025-07-02T20:00:00Z",
         "Labels": ["safety"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       },
       {
         "Title": "Paint fence",
@@ -250,8 +228,7 @@
         "DueDate": "2025-07-10T15:00:00Z",
         "Labels": ["outdoor"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       },
       {
         "Title": "Service HVAC",
@@ -262,15 +239,13 @@
         "DueDate": "2025-07-06T12:00:00Z",
         "Labels": ["maintenance", "hvac"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       }
     ]
   },
   {
     "Title": "Travel Plans",
     "Colour": "#FFFF66",
-    "UserId": "22222222-2222-2222-2222-222222222222",
     "Items": [
       {
         "Title": "Book flights",
@@ -281,8 +256,7 @@
         "DueDate": "2025-07-15T23:59:00Z",
         "Labels": ["travel", "booking"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       },
       {
         "Title": "Renew passport",
@@ -293,8 +267,7 @@
         "DueDate": "2025-07-05T12:00:00Z",
         "Labels": ["documents"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       },
       {
         "Title": "Reserve hotel",
@@ -305,8 +278,7 @@
         "DueDate": "2025-07-10T18:00:00Z",
         "Labels": ["travel", "hotel"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       },
       {
         "Title": "Plan itinerary",
@@ -317,8 +289,7 @@
         "DueDate": "2025-07-12T10:00:00Z",
         "Labels": ["planning"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       },
       {
         "Title": "Buy travel insurance",
@@ -329,15 +300,13 @@
         "DueDate": "2025-07-13T16:00:00Z",
         "Labels": ["insurance"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       }
     ]
   },
   {
     "Title": "Books to Read",
     "Colour": "#FFFFFF",
-    "UserId": "22222222-2222-2222-2222-222222222222",
     "Items": [
       {
         "Title": "Read '1984'",
@@ -348,8 +317,7 @@
         "DueDate": "2025-07-31T20:00:00Z",
         "Labels": ["reading", "fiction"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       },
       {
         "Title": "Start 'Sapiens'",
@@ -360,8 +328,7 @@
         "DueDate": "2025-07-10T21:00:00Z",
         "Labels": ["reading", "nonfiction"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       },
       {
         "Title": "Finish 'Atomic Habits'",
@@ -372,8 +339,7 @@
         "DueDate": "2025-07-15T22:00:00Z",
         "Labels": ["reading", "selfhelp"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       },
       {
         "Title": "Review 'Clean Code'",
@@ -384,8 +350,7 @@
         "DueDate": "2025-07-20T19:00:00Z",
         "Labels": ["reading", "tech"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       },
       {
         "Title": "Explore 'The Pragmatic Programmer'",
@@ -396,15 +361,13 @@
         "DueDate": "2025-07-25T18:00:00Z",
         "Labels": ["reading", "tech"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "22222222-2222-2222-2222-222222222222"
+        "Done": false
       }
     ]
   },
   {
     "Title": "Health Goals",
     "Colour": "#6666FF",
-    "UserId": "33333333-3333-3333-3333-333333333333",
     "Items": [
       {
         "Title": "Morning jog",
@@ -415,8 +378,7 @@
         "DueDate": "2025-06-26T08:00:00Z",
         "Labels": ["exercise", "health"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       },
       {
         "Title": "Drink water",
@@ -427,8 +389,7 @@
         "DueDate": "2025-06-26T20:00:00Z",
         "Labels": ["health"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       },
       {
         "Title": "Prepare healthy lunch",
@@ -439,8 +400,7 @@
         "DueDate": "2025-06-27T12:00:00Z",
         "Labels": ["diet", "health"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       },
       {
         "Title": "Meditation",
@@ -451,8 +411,7 @@
         "DueDate": "2025-06-27T22:00:00Z",
         "Labels": ["wellness"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       },
       {
         "Title": "Track sleep",
@@ -463,15 +422,13 @@
         "DueDate": "2025-06-28T08:00:00Z",
         "Labels": ["health", "sleep"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       }
     ]
   },
   {
     "Title": "Family Events",
     "Colour": "#CCFF99",
-    "UserId": "33333333-3333-3333-3333-333333333333",
     "Items": [
       {
         "Title": "Family dinner",
@@ -482,8 +439,7 @@
         "DueDate": "2025-06-28T20:00:00Z",
         "Labels": ["family", "event"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       },
       {
         "Title": "Call parents",
@@ -494,8 +450,7 @@
         "DueDate": "2025-06-29T19:00:00Z",
         "Labels": ["family"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       },
       {
         "Title": "Plan birthday party",
@@ -506,8 +461,7 @@
         "DueDate": "2025-07-05T17:00:00Z",
         "Labels": ["family", "birthday"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       },
       {
         "Title": "Visit grandparents",
@@ -518,8 +472,7 @@
         "DueDate": "2025-07-06T15:00:00Z",
         "Labels": ["family", "visit"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       },
       {
         "Title": "Game night",
@@ -530,15 +483,13 @@
         "DueDate": "2025-07-10T20:00:00Z",
         "Labels": ["family", "fun"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       }
     ]
   },
   {
     "Title": "Finance",
     "Colour": "#FF5733",
-    "UserId": "33333333-3333-3333-3333-333333333333",
     "Items": [
       {
         "Title": "Review budget",
@@ -549,8 +500,7 @@
         "DueDate": "2025-06-30T21:00:00Z",
         "Labels": ["finance", "budget"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       },
       {
         "Title": "Pay credit card",
@@ -561,8 +511,7 @@
         "DueDate": "2025-06-28T23:59:00Z",
         "Labels": ["finance", "urgent"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       },
       {
         "Title": "Check investments",
@@ -573,8 +522,7 @@
         "DueDate": "2025-07-01T18:00:00Z",
         "Labels": ["finance", "investments"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       },
       {
         "Title": "File taxes",
@@ -585,8 +533,7 @@
         "DueDate": "2025-07-10T12:00:00Z",
         "Labels": ["finance", "taxes"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       },
       {
         "Title": "Set savings goal",
@@ -597,8 +544,7 @@
         "DueDate": "2025-07-15T20:00:00Z",
         "Labels": ["finance", "savings"],
         "CompletedAt": null,
-        "Done": false,
-        "UserId": "33333333-3333-3333-3333-333333333333"
+        "Done": false
       }
     ]
   }
