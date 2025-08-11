@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Domain.Auctions;
+using CleanArch.Domain.Items;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Photos;
 using CleanArch.Domain.TodoItems;
@@ -97,7 +98,6 @@ public static class ApplicationDbContextInitialiser
         string usersJsonPath
     )
     {
-        var culture = System.Globalization.CultureInfo.InvariantCulture;
         List<Guid> createdUserIds = new();
         if (await context.Users.AnyAsync())
         {
@@ -133,12 +133,10 @@ public static class ApplicationDbContextInitialiser
                 Member = new Member
                 {
                     Id = userDto.Id,
-                    DateOfBirth = DateOnly.FromDateTime(
-                        DateTime.SpecifyKind(DateTime.Parse(userDto.DateOfBirth, culture), DateTimeKind.Utc)
-                    ),
+                    DateOfBirth = DateOnly.FromDateTime(DateTime.SpecifyKind(userDto.DateOfBirth, DateTimeKind.Utc)),
                     ImageUrl = userDto.ImageUrl,
                     DisplayName = userDto.DisplayName,
-                    LastActive = DateTime.SpecifyKind(DateTime.Parse(userDto.LastActive, culture), DateTimeKind.Utc),
+                    LastActive = DateTime.SpecifyKind(userDto.LastActive, DateTimeKind.Utc),
                     Gender = userDto.Gender,
                     Description = userDto.Description,
                     City = userDto.City,
@@ -252,16 +250,43 @@ public static class ApplicationDbContextInitialiser
 
         logger.LogInformation("Seeding auctions from {Path}", auctionsJsonPath);
         var auctionsJson = await File.ReadAllTextAsync(auctionsJsonPath);
-        var auctions = JsonSerializer.Deserialize<List<Auction>>(auctionsJson, _jsonOptions);
-        if (auctions is null || auctions.Count == 0)
+        var auctionsData = JsonSerializer.Deserialize<List<AuctionSeedDto>>(auctionsJson, _jsonOptions);
+        if (auctionsData is null || auctionsData.Count == 0)
         {
             logger.LogWarning("No data found in auctions.json");
             return;
         }
 
-        context.Auctions.AddRange(auctions);
+        foreach (var auctionData in auctionsData)
+        {
+            var auction = new Auction
+            {
+                ReservePrice = auctionData.ReservePrice,
+                Seller = auctionData.Seller,
+                Winner = auctionData.Winner,
+                SoldAmount = auctionData.SoldAmount,
+                CurrentHighBid = auctionData.CurrentHighBid,
+                AuctionEnd = DateTime.SpecifyKind(auctionData.AuctionEnd, DateTimeKind.Utc),
+                Status = Enum.Parse<Status>(auctionData.Status),
+                Item = new Item
+                {
+                    Make = auctionData.Item.Make,
+                    Model = auctionData.Item.Model,
+                    Year = auctionData.Item.Year,
+                    Color = auctionData.Item.Color,
+                    Mileage = auctionData.Item.Mileage,
+                    ImageUrl = auctionData.Item.ImageUrl,
+                    Auction = null!, // Will be set below
+                },
+            };
+
+            // Set the circular reference
+            auction.Item.Auction = auction;
+            context.Auctions.Add(auction);
+        }
+
         await context.SaveChangesAsync();
-        logger.LogInformation("Seeded {AuctionCount} auctions.", auctions.Count);
+        logger.LogInformation("Seeded {AuctionCount} auctions.", auctionsData.Count);
     }
 }
 
@@ -271,12 +296,12 @@ public class UserSeedDto
     public required Guid Id { get; set; }
     public required string Email { get; set; }
     public required string Gender { get; set; }
-    public required string DateOfBirth { get; set; }
+    public required DateTime DateOfBirth { get; set; }
     public required string DisplayName { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
-    public required string Created { get; set; }
-    public required string LastActive { get; set; }
+    public required DateTime Created { get; set; }
+    public required DateTime LastActive { get; set; }
     public required string Description { get; set; }
     public required string City { get; set; }
     public required string Country { get; set; }
@@ -303,4 +328,28 @@ public class TodoItemSeedDto
     public List<string>? Labels { get; set; }
     public DateTime? CompletedAt { get; set; }
     public bool Done { get; set; }
+}
+
+// DTO for seeding Auctions from JSON
+public class AuctionSeedDto
+{
+    public int ReservePrice { get; set; }
+    public required string Seller { get; set; }
+    public string? Winner { get; set; }
+    public int? SoldAmount { get; set; }
+    public int? CurrentHighBid { get; set; }
+    public required DateTime AuctionEnd { get; set; }
+    public required string Status { get; set; }
+    public required ItemSeedDto Item { get; set; }
+}
+
+// DTO for seeding Items from JSON
+public class ItemSeedDto
+{
+    public required string Make { get; set; }
+    public required string Model { get; set; }
+    public int Year { get; set; }
+    public required string Color { get; set; }
+    public int Mileage { get; set; }
+    public required string ImageUrl { get; set; }
 }

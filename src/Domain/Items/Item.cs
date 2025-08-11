@@ -14,6 +14,6 @@ public class Item : BaseEntity<Guid>
     public required string ImageUrl { get; set; }
 
     // navigation properties
-    public Auction Auction { get; set; } = null!;
+    public required Auction Auction { get; set; }
     public Guid AuctionId { get; set; }
 }
