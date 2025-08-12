@@ -1,0 +1,48 @@
+name: Publish 🚀🚀
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main-enhanced
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Restore
+        run: dotnet restore ./CleanArch.sln
+
+      - name: Build
+        run: dotnet build ./CleanArch.sln --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish ./CleanArch.sln --configuration Release --no-build
+# ---
+# Explanations (English):
+
+# name: Sets the workflow name ("Publish 🚀") as shown in GitHub Actions UI.
+# on: Defines the events that trigger the workflow. 'workflow_dispatch' allows manual runs, 'push' triggers on code push to 'main'.
+# jobs: Groups the steps under a job called 'publish'.
+# runs-on: Specifies the runner environment (ubuntu-latest).
+# steps: Sequence of actions in the job.
+# actions/checkout@v3: Checks out repository code.
+# actions/setup-dotnet@v3: Installs the specified .NET SDK version for building/testing/deploying .NET projects.
+
+# - name: Restore
+#   run: dotnet restore ./CurrentTimeService.sln
+#     This step restores NuGet packages for the solution file (CurrentTimeService.sln), making sure all dependencies are downloaded before building.
+
+# - name: Build
+#   run: dotnet build ./CurrentTimeService.sln --configuration Release --no-restore
+#     This step compiles the solution in Release mode. The '--no-restore' flag skips the restore process, assuming it has already been completed.
+
+# - name: Publish
+#   run: dotnet publish ./CurrentTimeService.sln --configuration Release --no-build
+#     This step publishes the compiled application for deployment, also in Release mode. The '--no-build' flag skips the build process, assuming it was done in the previous step.
