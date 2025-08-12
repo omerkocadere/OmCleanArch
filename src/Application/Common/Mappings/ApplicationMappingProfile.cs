@@ -57,5 +57,12 @@ public static class MappingConfig
         // CreateAuctionCommand -> Item: Otomatik
 
         #endregion
+
+        #region Members
+
+        // Member -> MemberDto: Otomatik (property isimleri aynı)
+        // Photo -> PhotoDto: Otomatik (property isimleri aynı)
+
+        #endregion
     }
 }
