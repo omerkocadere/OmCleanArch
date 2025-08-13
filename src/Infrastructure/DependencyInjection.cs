@@ -43,7 +43,7 @@ public static class DependencyInjection
 
         // Add Memory Cache services
         services.AddMemoryCache();
-        services.AddScoped<ICacheService, MemoryCacheService>();
+        services.AddScoped<ICacheService, RedisCacheService>();
 
         return services;
     }

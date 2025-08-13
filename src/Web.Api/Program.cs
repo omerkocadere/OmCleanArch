@@ -44,6 +44,17 @@ builder.Services.AddCors(options =>
     );
 });
 
+builder.Services.AddStackExchangeRedisCache(redisOptions =>
+{
+    var connection = builder.Configuration.GetConnectionString("Redis");
+    if (string.IsNullOrWhiteSpace(connection))
+    {
+        throw new InvalidOperationException("Redis connection string is not configured.");
+    }
+
+    redisOptions.Configuration = connection;
+});
+
 var app = builder.Build();
 app.UseRateLimiter();
 
