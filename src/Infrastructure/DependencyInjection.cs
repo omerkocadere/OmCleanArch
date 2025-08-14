@@ -14,8 +14,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 namespace CleanArch.Infrastructure;
 
@@ -29,6 +29,7 @@ public static class DependencyInjection
     {
         return services
             .AddServices()
+            .AddCacheServices(configuration)
             .AddDatabase(env, configuration)
             .AddBackgroundJobsConditionally(configuration)
             .AddAuthenticationInternal(configuration)
@@ -41,9 +42,39 @@ public static class DependencyInjection
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<ITelemetryService, TelemetryService>();
 
-        // Add Memory Cache services
-        services.AddMemoryCache();
-        services.AddScoped<ICacheService, RedisCacheService>();
+        return services;
+    }
+
+    private static IServiceCollection AddCacheServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Configure cache options
+        services.Configure<CacheOptions>(configuration.GetSection(CacheOptions.SectionName));
+
+        var cacheOptions = configuration.GetSection(CacheOptions.SectionName).Get<CacheOptions>() ?? new CacheOptions();
+
+        if (cacheOptions.Provider.Equals("Redis", StringComparison.OrdinalIgnoreCase))
+        {
+            // Add Redis distributed cache
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = cacheOptions.RedisConnectionString;
+                options.InstanceName = "CleanArch";
+            });
+
+            // Add Redis connection multiplexer for direct Redis operations
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+                ConnectionMultiplexer.Connect(cacheOptions.RedisConnectionString)
+            );
+
+            // Register Redis cache service
+            services.AddScoped<ICacheService, RedisCacheService>();
+        }
+        else
+        {
+            // Default to memory cache
+            services.AddMemoryCache();
+            services.AddScoped<ICacheService, MemoryCacheService>();
+        }
 
         return services;
     }

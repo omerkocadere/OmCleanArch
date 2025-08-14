@@ -1,7 +1,9 @@
 using System.Collections.Concurrent;
 using CleanArch.Application.Common.Interfaces;
+using CleanArch.Infrastructure.Configuration;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CleanArch.Infrastructure.Services;
 
@@ -12,14 +14,18 @@ namespace CleanArch.Infrastructure.Services;
 /// Async interface: Enables Redis/distributed cache implementations without API changes
 /// Key tracker: IMemoryCache doesn't expose keys, needed for prefix-based removal operations
 /// </summary>
-public sealed class MemoryCacheService(IMemoryCache memoryCache, ILogger<MemoryCacheService> logger) : ICacheService
+public sealed class MemoryCacheService(
+    IMemoryCache memoryCache,
+    IOptions<CacheOptions> cacheOptions,
+    ILogger<MemoryCacheService> logger
+) : ICacheService
 {
     /// <summary>
     /// Thread-safe dictionary to track cache keys for prefix-based operations.
     /// Uses byte as value type for minimal memory footprint (only key enumeration needed).
     /// </summary>
     private readonly ConcurrentDictionary<string, byte> _keyTracker = new();
-    private readonly TimeSpan _defaultExpiration = TimeSpan.FromMinutes(30);
+    private readonly TimeSpan _defaultExpiration = cacheOptions.Value.DefaultTimeout;
 
     public ValueTask<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
         where T : class
@@ -80,7 +86,11 @@ public sealed class MemoryCacheService(IMemoryCache memoryCache, ILogger<MemoryC
             Priority = CacheItemPriority.Normal,
         };
 
-        // Add removal callback to track keys
+        // Add removal callback to track keys for prefix-based operations.
+        // NOTE: This callback is ESSENTIAL for MemoryCache because:
+        // 1. IMemoryCache doesn't provide native key enumeration (unlike Redis SCAN)
+        // 2. RemoveByPrefixAsync requires knowing all cached keys
+        // 3. Automatic cleanup when items expire or are evicted due to memory pressure
         options.RegisterPostEvictionCallback(
             (cacheKey, cacheValue, evictionReason, state) =>
             {

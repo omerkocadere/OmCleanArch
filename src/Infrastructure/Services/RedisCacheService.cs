@@ -1,20 +1,26 @@
-using System.Collections.Concurrent;
 using System.Text.Json;
 using CleanArch.Application.Common.Interfaces;
+using CleanArch.Infrastructure.Configuration;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 
 namespace CleanArch.Infrastructure.Services;
 
-public sealed class RedisCacheService(IDistributedCache distributedCache, ILogger<MemoryCacheService> logger)
-    : ICacheService
+public sealed class RedisCacheService(
+    IDistributedCache distributedCache,
+    IConnectionMultiplexer connectionMultiplexer,
+    IOptions<CacheOptions> cacheOptions,
+    ILogger<RedisCacheService> logger
+) : ICacheService
 {
-    /// <summary>
-    /// Thread-safe dictionary to track cache keys for prefix-based operations.
-    /// Uses byte as value type for minimal memory footprint (only key enumeration needed).
-    /// </summary>
-    private readonly ConcurrentDictionary<string, byte> _keyTracker = new();
-    private readonly TimeSpan _defaultExpiration = TimeSpan.FromMinutes(30);
+    // NOTE: Key tracking removed for Redis implementation.
+    // Reason: Redis supports native SCAN command for pattern-based key operations,
+    // making manual key tracking unnecessary and inefficient.
+    // Use Redis SCAN with pattern matching for RemoveByPrefixAsync instead.
+
+    private readonly TimeSpan _defaultExpiration = cacheOptions.Value.DefaultTimeout;
 
     public async ValueTask<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
         where T : class
@@ -78,7 +84,6 @@ public sealed class RedisCacheService(IDistributedCache distributedCache, ILogge
 
         var serialized = JsonSerializer.Serialize(value);
         await distributedCache.SetStringAsync(key, serialized, options, cancellationToken);
-        _keyTracker.TryAdd(key, 0);
 
         logger.LogDebug(
             "Cache set for key: {CacheKey} with expiration: {Expiration}",
@@ -99,7 +104,6 @@ public sealed class RedisCacheService(IDistributedCache distributedCache, ILogge
         try
         {
             distributedCache.Remove(key);
-            _keyTracker.TryRemove(key, out _);
             logger.LogDebug("Cache removed for key: {CacheKey}", key);
         }
         catch (Exception ex)
@@ -110,30 +114,52 @@ public sealed class RedisCacheService(IDistributedCache distributedCache, ILogge
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
+    public async ValueTask RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
         cancellationToken.ThrowIfCancellationRequested();
 
         try
         {
-            var keysToRemove = _keyTracker
-                .Keys.Where(key => key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            var database = connectionMultiplexer.GetDatabase();
+            var server = connectionMultiplexer.GetServer(connectionMultiplexer.GetEndPoints().First());
+            var pattern = $"{prefix}*";
+            var keysToDelete = new List<RedisKey>();
 
-            foreach (var key in keysToRemove)
+            // Use Redis SCAN command to find keys matching the pattern
+            await foreach (var key in server.KeysAsync(pattern: pattern))
             {
-                distributedCache.Remove(key);
-                _keyTracker.TryRemove(key, out _);
+                keysToDelete.Add(key);
+
+                // Process in batches to avoid memory issues with large key sets
+                if (keysToDelete.Count >= 100)
+                {
+                    await database.KeyDeleteAsync([.. keysToDelete]);
+                    logger.LogDebug("Deleted batch of {Count} keys with prefix: {Prefix}", keysToDelete.Count, prefix);
+                    keysToDelete.Clear();
+                }
             }
 
-            logger.LogDebug("Cache cleared for prefix: {Prefix}, removed {Count} keys", prefix, keysToRemove.Count);
+            // Delete remaining keys
+            if (keysToDelete.Count > 0)
+            {
+                await database.KeyDeleteAsync(keysToDelete.ToArray());
+                logger.LogDebug(
+                    "Deleted final batch of {Count} keys with prefix: {Prefix}",
+                    keysToDelete.Count,
+                    prefix
+                );
+            }
+
+            logger.LogDebug("Cache cleared for prefix: {Prefix}", prefix);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error removing cache by prefix: {Prefix}", prefix);
         }
-
-        return ValueTask.CompletedTask;
     }
 }
+
+// TODO 1: How to add RegisterPostEvictionCallback for distributed cache?
+// TODO 2: Track cached entity in DbContext
+// TODO 3: Read default timeout and cache provider (Redis or MemoryCache) from appsettings
