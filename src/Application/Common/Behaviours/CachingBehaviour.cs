@@ -31,12 +31,23 @@ public sealed class CachingBehaviour<TRequest, TResponse>(
         var cacheKey = cacheableQuery.CacheKey;
         logger.LogDebug("Checking cache for key: {CacheKey}", cacheKey);
 
-        // Try to get from cache
-        var cachedResponse = await cacheService.GetAsync<TResponse>(cacheKey, cancellationToken);
-        if (cachedResponse is not null)
+        // Try to get from cache with error handling
+        try
         {
-            logger.LogDebug("Cache hit for key: {CacheKey}", cacheKey);
-            return cachedResponse;
+            var cachedResponse = await cacheService.GetAsync<TResponse>(cacheKey, cancellationToken);
+            if (cachedResponse is not null)
+            {
+                logger.LogDebug("Cache hit for key: {CacheKey}", cacheKey);
+                return cachedResponse;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Failed to get from cache for key: {CacheKey}. Proceeding with database query.",
+                cacheKey
+            );
         }
 
         logger.LogDebug("Cache miss for key: {CacheKey}", cacheKey);
@@ -44,16 +55,27 @@ public sealed class CachingBehaviour<TRequest, TResponse>(
         // Execute the actual handler
         var response = await next(cancellationToken);
 
-        // Cache the response if it's successful
+        // Cache the response if it's successful with error handling
         if (ShouldCacheResponse(response))
         {
-            await cacheService.SetAsync(cacheKey, response, cacheableQuery.Expiration, cancellationToken);
+            try
+            {
+                await cacheService.SetAsync(cacheKey, response, cacheableQuery.Expiration, cancellationToken);
 
-            logger.LogDebug(
-                "Cached response for key: {CacheKey} with expiration: {Expiration}",
-                cacheKey,
-                cacheableQuery.Expiration
-            );
+                logger.LogDebug(
+                    "Cached response for key: {CacheKey} with expiration: {Expiration}",
+                    cacheKey,
+                    cacheableQuery.Expiration
+                );
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(
+                    ex,
+                    "Failed to set cache for key: {CacheKey}. Request completed successfully.",
+                    cacheKey
+                );
+            }
         }
 
         return response;

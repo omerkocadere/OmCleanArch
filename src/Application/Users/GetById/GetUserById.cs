@@ -20,7 +20,8 @@ internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUs
         }
 
         UserDto? user = await context
-            .Users.Where(u => u.Id == query.UserId)
+            .Users
+            .Where(u => u.Id == query.UserId)
             .Select(u => new UserDto
             {
                 Id = u.Id,
