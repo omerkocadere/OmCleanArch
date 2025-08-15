@@ -159,6 +159,3 @@ public sealed class RedisCacheService(
         }
     }
 }
-
-// TODO 2: Track cached entity in DbContext
-// TODO 3: Read default timeout and cache provider (Redis or MemoryCache) from appsettings
