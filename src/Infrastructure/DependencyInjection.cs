@@ -53,8 +53,16 @@ public static class DependencyInjection
 
         var cacheOptions = configuration.GetSection(CacheOptions.SectionName).Get<CacheOptions>() ?? new CacheOptions();
 
-        if (cacheOptions.Provider.Equals("Redis", StringComparison.OrdinalIgnoreCase))
+        if (cacheOptions.Provider.Equals(CacheProviders.Redis, StringComparison.OrdinalIgnoreCase))
         {
+            // Validate Redis connection string is provided
+            if (string.IsNullOrWhiteSpace(cacheOptions.RedisConnectionString))
+            {
+                throw new InvalidOperationException(
+                    "Redis connection string is required when Redis cache provider is selected."
+                );
+            }
+
             // Add Redis distributed cache
             services.AddStackExchangeRedisCache(options =>
             {
@@ -68,7 +76,6 @@ public static class DependencyInjection
         else
         {
             // Default to memory cache
-
             services.AddScoped<ICacheService, MemoryCacheService>();
         }
 
