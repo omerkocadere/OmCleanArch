@@ -469,8 +469,11 @@ The solution structure supports:
 - **Validation**: Comprehensive input validation
 
 ### Performance
-- **Caching**: Automatic query result caching
-- **Async/Await**: Non-blocking operations
+- **Distributed Caching**: Redis for multi-instance deployments
+- **Memory Caching**: High-performance in-memory cache for single instances  
+- **Cache Versioning**: Efficient bulk invalidation with version-based keys
+- **Automatic Query Caching**: MediatR pipeline behavior for query result caching
+- **Async/Await**: Non-blocking operations with ValueTask optimization
 - **Pagination**: Efficient data retrieval
 - **Connection Pooling**: Database performance optimization
 

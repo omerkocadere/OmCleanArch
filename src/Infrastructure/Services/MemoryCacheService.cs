@@ -102,23 +102,6 @@ public sealed class MemoryCacheService(IMemoryCache memoryCache, IOptions<CacheO
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
-
-        var keysToRemove = _keyTracker
-            .Keys.Where(key => key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
-        foreach (var key in keysToRemove)
-        {
-            memoryCache.Remove(key);
-            _keyTracker.TryRemove(key, out _);
-        }
-
-        return ValueTask.CompletedTask;
-    }
-
     public ValueTask<long> GetVersionAsync(string prefix, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
