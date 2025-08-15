@@ -34,56 +34,26 @@ public sealed class CachingBehaviour<TRequest, TResponse>(
         var key = ExtractKey(baseCacheKey, prefix);
         var versionedCacheKey = await cacheService.BuildVersionedKeyAsync(prefix, key, cancellationToken);
 
-        logger.LogDebug(
-            "Checking cache for versioned key: {CacheKey} (base: {BaseCacheKey})",
-            versionedCacheKey,
-            baseCacheKey
-        );
-
-        // Try to get from cache with error handling
-        try
+        var cachedResponse = await cacheService.GetAsync<TResponse>(versionedCacheKey, cancellationToken);
+        if (cachedResponse is not null)
         {
-            var cachedResponse = await cacheService.GetAsync<TResponse>(versionedCacheKey, cancellationToken);
-            if (cachedResponse is not null)
-            {
-                logger.LogDebug("Cache hit for key: {CacheKey}", versionedCacheKey);
-                return cachedResponse;
-            }
+            return cachedResponse;
         }
-        catch (Exception ex)
-        {
-            logger.LogWarning(
-                ex,
-                "Failed to get from cache for key: {CacheKey}. Proceeding with database query.",
-                versionedCacheKey
-            );
-        }
-
-        logger.LogDebug("Cache miss for key: {CacheKey}", versionedCacheKey);
 
         // Execute the actual handler
         var response = await next(cancellationToken);
 
-        // Cache the response if it's successful with error handling
+        // Cache the response if it's successful
         if (ShouldCacheResponse(response))
         {
             try
             {
                 await cacheService.SetAsync(versionedCacheKey, response, cacheableQuery.Expiration, cancellationToken);
-
-                logger.LogDebug(
-                    "Cached response for key: {CacheKey} with expiration: {Expiration}",
-                    versionedCacheKey,
-                    cacheableQuery.Expiration
-                );
             }
             catch (Exception ex)
             {
-                logger.LogWarning(
-                    ex,
-                    "Failed to set cache for key: {CacheKey}. Request completed successfully.",
-                    versionedCacheKey
-                );
+                // Cache write failure shouldn't break the request - response is still valid
+                logger.LogWarning(ex, "Failed to cache response for key {CacheKey}", versionedCacheKey);
             }
         }
 

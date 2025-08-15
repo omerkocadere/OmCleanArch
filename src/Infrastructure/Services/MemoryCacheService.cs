@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Infrastructure.Configuration;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CleanArch.Infrastructure.Services;
@@ -14,11 +13,7 @@ namespace CleanArch.Infrastructure.Services;
 /// Async interface: Enables Redis/distributed cache implementations without API changes
 /// Key tracker: IMemoryCache doesn't expose keys, needed for prefix-based removal operations
 /// </summary>
-public sealed class MemoryCacheService(
-    IMemoryCache memoryCache,
-    IOptions<CacheOptions> cacheOptions,
-    ILogger<MemoryCacheService> logger
-) : ICacheService
+public sealed class MemoryCacheService(IMemoryCache memoryCache, IOptions<CacheOptions> cacheOptions) : ICacheService
 {
     /// <summary>
     /// Thread-safe dictionary to track cache keys for prefix-based operations.
@@ -38,15 +33,6 @@ public sealed class MemoryCacheService(
         where T : class
     {
         var cached = memoryCache.Get<T>(key);
-        if (cached is not null)
-        {
-            logger.LogDebug("Cache hit for key: {CacheKey}", key);
-        }
-        else
-        {
-            logger.LogDebug("Cache miss for key: {CacheKey}", key);
-        }
-
         return ValueTask.FromResult(cached);
     }
 
@@ -58,17 +44,12 @@ public sealed class MemoryCacheService(
     )
         where T : class
     {
-        // Try to get from cache first
         var cached = memoryCache.Get<T>(key);
         if (cached is not null)
         {
-            logger.LogDebug("Cache hit for key: {CacheKey}", key);
             return cached;
         }
 
-        logger.LogDebug("Cache miss for key: {CacheKey}, creating new value", key);
-
-        // Create new value using factory
         var value = await factory();
         if (value is not null)
         {
@@ -102,22 +83,11 @@ public sealed class MemoryCacheService(
             (cacheKey, cacheValue, evictionReason, state) =>
             {
                 _keyTracker.TryRemove(cacheKey.ToString()!, out _);
-                logger.LogDebug(
-                    "Cache entry removed for key: {CacheKey}, reason: {EvictionReason}",
-                    cacheKey,
-                    evictionReason
-                );
             }
         );
 
         memoryCache.Set(key, value, options);
         _keyTracker.TryAdd(key, 0);
-
-        logger.LogDebug(
-            "Cache set for key: {CacheKey} with expiration: {Expiration}",
-            key,
-            expiration ?? _defaultExpiration
-        );
 
         return ValueTask.CompletedTask;
     }
@@ -125,18 +95,9 @@ public sealed class MemoryCacheService(
     public ValueTask RemoveAsync(string key, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
-        cancellationToken.ThrowIfCancellationRequested();
 
-        try
-        {
-            memoryCache.Remove(key);
-            _keyTracker.TryRemove(key, out _);
-            logger.LogDebug("Cache removed for key: {CacheKey}", key);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error removing cache for key: {CacheKey}", key);
-        }
+        memoryCache.Remove(key);
+        _keyTracker.TryRemove(key, out _);
 
         return ValueTask.CompletedTask;
     }
@@ -144,25 +105,15 @@ public sealed class MemoryCacheService(
     public ValueTask RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
-        cancellationToken.ThrowIfCancellationRequested();
 
-        try
+        var keysToRemove = _keyTracker
+            .Keys.Where(key => key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        foreach (var key in keysToRemove)
         {
-            var keysToRemove = _keyTracker
-                .Keys.Where(key => key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            foreach (var key in keysToRemove)
-            {
-                memoryCache.Remove(key);
-                _keyTracker.TryRemove(key, out _);
-            }
-
-            logger.LogDebug("Cache cleared for prefix: {Prefix}, removed {Count} keys", prefix, keysToRemove.Count);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error removing cache by prefix: {Prefix}", prefix);
+            memoryCache.Remove(key);
+            _keyTracker.TryRemove(key, out _);
         }
 
         return ValueTask.CompletedTask;
@@ -181,21 +132,11 @@ public sealed class MemoryCacheService(
     public ValueTask<long> InvalidateVersionAsync(string prefix, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
-        cancellationToken.ThrowIfCancellationRequested();
 
-        try
-        {
-            var versionKey = $"{prefix}:version";
-            var newVersion = _versionTracker.AddOrUpdate(versionKey, 2, (key, oldValue) => oldValue + 1);
+        var versionKey = $"{prefix}:version";
+        var newVersion = _versionTracker.AddOrUpdate(versionKey, 2, (key, oldValue) => oldValue + 1);
 
-            logger.LogDebug("Incremented version for prefix: {Prefix} to {Version}", prefix, newVersion);
-            return ValueTask.FromResult(newVersion);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error invalidating version for prefix: {Prefix}", prefix);
-            return ValueTask.FromResult(1L);
-        }
+        return ValueTask.FromResult(newVersion);
     }
 
     public async ValueTask<string> BuildVersionedKeyAsync(

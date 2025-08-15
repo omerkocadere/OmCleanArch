@@ -39,7 +39,6 @@ public sealed class CacheInvalidationBehaviour<TRequest, TResponse>(
 
         // Invalidate cache based on the command type
         await InvalidateCacheAsync(request, cancellationToken);
-
         return response;
     }
 
@@ -74,16 +73,15 @@ public sealed class CacheInvalidationBehaviour<TRequest, TResponse>(
         }
         catch (Exception ex)
         {
-            // Log the error but don't fail the request
-            logger.LogError(ex, "Failed to invalidate cache for request {RequestType}", request.GetType().Name);
+            // Cache invalidation failure shouldn't break the command - it completed successfully
+            // Stale cache is better than failed command, but we should log this for monitoring
+            logger.LogWarning(ex, "Cache invalidation failed for command {RequestType}", request.GetType().FullName);
         }
     }
 
     private async Task InvalidateUserCacheAsync(CancellationToken cancellationToken)
     {
         // Use key versioning instead of RemoveByPrefix for cluster-safe invalidation
-        var newVersion = await cacheService.InvalidateVersionAsync("users", cancellationToken);
-
-        logger.LogDebug("Invalidated user-related cache entries by incrementing version to {Version}", newVersion);
+        await cacheService.InvalidateVersionAsync("users", cancellationToken);
     }
 }
