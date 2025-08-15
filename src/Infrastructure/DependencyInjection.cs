@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CleanArch.Infrastructure;
@@ -29,6 +28,7 @@ public static class DependencyInjection
     {
         return services
             .AddServices()
+            .AddCacheServices(configuration)
             .AddDatabase(env, configuration)
             .AddBackgroundJobsConditionally(configuration)
             .AddAuthenticationInternal(configuration)
@@ -41,9 +41,43 @@ public static class DependencyInjection
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<ITelemetryService, TelemetryService>();
 
-        // Add Memory Cache services
+        return services;
+    }
+
+    private static IServiceCollection AddCacheServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Configure cache options
+        services.Configure<CacheOptions>(configuration.GetSection(CacheOptions.SectionName));
+
         services.AddMemoryCache();
-        services.AddScoped<ICacheService, MemoryCacheService>();
+
+        var cacheOptions = configuration.GetSection(CacheOptions.SectionName).Get<CacheOptions>() ?? new CacheOptions();
+
+        if (cacheOptions.Provider.Equals(CacheProviders.Redis, StringComparison.OrdinalIgnoreCase))
+        {
+            // Validate Redis connection string is provided
+            if (string.IsNullOrWhiteSpace(cacheOptions.RedisConnectionString))
+            {
+                throw new InvalidOperationException(
+                    "Redis connection string is required when Redis cache provider is selected."
+                );
+            }
+
+            // Add Redis distributed cache
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = cacheOptions.RedisConnectionString;
+                options.InstanceName = "CleanArch";
+            });
+
+            // Register Redis cache service
+            services.AddScoped<ICacheService, RedisCacheService>();
+        }
+        else
+        {
+            // Default to memory cache
+            services.AddScoped<ICacheService, MemoryCacheService>();
+        }
 
         return services;
     }

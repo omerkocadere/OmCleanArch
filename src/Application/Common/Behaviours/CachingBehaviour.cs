@@ -28,18 +28,17 @@ public sealed class CachingBehaviour<TRequest, TResponse>(
             return await next(cancellationToken);
         }
 
-        var cacheKey = cacheableQuery.CacheKey;
-        logger.LogDebug("Checking cache for key: {CacheKey}", cacheKey);
+        // Build versioned cache key for cluster-safe invalidation
+        var baseCacheKey = cacheableQuery.CacheKey;
+        var prefix = ExtractPrefix(baseCacheKey);
+        var key = ExtractKey(baseCacheKey, prefix);
+        var versionedCacheKey = await cacheService.BuildVersionedKeyAsync(prefix, key, cancellationToken);
 
-        // Try to get from cache
-        var cachedResponse = await cacheService.GetAsync<TResponse>(cacheKey, cancellationToken);
+        var cachedResponse = await cacheService.GetAsync<TResponse>(versionedCacheKey, cancellationToken);
         if (cachedResponse is not null)
         {
-            logger.LogDebug("Cache hit for key: {CacheKey}", cacheKey);
             return cachedResponse;
         }
-
-        logger.LogDebug("Cache miss for key: {CacheKey}", cacheKey);
 
         // Execute the actual handler
         var response = await next(cancellationToken);
@@ -47,16 +46,35 @@ public sealed class CachingBehaviour<TRequest, TResponse>(
         // Cache the response if it's successful
         if (ShouldCacheResponse(response))
         {
-            await cacheService.SetAsync(cacheKey, response, cacheableQuery.Expiration, cancellationToken);
-
-            logger.LogDebug(
-                "Cached response for key: {CacheKey} with expiration: {Expiration}",
-                cacheKey,
-                cacheableQuery.Expiration
-            );
+            try
+            {
+                await cacheService.SetAsync(versionedCacheKey, response, cacheableQuery.Expiration, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                // Cache write failure shouldn't break the request - response is still valid
+                logger.LogWarning(ex, "Failed to cache response for key {CacheKey}", versionedCacheKey);
+            }
         }
 
         return response;
+    }
+
+    /// <summary>
+    /// Extracts the prefix from a cache key (e.g., "users:all" -> "users").
+    /// </summary>
+    private static string ExtractPrefix(string cacheKey)
+    {
+        var colonIndex = cacheKey.IndexOf(':');
+        return colonIndex > 0 ? cacheKey[..colonIndex] : cacheKey;
+    }
+
+    /// <summary>
+    /// Extracts the key part after prefix (e.g., "users:all" -> "all").
+    /// </summary>
+    private static string ExtractKey(string cacheKey, string prefix)
+    {
+        return cacheKey.StartsWith($"{prefix}:") ? cacheKey[(prefix.Length + 1)..] : cacheKey;
     }
 
     private static bool ShouldCacheResponse(TResponse response)

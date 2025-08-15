@@ -8,7 +8,7 @@ namespace CleanArch.Application.Users.GetAll;
 public sealed record GetAllUsersQuery : IQuery<IEnumerable<UserDto>>, ICacheableQuery
 {
     public string CacheKey => "users:all";
-    public TimeSpan? Expiration => TimeSpan.FromMinutes(1);
+    public TimeSpan? Expiration => TimeSpan.FromMinutes(5);
 }
 
 internal sealed class GetAllUsersQueryHandler(IApplicationDbContext context)
@@ -17,7 +17,8 @@ internal sealed class GetAllUsersQueryHandler(IApplicationDbContext context)
     public async Task<Result<IEnumerable<UserDto>>> Handle(GetAllUsersQuery query, CancellationToken cancellationToken)
     {
         var users = await context
-            .Users.Select(u => new UserDto
+            .Users.AsNoTracking()
+            .Select(u => new UserDto
             {
                 Id = u.Id,
                 Email = u.Email,

@@ -56,9 +56,27 @@ public interface ICacheService
     ValueTask RemoveAsync(string key, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Removes all cached values that start with the specified prefix.
+    /// Gets the current version for a given prefix.
     /// </summary>
-    /// <param name="prefix">The key prefix.</param>
+    /// <param name="prefix">The cache prefix (e.g., "users").</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    ValueTask RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default);
+    /// <returns>The current version number.</returns>
+    ValueTask<long> GetVersionAsync(string prefix, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Increments the version for a given prefix, effectively invalidating all cached entries with that prefix.
+    /// </summary>
+    /// <param name="prefix">The cache prefix (e.g., "users").</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The new version number after increment.</returns>
+    ValueTask<long> InvalidateVersionAsync(string prefix, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Builds a versioned cache key using the current version for the prefix.
+    /// </summary>
+    /// <param name="prefix">The cache prefix (e.g., "users").</param>
+    /// <param name="key">The specific cache key (e.g., "all", "123").</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>A versioned cache key (e.g., "users:all:v5").</returns>
+    ValueTask<string> BuildVersionedKeyAsync(string prefix, string key, CancellationToken cancellationToken = default);
 }

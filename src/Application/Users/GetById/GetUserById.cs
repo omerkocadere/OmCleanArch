@@ -7,11 +7,7 @@ using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Users.GetById;
 
-public sealed record GetUserByIdQuery(Guid UserId) : IQuery<UserDto>, ICacheableQuery
-{
-    public string CacheKey => $"user:{UserId}";
-    public TimeSpan? Expiration => TimeSpan.FromMinutes(15);
-}
+public sealed record GetUserByIdQuery(Guid UserId) : IQuery<UserDto> { }
 
 internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUserContext userContext)
     : IQueryHandler<GetUserByIdQuery, UserDto>
@@ -24,7 +20,8 @@ internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUs
         }
 
         UserDto? user = await context
-            .Users.Where(u => u.Id == query.UserId)
+            .Users
+            .Where(u => u.Id == query.UserId)
             .Select(u => new UserDto
             {
                 Id = u.Id,
