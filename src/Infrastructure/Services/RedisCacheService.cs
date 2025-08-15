@@ -2,6 +2,7 @@ using System.Text.Json;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Infrastructure.Configuration;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -10,7 +11,8 @@ namespace CleanArch.Infrastructure.Services;
 public sealed class RedisCacheService(
     IDistributedCache distributedCache,
     IOptions<CacheOptions> cacheOptions,
-    ILogger<RedisCacheService> logger
+    ILogger<RedisCacheService> logger,
+    Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache
 ) : ICacheService
 {
     private readonly TimeSpan _defaultExpiration = cacheOptions.Value.DefaultTimeout;
@@ -85,22 +87,21 @@ public sealed class RedisCacheService(
         );
     }
 
-    public ValueTask RemoveAsync(string key, CancellationToken cancellationToken = default)
+    public async ValueTask RemoveAsync(string key, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         cancellationToken.ThrowIfCancellationRequested();
 
         try
         {
-            distributedCache.Remove(key);
+            // prefer async remove to avoid blocking calls
+            await distributedCache.RemoveAsync(key, cancellationToken);
             logger.LogDebug("Cache removed for key: {CacheKey}", key);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error removing cache for key: {CacheKey}", key);
         }
-
-        return ValueTask.CompletedTask;
     }
 
     public async ValueTask<long> InvalidateVersionAsync(string prefix, CancellationToken cancellationToken = default)
@@ -112,15 +113,28 @@ public sealed class RedisCacheService(
         {
             var versionKey = $"{prefix}:version";
 
-            // Get current version
-            var currentVersionStr = await distributedCache.GetStringAsync(versionKey, cancellationToken);
-            var currentVersion = long.TryParse(currentVersionStr, out var parsed) ? parsed : 0;
+            // Determine current version via GetVersionAsync so defaults and local cache are respected
+            var currentVersion = await GetVersionAsync(prefix, cancellationToken);
             var newVersion = currentVersion + 1;
 
             // Set new version with 30 days expiration
             var options = new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30) };
 
             await distributedCache.SetStringAsync(versionKey, newVersion.ToString(), options, cancellationToken);
+
+            // Update local cached version for this prefix so subsequent reads return the new value
+            try
+            {
+                memoryCache.Set(
+                    versionKey,
+                    newVersion,
+                    new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60) }
+                );
+            }
+            catch (Exception memEx)
+            {
+                logger.LogDebug(memEx, "Failed to update local version cache for {VersionKey}", versionKey);
+            }
 
             logger.LogDebug("Incremented version for prefix: {Prefix} to {Version}", prefix, newVersion);
             return newVersion;
@@ -147,20 +161,56 @@ public sealed class RedisCacheService(
 
     public async ValueTask<long> GetVersionAsync(string prefix, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
-        cancellationToken.ThrowIfCancellationRequested();
-
         try
         {
             var versionKey = $"{prefix}:version";
+            // Try in-memory cache first to avoid frequent distributed calls under high load
+            if (memoryCache.TryGetValue(versionKey, out var cachedObj) && cachedObj is long cachedVersion)
+            {
+                logger.LogDebug(
+                    "Returning in-memory cached version for {VersionKey}: {Version}",
+                    versionKey,
+                    cachedVersion
+                );
+                return cachedVersion;
+            }
+
             var version = await distributedCache.GetStringAsync(versionKey, cancellationToken);
 
             if (version is not null && long.TryParse(version, out var result))
             {
+                // Cache locally for a short period to reduce distributed calls
+                try
+                {
+                    memoryCache.Set(
+                        versionKey,
+                        result,
+                        new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60) }
+                    );
+                }
+                catch (Exception memEx)
+                {
+                    logger.LogDebug(memEx, "Failed to set local version cache for {VersionKey}", versionKey);
+                }
+
                 return result;
             }
 
             logger.LogDebug("Version key {VersionKey} not found, returning default version 1", versionKey);
+            // Cache default version too to avoid hammering underlying store
+            try
+            {
+                memoryCache.Set(
+                    versionKey,
+                    1L,
+                    new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60) }
+                );
+            }
+            catch (Exception memEx)
+            {
+                logger.LogDebug(memEx, "Failed to set local default version cache for {VersionKey}", versionKey);
+            }
+
             return 1;
         }
         catch (Exception ex)

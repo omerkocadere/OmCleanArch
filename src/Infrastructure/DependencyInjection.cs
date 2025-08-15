@@ -49,6 +49,8 @@ public static class DependencyInjection
         // Configure cache options
         services.Configure<CacheOptions>(configuration.GetSection(CacheOptions.SectionName));
 
+        services.AddMemoryCache();
+
         var cacheOptions = configuration.GetSection(CacheOptions.SectionName).Get<CacheOptions>() ?? new CacheOptions();
 
         if (cacheOptions.Provider.Equals("Redis", StringComparison.OrdinalIgnoreCase))
@@ -66,7 +68,7 @@ public static class DependencyInjection
         else
         {
             // Default to memory cache
-            services.AddMemoryCache();
+
             services.AddScoped<ICacheService, MemoryCacheService>();
         }
 
