@@ -25,8 +25,8 @@ public sealed class CacheInvalidationBehaviour<TRequest, TResponse>(
         // Execute the command first
         var response = await next(cancellationToken);
 
-        // Only invalidate cache for commands (not queries)
-        if (request is not ICommand)
+        // Only invalidate cache for commands
+        if (request is not ICommandMarker)
         {
             return response;
         }
@@ -81,9 +81,9 @@ public sealed class CacheInvalidationBehaviour<TRequest, TResponse>(
 
     private async Task InvalidateUserCacheAsync(CancellationToken cancellationToken)
     {
-        // Invalidate all user-related cache entries
-        await cacheService.RemoveByPrefixAsync("users:", cancellationToken);
+        // Use key versioning instead of RemoveByPrefix for cluster-safe invalidation
+        var newVersion = await cacheService.InvalidateVersionAsync("users", cancellationToken);
 
-        logger.LogDebug("Invalidated user-related cache entries");
+        logger.LogDebug("Invalidated user-related cache entries by incrementing version to {Version}", newVersion);
     }
 }

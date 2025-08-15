@@ -15,7 +15,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using StackExchange.Redis;
 
 namespace CleanArch.Infrastructure;
 
@@ -60,11 +59,6 @@ public static class DependencyInjection
                 options.Configuration = cacheOptions.RedisConnectionString;
                 options.InstanceName = "CleanArch";
             });
-
-            // Add Redis connection multiplexer for direct Redis operations
-            services.AddSingleton<IConnectionMultiplexer>(sp =>
-                ConnectionMultiplexer.Connect(cacheOptions.RedisConnectionString)
-            );
 
             // Register Redis cache service
             services.AddScoped<ICacheService, RedisCacheService>();

@@ -25,6 +25,13 @@ public sealed class MemoryCacheService(
     /// Uses byte as value type for minimal memory footprint (only key enumeration needed).
     /// </summary>
     private readonly ConcurrentDictionary<string, byte> _keyTracker = new();
+
+    /// <summary>
+    /// Thread-safe dictionary to track version numbers for cache prefixes.
+    /// Used for key-versioning invalidation strategy.
+    /// </summary>
+    private readonly ConcurrentDictionary<string, long> _versionTracker = new();
+
     private readonly TimeSpan _defaultExpiration = cacheOptions.Value.DefaultTimeout;
 
     public ValueTask<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
@@ -159,5 +166,48 @@ public sealed class MemoryCacheService(
         }
 
         return ValueTask.CompletedTask;
+    }
+
+    public ValueTask<long> GetVersionAsync(string prefix, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var versionKey = $"{prefix}:version";
+        var version = _versionTracker.GetOrAdd(versionKey, 1);
+        return ValueTask.FromResult(version);
+    }
+
+    public ValueTask<long> InvalidateVersionAsync(string prefix, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        try
+        {
+            var versionKey = $"{prefix}:version";
+            var newVersion = _versionTracker.AddOrUpdate(versionKey, 2, (key, oldValue) => oldValue + 1);
+
+            logger.LogDebug("Incremented version for prefix: {Prefix} to {Version}", prefix, newVersion);
+            return ValueTask.FromResult(newVersion);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error invalidating version for prefix: {Prefix}", prefix);
+            return ValueTask.FromResult(1L);
+        }
+    }
+
+    public async ValueTask<string> BuildVersionedKeyAsync(
+        string prefix,
+        string key,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+
+        var version = await GetVersionAsync(prefix, cancellationToken);
+        return $"{prefix}:{key}:v{version}";
     }
 }

@@ -31,7 +31,6 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="Polly" />
     <PackageReference Include="Scrutor" />
-    <PackageReference Include="StackExchange.Redis" />
   </ItemGroup>
 
   <ItemGroup>

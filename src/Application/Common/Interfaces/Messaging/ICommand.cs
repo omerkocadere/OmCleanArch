@@ -2,6 +2,12 @@ using CleanArch.Application.Common.Models;
 
 namespace CleanArch.Application.Common.Interfaces.Messaging;
 
-public interface ICommand : IRequest<Result> { }
+/// <summary>
+/// Marker interface for all command types.
+/// Enables polymorphic handling without generic constraints.
+/// </summary>
+public interface ICommandMarker { }
 
-public interface ICommand<TResponse> : IRequest<Result<TResponse>> { }
+public interface ICommand : ICommandMarker, IRequest<Result> { }
+
+public interface ICommand<TResponse> : ICommandMarker, IRequest<Result<TResponse>> { }

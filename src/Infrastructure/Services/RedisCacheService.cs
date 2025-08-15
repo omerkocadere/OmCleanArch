@@ -4,13 +4,11 @@ using CleanArch.Infrastructure.Configuration;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using StackExchange.Redis;
 
 namespace CleanArch.Infrastructure.Services;
 
 public sealed class RedisCacheService(
     IDistributedCache distributedCache,
-    IConnectionMultiplexer connectionMultiplexer,
     IOptions<CacheOptions> cacheOptions,
     ILogger<RedisCacheService> logger
 ) : ICacheService
@@ -93,7 +91,6 @@ public sealed class RedisCacheService(
 
         // No eviction callback for distributed cache
         // Key tracking is handled above
-        await ValueTask.CompletedTask;
     }
 
     public ValueTask RemoveAsync(string key, CancellationToken cancellationToken = default)
@@ -114,48 +111,80 @@ public sealed class RedisCacheService(
         return ValueTask.CompletedTask;
     }
 
-    public async ValueTask RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
+    public ValueTask RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
+    {
+        // Note: With key-versioning approach, we don't need to physically remove old cache entries.
+        // Old versioned keys will naturally expire via TTL and become unused when version increments.
+        // This is more efficient and cluster-safe than scanning and deleting keys.
+
+        logger.LogDebug("RemoveByPrefix called for: {Prefix} - using version invalidation instead", prefix);
+        return ValueTask.CompletedTask;
+    }
+
+    public async ValueTask<long> GetVersionAsync(string prefix, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
         cancellationToken.ThrowIfCancellationRequested();
 
         try
         {
-            var database = connectionMultiplexer.GetDatabase();
-            var server = connectionMultiplexer.GetServer(connectionMultiplexer.GetEndPoints().First());
-            var pattern = $"{prefix}*";
-            var keysToDelete = new List<RedisKey>();
+            var versionKey = $"{prefix}:version";
+            var version = await distributedCache.GetStringAsync(versionKey, cancellationToken);
 
-            // Use Redis SCAN command to find keys matching the pattern
-            await foreach (var key in server.KeysAsync(pattern: pattern))
+            if (version is not null && long.TryParse(version, out var result))
             {
-                keysToDelete.Add(key);
-
-                // Process in batches to avoid memory issues with large key sets
-                if (keysToDelete.Count >= 100)
-                {
-                    await database.KeyDeleteAsync([.. keysToDelete]);
-                    logger.LogDebug("Deleted batch of {Count} keys with prefix: {Prefix}", keysToDelete.Count, prefix);
-                    keysToDelete.Clear();
-                }
+                return result;
             }
 
-            // Delete remaining keys
-            if (keysToDelete.Count > 0)
-            {
-                await database.KeyDeleteAsync(keysToDelete.ToArray());
-                logger.LogDebug(
-                    "Deleted final batch of {Count} keys with prefix: {Prefix}",
-                    keysToDelete.Count,
-                    prefix
-                );
-            }
-
-            logger.LogDebug("Cache cleared for prefix: {Prefix}", prefix);
+            logger.LogDebug("Version key {VersionKey} not found, returning default version 1", versionKey);
+            return 1;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error removing cache by prefix: {Prefix}", prefix);
+            logger.LogError(ex, "Error getting version for prefix: {Prefix}", prefix);
+            return 1; // Default version
         }
+    }
+
+    public async ValueTask<long> InvalidateVersionAsync(string prefix, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        try
+        {
+            var versionKey = $"{prefix}:version";
+
+            // Get current version
+            var currentVersionStr = await distributedCache.GetStringAsync(versionKey, cancellationToken);
+            var currentVersion = long.TryParse(currentVersionStr, out var parsed) ? parsed : 0;
+            var newVersion = currentVersion + 1;
+
+            // Set new version with 30 days expiration
+            var options = new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30) };
+
+            await distributedCache.SetStringAsync(versionKey, newVersion.ToString(), options, cancellationToken);
+
+            logger.LogDebug("Incremented version for prefix: {Prefix} to {Version}", prefix, newVersion);
+            return newVersion;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error invalidating version for prefix: {Prefix}", prefix);
+            return 1; // Fallback
+        }
+    }
+
+    public async ValueTask<string> BuildVersionedKeyAsync(
+        string prefix,
+        string key,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+
+        var version = await GetVersionAsync(prefix, cancellationToken);
+        return $"{prefix}:{key}:v{version}";
     }
 }
