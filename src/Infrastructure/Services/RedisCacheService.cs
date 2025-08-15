@@ -13,11 +13,6 @@ public sealed class RedisCacheService(
     ILogger<RedisCacheService> logger
 ) : ICacheService
 {
-    // NOTE: Key tracking removed for Redis implementation.
-    // Reason: Redis supports native SCAN command for pattern-based key operations,
-    // making manual key tracking unnecessary and inefficient.
-    // Use Redis SCAN with pattern matching for RemoveByPrefixAsync instead.
-
     private readonly TimeSpan _defaultExpiration = cacheOptions.Value.DefaultTimeout;
 
     public async ValueTask<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
@@ -88,9 +83,6 @@ public sealed class RedisCacheService(
             key,
             expiration ?? _defaultExpiration
         );
-
-        // No eviction callback for distributed cache
-        // Key tracking is handled above
     }
 
     public ValueTask RemoveAsync(string key, CancellationToken cancellationToken = default)
@@ -109,41 +101,6 @@ public sealed class RedisCacheService(
         }
 
         return ValueTask.CompletedTask;
-    }
-
-    public ValueTask RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
-    {
-        // Note: With key-versioning approach, we don't need to physically remove old cache entries.
-        // Old versioned keys will naturally expire via TTL and become unused when version increments.
-        // This is more efficient and cluster-safe than scanning and deleting keys.
-
-        logger.LogDebug("RemoveByPrefix called for: {Prefix} - using version invalidation instead", prefix);
-        return ValueTask.CompletedTask;
-    }
-
-    public async ValueTask<long> GetVersionAsync(string prefix, CancellationToken cancellationToken = default)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
-        cancellationToken.ThrowIfCancellationRequested();
-
-        try
-        {
-            var versionKey = $"{prefix}:version";
-            var version = await distributedCache.GetStringAsync(versionKey, cancellationToken);
-
-            if (version is not null && long.TryParse(version, out var result))
-            {
-                return result;
-            }
-
-            logger.LogDebug("Version key {VersionKey} not found, returning default version 1", versionKey);
-            return 1;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error getting version for prefix: {Prefix}", prefix);
-            return 1; // Default version
-        }
     }
 
     public async ValueTask<long> InvalidateVersionAsync(string prefix, CancellationToken cancellationToken = default)
@@ -186,5 +143,30 @@ public sealed class RedisCacheService(
 
         var version = await GetVersionAsync(prefix, cancellationToken);
         return $"{prefix}:{key}:v{version}";
+    }
+
+    public async ValueTask<long> GetVersionAsync(string prefix, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        try
+        {
+            var versionKey = $"{prefix}:version";
+            var version = await distributedCache.GetStringAsync(versionKey, cancellationToken);
+
+            if (version is not null && long.TryParse(version, out var result))
+            {
+                return result;
+            }
+
+            logger.LogDebug("Version key {VersionKey} not found, returning default version 1", versionKey);
+            return 1;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error getting version for prefix: {Prefix}", prefix);
+            return 1; // Default version
+        }
     }
 }
