@@ -22,4 +22,6 @@ builder
 
 builder.AddProject<Projects.Dummy_Api>("dummy-api").WithReference(seq).WaitFor(seq);
 
+builder.AddProject<Projects.GatewayService>("gatewayservice");
+
 builder.Build().Run();

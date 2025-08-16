@@ -10,7 +10,7 @@ public class AuctionCreatedFaultConsumer : IConsumer<Fault<AuctionCreated>>
     {
         Console.WriteLine("--> Consuming faulty creation");
 
-        var exception = context.Message.Exceptions.First();
+        var exception = context.Message.Exceptions[0];
 
         if (exception.ExceptionType == typeof(ArgumentException).FullName)
         {

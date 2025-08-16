@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\other-services\Dummy.Api\Dummy.Api.csproj" />
+    <ProjectReference Include="..\..\other-services\GatewayService\GatewayService.csproj" />
     <ProjectReference Include="..\Web.Api\Web.Api.csproj" />
   </ItemGroup>
 

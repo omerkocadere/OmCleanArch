@@ -11,6 +11,7 @@ $WebApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\src\Web.Api"
 $DummyApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\Dummy.Api"
 $SearchApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\SearchService"
 $IdentityApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\IdentityService"
+$GatewayPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\GatewayService"
 
 # Start Angular Client
 Log "Checking Angular dependencies in '$angularClientPath'..."
@@ -32,6 +33,8 @@ Start-Sleep -Milliseconds 100
 wt -w 0 -d "$SearchApiPath" --title "SearchApi" pwsh -NoExit -Command "dotnet watch"
 Start-Sleep -Milliseconds 100
 wt -w 0 -d "$IdentityApiPath" --title "IdentityService" pwsh -NoExit -Command "dotnet watch"
+Start-Sleep -Milliseconds 100
+wt -w 0 -d "$GatewayPath" --title "GatewayService" pwsh -NoExit -Command "dotnet watch"
 
 Log "All processes started successfully."
 Read-Host "Press Enter to exit"

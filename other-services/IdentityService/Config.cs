@@ -15,10 +15,22 @@ public static class Config
             {
                 ClientId = "postman",
                 ClientName = "Postman",
-                AllowedScopes = { "openid", "profile", "auctionApp" },
-                RedirectUris = { GetPostmanRedirectUri() },
                 ClientSecrets = [new Secret("NotASecret".Sha256())],
                 AllowedGrantTypes = { GrantType.ResourceOwnerPassword },
+                AllowedScopes = { "openid", "profile", "auctionApp" },
+                RedirectUris = { GetPostmanRedirectUri() },
+            },
+            new Client
+            {
+                ClientId = "nextApp",
+                ClientName = "nextApp",
+                ClientSecrets = { new Secret("secret".Sha256()) },
+                AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
+                RequirePkce = false,
+                RedirectUris = { GetNextAppRedirectUri() },
+                AllowOfflineAccess = true,
+                AllowedScopes = { "openid", "profile", "auctionApp" },
+                AccessTokenLifetime = 3600 * 24 * 30,
             },
         ];
 
@@ -27,5 +39,12 @@ public static class Config
         // Ideally, fetch from configuration/environment; fallback to default if not set
         var uri = Environment.GetEnvironmentVariable("POSTMAN_REDIRECT_URI");
         return !string.IsNullOrWhiteSpace(uri) ? uri : "https://www.getpostman.com/oauth2/callback"; // fallback for local/dev
+    }
+
+    private static string GetNextAppRedirectUri()
+    {
+        // Fetch from environment variable, fallback to default for local/dev
+        var uri = Environment.GetEnvironmentVariable("NEXTAPP_REDIRECT_URI");
+        return !string.IsNullOrWhiteSpace(uri) ? uri : "http://localhost:3000/api/auth/callback/id-server";
     }
 }
