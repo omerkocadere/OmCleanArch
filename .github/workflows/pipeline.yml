@@ -1,4 +1,4 @@
-name: Publish 🚀🚀
+name: Publish 🚀
 
 on:
   workflow_dispatch:
