@@ -14,7 +14,7 @@ public class BidPlacedConsumer : IConsumer<BidPlaced>
 
         var auction =
             await DB.Find<Item>().OneAsync(context.Message.AuctionId)
-            ?? throw new MessageException(typeof(AuctionFinished), "Cannot retrieve this auction");
+            ?? throw new MessageException(typeof(BidPlaced), "Cannot retrieve this auction");
 
         if (
             auction.CurrentHighBid == null

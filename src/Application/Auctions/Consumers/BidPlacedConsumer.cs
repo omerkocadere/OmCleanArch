@@ -12,12 +12,17 @@ public class BidPlacedConsumer(IApplicationDbContext dbContext) : IConsumer<BidP
 
         var auction = await dbContext.Auctions.FindAsync(context.Message.AuctionId);
 
+        if (auction is null)
+        {
+            // It's important to handle cases where the auction might not be found.
+            // Consider injecting a logger to log a warning.
+            Console.WriteLine($"--> Auction not found for BidPlaced event: {context.Message.AuctionId}");
+            return;
+        }
+
         if (
-            auction != null
-            && (
-                auction.CurrentHighBid == null
-                || context.Message.BidStatus.Contains("Accepted") && context.Message.Amount > auction.CurrentHighBid
-            )
+            auction.CurrentHighBid == null
+            || context.Message.BidStatus.Contains("Accepted") && context.Message.Amount > auction.CurrentHighBid
         )
         {
             auction.CurrentHighBid = context.Message.Amount;
