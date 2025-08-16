@@ -46,3 +46,4 @@ jobs:
 # - name: Publish
 #   run: dotnet publish ./CurrentTimeService.sln --configuration Release --no-build
 #     This step publishes the compiled application for deployment, also in Release mode. The '--no-build' flag skips the build process, assuming it was done in the previous step.
+#   test
