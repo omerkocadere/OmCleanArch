@@ -20,19 +20,19 @@ public class Auctions : EndpointGroupBase
         groupBuilder.MapDelete(DeleteAuction, "{id:Guid}").RequireAuthorization();
     }
 
-    public async Task<IResult> GetAuctions(ISender sender, string? date)
+    public static async Task<IResult> GetAuctions(ISender sender, string? date)
     {
         var result = await sender.Send(new GetAuctionsQuery(date));
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    public async Task<IResult> GetAuctionById(ISender sender, Guid id)
+    public static async Task<IResult> GetAuctionById(ISender sender, Guid id)
     {
         var result = await sender.Send(new GetAuctionByIdQuery(id));
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    public async Task<IResult> CreateAuction(ISender sender, CreateAuctionCommand command)
+    public static async Task<IResult> CreateAuction(ISender sender, CreateAuctionCommand command)
     {
         Result<AuctionDto> result = await sender.Send(command);
 
@@ -42,7 +42,7 @@ public class Auctions : EndpointGroupBase
         );
     }
 
-    public async Task<IResult> UpdateAuction(ISender sender, Guid id, UpdateAuctionCommand command)
+    public static async Task<IResult> UpdateAuction(ISender sender, Guid id, UpdateAuctionCommand command)
     {
         command = command with { Id = id }; // Set the Id for the command
 
@@ -51,7 +51,7 @@ public class Auctions : EndpointGroupBase
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    public async Task<IResult> DeleteAuction(ISender sender, Guid id)
+    public static async Task<IResult> DeleteAuction(ISender sender, Guid id)
     {
         Result result = await sender.Send(new DeleteAuctionCommand(id));
         return result.Match(Results.NoContent, CustomResults.Problem);
