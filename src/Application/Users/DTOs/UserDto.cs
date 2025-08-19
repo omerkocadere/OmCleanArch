@@ -7,5 +7,6 @@ public class UserDto
     public required string DisplayName { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
+    public string? ImageUrl { get; set; }
     public string? Token { get; set; }
 }

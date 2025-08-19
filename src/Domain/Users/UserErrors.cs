@@ -15,7 +15,7 @@ public static class UserErrors
         "You are not authorized to perform this action."
     );
 
-    public static readonly Error NotFoundByEmail = Error.NotFound(
+    public static readonly Error NotFoundByEmail = Error.Problem(
         "Users.NotFoundByEmail",
         "The user with the specified email was not found"
     );

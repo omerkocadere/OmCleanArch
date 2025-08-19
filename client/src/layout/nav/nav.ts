@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AccountService } from '../../core/services/account-service';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ToastService } from '../../core/services/toast-service';
-import { LoginCreds } from '../../types/user';
+import { themes } from '../theme';
 
 @Component({
   selector: 'app-nav',
@@ -11,18 +11,35 @@ import { LoginCreds } from '../../types/user';
   templateUrl: './nav.html',
   styleUrl: './nav.css',
 })
-export class Nav {
+export class Nav implements OnInit {
   protected accountService = inject(AccountService);
   private router = inject(Router);
   private toast = inject(ToastService);
-  protected creds: LoginCreds = { email: '', password: '' };
+  protected creds: any = {};
+  protected selectedTheme = signal<string>(localStorage.getItem('theme') || 'light');
+  protected themes = themes;
+
+  ngOnInit(): void {
+    document.documentElement.setAttribute('data-theme', this.selectedTheme());
+  }
+
+  handleSelectTheme(theme: string) {
+    this.selectedTheme.set(theme);
+    localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    const elem = document.activeElement as HTMLDivElement;
+    if (elem) elem.blur();
+  }
 
   login() {
     this.accountService.login(this.creds).subscribe({
       next: () => {
         this.router.navigateByUrl('/members');
         this.toast.success('Logged in successfully');
-        this.creds = { email: '', password: '' };
+        this.creds = {};
+      },
+      error: (error) => {
+        this.toast.error(error.error);
       },
     });
   }

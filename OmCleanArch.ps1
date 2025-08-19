@@ -22,11 +22,11 @@ if (!(Test-Path "node_modules")) {
 }
 
 Log "Starting Angular client with npm run dev..."
-wt -w 0 -d "$angularClientPath" --title "Angular Client" pwsh -NoExit -Command "npm start"	
+wt -w 0 -d "$angularClientPath" --title "Angular Client" pwsh -NoExit -Command "ng serve --port 4201"	
 
 # Start .NET API in a new terminal
 Log "Starting .NET APIs ..."
-wt -w 0 -d "$WebApiPath" --title "WebApi" pwsh -NoExit -Command "dotnet watch --launch-profile https"
+wt -w 0 -d "$WebApiPath" --title "WebApi" pwsh -NoExit -Command "dotnet run --launch-profile https"
 Start-Sleep -Milliseconds 100
 wt -w 0 -d "$DummyApiPath" --title "DummyApi" pwsh -NoExit -Command "dotnet watch"
 Start-Sleep -Milliseconds 100

@@ -31,12 +31,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           case 404:
             router.navigateByUrl('/not-found');
             break;
-          case 500:
+          case 500: {
             const navigationExtras: NavigationExtras = {
               state: { problemDetails: error.error as ProblemDetails },
             };
             router.navigateByUrl('/server-error', navigationExtras);
             break;
+          }
           default:
             toast.error('Something went wrong');
             break;
