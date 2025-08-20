@@ -1,17 +1,16 @@
 services:
-  web:
-    image: ${DOCKER_REGISTRY-}omcleanarch.api
+  cleanarch:
+    image: zormax/cleanarch:latest
     build:
       context: .
       dockerfile: src/Web.Api/Dockerfile
     ports:
       - 7800:7800
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Docker
-      - ASPNETCORE_URLS=http://+:7800
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire:18889
+    env_file:
+      - .env.docker
     depends_on:
-      - om-postgres
+      - postgres
+      - rabbitmq
 
   seq:
     image: datalust/seq:latest
@@ -24,7 +23,7 @@ services:
     volumes:
       - ./seq-data:/data
 
-  om-postgres:
+  postgres:
     image: postgres:latest
     environment:
       POSTGRES_PASSWORD: postgrespw
@@ -63,6 +62,7 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
+
   aspire:
     image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
     ports:

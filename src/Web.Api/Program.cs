@@ -5,7 +5,6 @@ using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.OpenTelemetry;
 using CleanArch.Web.Api;
 using CleanArch.Web.Api.Extensions;
-using CleanArch.Web.Api.Playground.Services;
 using Hangfire;
 using Serilog;
 
@@ -16,21 +15,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.ConfigureOpenTelemetryInHouse();
 
 // builder.AddServiceDefaults();
-builder.AddSeqEndpoint("om-seq");
+// builder.AddSeqEndpoint("om-seq");
 
-// builder.Host.UseSerilog(
-//     (context, loggerConfig) =>
-//     {
-//         loggerConfig.ReadFrom.Configuration(context.Configuration);
-//     }
-// );
-
+builder.Host.UseSerilog(
+    (context, loggerConfig) =>
+    {
+        loggerConfig.ReadFrom.Configuration(context.Configuration);
+    }
+);
 
 builder
     .Services.AddApplicationServices()
     .AddInfrastructureServices(builder.Environment, builder.Configuration)
     .AddWebServices(builder.Configuration)
-    .AddPlayServices(builder.Configuration)
     .AddRateLimiting();
 
 builder.Services.AddCors(options =>

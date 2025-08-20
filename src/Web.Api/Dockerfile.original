@@ -2,10 +2,16 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+RUN apt-get update && apt-get install -y \
+    libnss3 \
+    libgtk-3-0 \
+    libgbm1 \
+    libasound2 \
+    && rm -rf /var/lib/apt/lists/*
 USER $APP_UID
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 8086
+EXPOSE 8087
 
 
 # This stage is used to build the service project
@@ -16,7 +22,6 @@ COPY ["Directory.Packages.props", "."]
 COPY ["Directory.Build.props", "."]
 COPY ["src/Web.Api/Web.Api.csproj", "src/Web.Api/"]
 COPY ["src/Application/Application.csproj", "src/Application/"]
-COPY ["other-services/Contracts/Contracts.csproj", "other-services/Contracts/"]
 COPY ["src/Domain/Domain.csproj", "src/Domain/"]
 COPY ["src/Aspire.ServiceDefaults/Aspire.ServiceDefaults.csproj", "src/Aspire.ServiceDefaults/"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
@@ -29,6 +34,7 @@ RUN dotnet build "./Web.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Web.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+COPY src/Infrastructure/Data/Migrations /app/publish/Migrations
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final

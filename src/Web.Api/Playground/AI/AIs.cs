@@ -1,25 +1,25 @@
-﻿using CleanArch.Application.Common.Models;
-using CleanArch.Web.Api.Extensions;
-using Microsoft.Extensions.AI;
+﻿// using CleanArch.Application.Common.Models;
+// using CleanArch.Web.Api.Extensions;
+// using Microsoft.Extensions.AI;
 
-namespace CleanArch.Web.Api.Playground.AI;
+// namespace CleanArch.Web.Api.Playground.AI;
 
-public class AIs : EndpointGroupBase
-{
-    public override string? GroupName => "[Play]";
+// public class AIs : EndpointGroupBase
+// {
+//     public override string? GroupName => "[Play]";
 
-    public override void Map(RouteGroupBuilder groupBuilder)
-    {
-        groupBuilder.MapGet(ChatMessage, "chat-message");
-    }
+//     public override void Map(RouteGroupBuilder groupBuilder)
+//     {
+//         groupBuilder.MapGet(ChatMessage, "chat-message");
+//     }
 
-    public async Task<IResult> ChatMessage(IChatClient chatClient)
-    {
-        var message = new ChatMessage(ChatRole.User, "What is .Net?");
+//     public async Task<IResult> ChatMessage(IChatClient chatClient)
+//     {
+//         var message = new ChatMessage(ChatRole.User, "What is .Net?");
 
-        var response = await chatClient.GetResponseAsync(message);
+//         var response = await chatClient.GetResponseAsync(message);
 
-        var result = Result.Create(response);
-        return result.Match(Results.Ok, CustomResults.Problem);
-    }
-}
+//         var result = Result.Create(response);
+//         return result.Match(Results.Ok, CustomResults.Problem);
+//     }
+// }

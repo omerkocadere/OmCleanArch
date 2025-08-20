@@ -33,7 +33,7 @@ public static class DependencyInjection
             .AddBackgroundJobsConditionally(configuration)
             .AddAuthenticationInternal(configuration)
             .AddMediatRDecorators()
-            .AddMassTransitServices();
+            .AddMassTransitServices(configuration);
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -163,13 +163,16 @@ public static class DependencyInjection
     /// <summary>
     /// Configures MassTransit with RabbitMQ and EntityFramework outbox pattern.
     /// </summary>
-    private static IServiceCollection AddMassTransitServices(this IServiceCollection services)
+    private static IServiceCollection AddMassTransitServices(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         services.AddMassTransit(x =>
         {
             x.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
             {
-                o.QueryDelay = TimeSpan.FromMinutes(5);
+                o.QueryDelay = TimeSpan.FromSeconds(10);
                 o.UsePostgres();
                 o.UseBusOutbox();
             });
@@ -180,6 +183,23 @@ public static class DependencyInjection
             x.UsingRabbitMq(
                 (context, cfg) =>
                 {
+                    // RabbitMQ configuration for Docker environments
+                    // The application could work with default settings before, but this configuration
+                    // is required for proper Docker container communication
+                    var rabbitOptions =
+                        configuration.GetSection(RabbitMQOptions.SectionName).Get<RabbitMQOptions>()
+                        ?? new RabbitMQOptions();
+
+                    cfg.Host(
+                        rabbitOptions.Host,
+                        rabbitOptions.VirtualHost,
+                        h =>
+                        {
+                            h.Username(rabbitOptions.Username);
+                            h.Password(rabbitOptions.Password);
+                        }
+                    );
+
                     cfg.ConfigureEndpoints(context);
                 }
             );
