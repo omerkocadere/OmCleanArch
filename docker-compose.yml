@@ -93,12 +93,24 @@ services:
       context: .
       dockerfile: other-services/SearchService/Dockerfile
     ports:
-      - 7801:7801
+      - 7801:7800
     env_file:
       - .env.docker
     depends_on:
       - mongodb
       - rabbitmq
+
+  identity-svc:
+    image: zormax/identity-svc:latest
+    build:
+      context: .
+      dockerfile: other-services/IdentityService/Dockerfile
+    ports:
+      - 7802:7800
+    env_file:
+      - .env.docker
+    depends_on:
+      - postgres
 
 volumes:
   mongodata:
