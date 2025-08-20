@@ -87,5 +87,18 @@ services:
     depends_on:
       - redis
 
+  search-svc:
+    image: zormax/search-svc:latest
+    build:
+      context: .
+      dockerfile: other-services/SearchService/Dockerfile
+    ports:
+      - 7801:7801
+    env_file:
+      - .env.docker
+    depends_on:
+      - mongodb
+      - rabbitmq
+
 volumes:
   mongodata:
