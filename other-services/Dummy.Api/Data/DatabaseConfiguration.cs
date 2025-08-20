@@ -24,7 +24,7 @@ public static class DatabaseConfiguration
                 logger.LogInformation("Using connection string: {ConnectionString}", connectionString);
                 options.UseNpgsql(connectionString);
 
-                if (env.IsDevelopment() || env.IsEnvironment("Docker"))
+                if (env.IsDevelopment())
                 {
                     options.EnableSensitiveDataLogging();
                     options.EnableDetailedErrors();

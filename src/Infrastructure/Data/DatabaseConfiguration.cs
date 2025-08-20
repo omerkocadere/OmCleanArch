@@ -61,7 +61,7 @@ public static class DatabaseConfiguration
                     warnings.Ignore(CoreEventId.PossibleIncorrectRequiredNavigationWithQueryFilterInteractionWarning);
                 });
 
-                if (env.IsDevelopment() || env.IsEnvironment("Docker"))
+                if (env.IsDevelopment())
                 {
                     options.EnableSensitiveDataLogging();
                     options.EnableDetailedErrors();

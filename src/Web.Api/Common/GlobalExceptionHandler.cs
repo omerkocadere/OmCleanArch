@@ -29,7 +29,7 @@ public class GlobalExceptionHandler(
             innerException
         );
 
-        var showStackTrace = env.IsDevelopment() || env.IsEnvironment("Docker");
+        var showStackTrace = env.IsDevelopment();
         httpContext.Response.StatusCode =
             (int?)exceptionType.GetProperty("StatusCode")?.GetValue(exception)
             ?? StatusCodes.Status500InternalServerError;
