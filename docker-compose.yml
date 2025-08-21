@@ -112,5 +112,17 @@ services:
     depends_on:
       - postgres
 
+  gateway-svc:
+    image: zormax/gateway-svc:latest
+    build:
+      context: .
+      dockerfile: other-services/GatewayService/Dockerfile
+    ports:
+      - 7803:7800
+    env_file:
+      - .env.docker
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+
 volumes:
   mongodata:
