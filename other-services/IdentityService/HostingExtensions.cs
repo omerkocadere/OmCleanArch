@@ -30,6 +30,16 @@ internal static class HostingExtensions
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
+
+                // Use /tmp for key storage in Docker - always writable
+                options.KeyManagement.KeyPath = "/tmp/identity-keys";
+
+                // Environment-based issuer configuration
+                if (builder.Environment.IsEnvironment("Docker"))
+                {
+                    // For container-to-container communication
+                    options.IssuerUri = "http://localhost:5001";
+                }
             })
             .AddInMemoryIdentityResources(Config.IdentityResources)
             .AddInMemoryApiScopes(Config.ApiScopes)

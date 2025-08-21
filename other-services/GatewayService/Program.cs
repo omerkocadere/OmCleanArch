@@ -9,6 +9,7 @@ builder
     .AddJwtBearer(options =>
     {
         options.Authority = builder.Configuration["IdentityServiceUrl"];
+        System.Console.WriteLine($"Using IdentityService at {options.Authority}");
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters.ValidateAudience = false;
         options.TokenValidationParameters.NameClaimType = "username";
