@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: src/Web.Api/Dockerfile
     ports:
-      - 7700:80
+      - 7700:7800
     env_file:
       - .env.docker
     depends_on:
@@ -111,7 +111,7 @@ services:
       context: .
       dockerfile: other-services/SearchService/Dockerfile
     ports:
-      - 7704:80
+      - 7704:7800
     env_file:
       - .env.docker
     depends_on:
@@ -126,7 +126,7 @@ services:
       context: .
       dockerfile: other-services/IdentityService/Dockerfile
     ports:
-      - 5001:80
+      - 5001:7800
     env_file:
       - .env.docker
     environment:
@@ -141,7 +141,7 @@ services:
       context: .
       dockerfile: other-services/GatewayService/Dockerfile
     ports:
-      - 7706:80
+      - 7706:7800
     env_file:
       - .env.docker
     environment:
