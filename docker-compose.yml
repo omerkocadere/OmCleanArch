@@ -5,12 +5,14 @@ services:
       context: .
       dockerfile: src/Web.Api/Dockerfile
     ports:
-      - 7800:7800
+      - 7700:7800
     env_file:
       - .env.docker
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   seq:
     image: datalust/seq:latest
@@ -31,6 +33,11 @@ services:
       - "5432:5432"
     volumes:
       - ./.containers/db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   mongodb:
     image: mongo:latest
@@ -42,6 +49,12 @@ services:
       - "27017:27017"
     volumes:
       - mongodata:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "127.0.0.1/test", "--eval", "'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
   mongo-express:
     image: mongo-express
@@ -62,6 +75,11 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   aspire:
     image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
@@ -93,12 +111,14 @@ services:
       context: .
       dockerfile: other-services/SearchService/Dockerfile
     ports:
-      - 7801:7800
+      - 7704:7800
     env_file:
       - .env.docker
     depends_on:
-      - mongodb
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
 
   identity-svc:
     image: zormax/identity-svc:latest
@@ -106,11 +126,14 @@ services:
       context: .
       dockerfile: other-services/IdentityService/Dockerfile
     ports:
-      - 7802:7800
+      - 5001:7800
     env_file:
       - .env.docker
+    volumes:
+      - identity-keys:/app/keys
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   gateway-svc:
     image: zormax/gateway-svc:latest
@@ -118,7 +141,7 @@ services:
       context: .
       dockerfile: other-services/GatewayService/Dockerfile
     ports:
-      - 7803:7800
+      - 7706:7800
     env_file:
       - .env.docker
     environment:
@@ -126,3 +149,4 @@ services:
 
 volumes:
   mongodata:
+  identity-keys:
