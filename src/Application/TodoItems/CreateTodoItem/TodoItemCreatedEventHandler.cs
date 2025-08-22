@@ -1,4 +1,4 @@
-﻿using CleanArch.Domain.TodoItems;
+using CleanArch.Domain.TodoItems;
 using Microsoft.Extensions.Logging;
 
 namespace CleanArch.Application.TodoItems.CreateTodoItem;

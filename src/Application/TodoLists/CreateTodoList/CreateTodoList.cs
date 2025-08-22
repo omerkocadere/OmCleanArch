@@ -1,6 +1,6 @@
-﻿using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Models;
+using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.TodoLists.GetTodos;
+using CleanArch.Domain.Common;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
 

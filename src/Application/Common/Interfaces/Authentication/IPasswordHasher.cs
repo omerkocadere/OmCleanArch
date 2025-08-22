@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Application.Common.Interfaces.Authentication;
+namespace CleanArch.Application.Common.Interfaces.Authentication;
 
 public interface IPasswordHasher
 {

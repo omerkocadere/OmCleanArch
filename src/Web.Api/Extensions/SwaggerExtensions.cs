@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Web.Api.Extensions;
+namespace CleanArch.Web.Api.Extensions;
 
 public static class SwaggerExtensions
 {

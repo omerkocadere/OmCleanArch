@@ -1,7 +1,6 @@
-﻿namespace CleanArch.Application.TodoItems.GetTodoItemsWithPagination;
+namespace CleanArch.Application.TodoItems.GetTodoItemsWithPagination;
 
-public class GetTodoItemsWithPaginationQueryValidator
-    : AbstractValidator<GetTodoItemsWithPaginationQuery>
+public class GetTodoItemsWithPaginationQueryValidator : AbstractValidator<GetTodoItemsWithPaginationQuery>
 {
     public GetTodoItemsWithPaginationQueryValidator()
     {
@@ -11,8 +10,6 @@ public class GetTodoItemsWithPaginationQueryValidator
             .GreaterThanOrEqualTo(1)
             .WithMessage("PageNumber at least greater than or equal to 1.");
 
-        RuleFor(x => x.PageSize)
-            .GreaterThanOrEqualTo(1)
-            .WithMessage("PageSize at least greater than or equal to 1.");
+        RuleFor(x => x.PageSize).GreaterThanOrEqualTo(1).WithMessage("PageSize at least greater than or equal to 1.");
     }
 }

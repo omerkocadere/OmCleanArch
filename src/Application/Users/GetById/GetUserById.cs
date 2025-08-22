@@ -1,8 +1,8 @@
-﻿using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
+using CleanArch.Domain.Common;
 using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Users.GetById;
@@ -20,8 +20,7 @@ internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUs
         }
 
         UserDto? user = await context
-            .Users
-            .Where(u => u.Id == query.UserId)
+            .Users.Where(u => u.Id == query.UserId)
             .Select(u => new UserDto
             {
                 Id = u.Id,

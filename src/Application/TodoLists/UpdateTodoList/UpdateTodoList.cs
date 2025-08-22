@@ -1,5 +1,5 @@
-﻿using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Models;
+using CleanArch.Application.Common.Interfaces;
+using CleanArch.Domain.Common;
 using CleanArch.Domain.TodoLists;
 
 namespace CleanArch.Application.TodoLists.UpdateTodoList;
@@ -9,15 +9,9 @@ public record UpdateTodoListCommand(int Id, string Title, string UserId) : IRequ
 public class UpdateTodoListCommandHandler(IApplicationDbContext context)
     : IRequestHandler<UpdateTodoListCommand, Result>
 {
-    public async Task<Result> Handle(
-        UpdateTodoListCommand request,
-        CancellationToken cancellationToken
-    )
+    public async Task<Result> Handle(UpdateTodoListCommand request, CancellationToken cancellationToken)
     {
-        TodoList? todoList = await context.TodoLists.SingleOrDefaultAsync(
-            t => t.Id == request.Id,
-            cancellationToken
-        );
+        TodoList? todoList = await context.TodoLists.SingleOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
 
         if (todoList is null)
         {

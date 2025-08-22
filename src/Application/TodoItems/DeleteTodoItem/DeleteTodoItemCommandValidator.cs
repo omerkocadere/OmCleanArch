@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Application.TodoItems.DeleteTodoItem;
+namespace CleanArch.Application.TodoItems.DeleteTodoItem;
 
 internal sealed class DeleteTodoListCommandValidator : AbstractValidator<DeleteTodoItemCommand>
 {

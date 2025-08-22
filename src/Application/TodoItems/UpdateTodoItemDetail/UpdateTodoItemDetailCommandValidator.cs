@@ -1,4 +1,4 @@
-﻿using CleanArch.Application.TodoItems.UpdateTodoItemDetail;
+using CleanArch.Application.TodoItems.UpdateTodoItemDetail;
 
 namespace CleanArch.Application.TodoItems.Commands.UpdateTodoItemDetail;
 

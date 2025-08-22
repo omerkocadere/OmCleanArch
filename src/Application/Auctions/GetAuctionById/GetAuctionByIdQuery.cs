@@ -1,8 +1,8 @@
 using CleanArch.Application.Auctions.DTOs;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Auctions;
+using CleanArch.Domain.Common;
 
 namespace CleanArch.Application.Auctions.GetAuctionById;
 

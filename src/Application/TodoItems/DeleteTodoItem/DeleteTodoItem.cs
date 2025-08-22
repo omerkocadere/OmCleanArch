@@ -1,6 +1,6 @@
-﻿using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
-using CleanArch.Application.Common.Models;
+using CleanArch.Domain.Common;
 using CleanArch.Domain.TodoItems;
 
 namespace CleanArch.Application.TodoItems.DeleteTodoItem;

@@ -1,4 +1,4 @@
-﻿using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces;
 
 namespace CleanArch.Application.TodoLists.CreateTodoList;
 

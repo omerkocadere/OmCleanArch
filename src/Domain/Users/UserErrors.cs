@@ -24,4 +24,16 @@ public static class UserErrors
         "Users.EmailNotUnique",
         "The provided email is not unique"
     );
+
+    public static readonly Error EmailEmpty = Error.Validation("Users.EmailEmpty", "Email cannot be empty");
+
+    public static readonly Error EmailTooLong = Error.Validation(
+        "Users.EmailTooLong",
+        "Email cannot be longer than 320 characters"
+    );
+
+    public static readonly Error EmailInvalidFormat = Error.Validation(
+        "Users.EmailInvalidFormat",
+        "Email must contain @ symbol and at least one dot"
+    );
 }

@@ -1,4 +1,4 @@
-﻿using CleanArch.Domain.Auctions;
+using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Comments;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Photos;

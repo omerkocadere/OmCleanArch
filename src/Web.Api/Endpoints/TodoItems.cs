@@ -1,4 +1,3 @@
-﻿using CleanArch.Application.Common.Models;
 using CleanArch.Application.TodoItems.CreateTodoItem;
 using CleanArch.Application.TodoItems.DeleteTodoItem;
 using CleanArch.Application.TodoItems.DTOs;
@@ -6,6 +5,7 @@ using CleanArch.Application.TodoItems.GetTodoItemById;
 using CleanArch.Application.TodoItems.GetTodoItemsWithPagination;
 using CleanArch.Application.TodoItems.UpdateTodoItem;
 using CleanArch.Application.TodoItems.UpdateTodoItemDetail;
+using CleanArch.Domain.Common;
 using CleanArch.Web.Api.Extensions;
 
 namespace CleanArch.Web.Api.Endpoints;

@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Application.Common.Models;
+namespace CleanArch.Application.Common.Models;
 
 public class LookupDto
 {

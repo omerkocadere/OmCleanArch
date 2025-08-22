@@ -1,7 +1,7 @@
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Common.Mappings;
-using CleanArch.Application.Common.Models;
+using CleanArch.Domain.Common;
 
 namespace CleanArch.Application.Members.Queries.GetMembers;
 

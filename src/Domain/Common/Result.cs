@@ -1,6 +1,4 @@
-﻿using CleanArch.Domain.Common;
-
-namespace CleanArch.Application.Common.Models;
+namespace CleanArch.Domain.Common;
 
 public interface IOperationResult
 {

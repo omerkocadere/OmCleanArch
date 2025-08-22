@@ -1,4 +1,4 @@
-﻿using CleanArch.Domain.Users;
+using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Common.Interfaces.Authentication;
 

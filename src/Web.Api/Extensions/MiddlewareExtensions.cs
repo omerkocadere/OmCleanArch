@@ -1,4 +1,4 @@
-﻿using CleanArch.Web.Api.Middleware;
+using CleanArch.Web.Api.Middleware;
 
 namespace CleanArch.Web.Api.Extensions;
 

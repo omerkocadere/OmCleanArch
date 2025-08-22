@@ -2,8 +2,8 @@ using CleanArch.Application.Auctions.DTOs;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Auctions;
+using CleanArch.Domain.Common;
 using Contracts;
 using MassTransit;
 

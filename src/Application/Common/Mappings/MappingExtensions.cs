@@ -1,4 +1,4 @@
-﻿using CleanArch.Application.Common.Models;
+using CleanArch.Application.Common.Models;
 
 namespace CleanArch.Application.Common.Mappings;
 

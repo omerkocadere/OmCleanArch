@@ -1,7 +1,7 @@
-﻿using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
+using CleanArch.Domain.Common;
 using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Users.GetByEmail;

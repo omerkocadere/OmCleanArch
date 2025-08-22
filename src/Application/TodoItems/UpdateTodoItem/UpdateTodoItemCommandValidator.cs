@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Application.TodoItems.UpdateTodoItem;
+namespace CleanArch.Application.TodoItems.UpdateTodoItem;
 
 public class UpdateTodoItemCommandValidator : AbstractValidator<UpdateTodoItemCommand>
 {

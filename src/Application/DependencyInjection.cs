@@ -1,6 +1,5 @@
-﻿using System.Reflection;
+using System.Reflection;
 using CleanArch.Application.Common.Behaviours;
-using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Mappings;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Application.Common.Exceptions;
+namespace CleanArch.Application.Common.Exceptions;
 
 public class ForbiddenAccessException : Exception
 {

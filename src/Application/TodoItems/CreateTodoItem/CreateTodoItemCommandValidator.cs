@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Application.TodoItems.CreateTodoItem;
+namespace CleanArch.Application.TodoItems.CreateTodoItem;
 
 public class CreateTodoItemCommandValidator : AbstractValidator<CreateTodoItemCommand>
 {

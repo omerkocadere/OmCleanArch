@@ -1,4 +1,4 @@
-﻿using CleanArch.Application.Common.Interfaces.Authentication;
+using CleanArch.Application.Common.Interfaces.Authentication;
 using Microsoft.Extensions.Logging;
 
 namespace CleanArch.Application.Common.Behaviours;

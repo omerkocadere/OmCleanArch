@@ -1,8 +1,8 @@
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
+using CleanArch.Domain.Common;
 using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Users.Create;
@@ -21,10 +21,14 @@ public class CreateUserCommandHandler(IApplicationDbContext context, IPasswordHa
 {
     public async Task<Result<UserDto>> Handle(CreateUserCommand command, CancellationToken cancellationToken)
     {
-        var emailExists = await context.Users.AnyAsync(
-            u => u.Email.ToLower() == command.Email.ToLower(),
-            cancellationToken
-        );
+        var emailResult = Email.Create(command.Email);
+
+        if (emailResult.IsFailure)
+        {
+            return Result.Failure<UserDto>(emailResult.Error);
+        }
+
+        var emailExists = await context.Users.AnyAsync(u => u.Email == emailResult.Value, cancellationToken);
 
         if (emailExists)
         {
@@ -33,6 +37,7 @@ public class CreateUserCommandHandler(IApplicationDbContext context, IPasswordHa
 
         var user = command.Adapt<User>();
         user.Id = Guid.NewGuid();
+        user.Email = emailResult.Value;
         user.PasswordHash = passwordHasher.Hash(command.Password);
 
         user.AddDomainEvent(new UserCreatedDomainEvent(Guid.NewGuid(), user));

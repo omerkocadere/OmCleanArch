@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Application.TodoItems.DTOs;
+namespace CleanArch.Application.TodoItems.DTOs;
 
 public class TodoItemDto
 {

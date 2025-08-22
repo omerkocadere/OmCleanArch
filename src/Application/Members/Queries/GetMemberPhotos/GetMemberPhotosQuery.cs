@@ -1,9 +1,7 @@
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Application.Common.Models;
 using CleanArch.Application.Members.Queries.GetMembers;
-using Mapster;
-using Microsoft.EntityFrameworkCore;
+using CleanArch.Domain.Common;
 
 namespace CleanArch.Application.Members.Queries.GetMemberPhotos;
 

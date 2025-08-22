@@ -1,8 +1,8 @@
-﻿using CleanArch.Application.Common.Models;
 using CleanArch.Application.TodoLists.CreateTodoList;
 using CleanArch.Application.TodoLists.DeleteTodoList;
 using CleanArch.Application.TodoLists.GetTodos;
 using CleanArch.Application.TodoLists.UpdateTodoList;
+using CleanArch.Domain.Common;
 using CleanArch.Web.Api.Extensions;
 using Microsoft.AspNetCore.Mvc;
 

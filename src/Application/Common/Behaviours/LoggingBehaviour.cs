@@ -1,5 +1,5 @@
-﻿using CleanArch.Application.Common.Interfaces.Authentication;
-using CleanArch.Application.Common.Models;
+using CleanArch.Application.Common.Interfaces.Authentication;
+using CleanArch.Domain.Common;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
 

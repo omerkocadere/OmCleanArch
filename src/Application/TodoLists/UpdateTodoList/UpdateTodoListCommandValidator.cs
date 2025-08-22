@@ -1,7 +1,6 @@
-﻿using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.TodoLists.UpdateTodoList;
+using CleanArch.Application.Common.Interfaces;
 
-namespace CleanArch.Application.TodoLists.Commands.UpdateTodoList;
+namespace CleanArch.Application.TodoLists.UpdateTodoList;
 
 public class UpdateTodoListCommandValidator : AbstractValidator<UpdateTodoListCommand>
 {

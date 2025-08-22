@@ -1,5 +1,5 @@
-﻿using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Models;
+using CleanArch.Application.Common.Interfaces;
+using CleanArch.Domain.Common;
 using CleanArch.Domain.TodoItems;
 
 namespace CleanArch.Application.TodoItems.UpdateTodoItemDetail;

@@ -4,7 +4,7 @@ using CleanArch.Application.Auctions.DTOs;
 using CleanArch.Application.Auctions.GetAuctionById;
 using CleanArch.Application.Auctions.GetAuctions;
 using CleanArch.Application.Auctions.UpdateAuction;
-using CleanArch.Application.Common.Models;
+using CleanArch.Domain.Common;
 using CleanArch.Web.Api.Extensions;
 
 namespace CleanArch.Web.Api.Endpoints;

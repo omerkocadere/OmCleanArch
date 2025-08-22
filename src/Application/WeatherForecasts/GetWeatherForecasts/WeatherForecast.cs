@@ -1,4 +1,4 @@
-﻿namespace CleanArch.Application.WeatherForecasts.GetWeatherForecasts;
+namespace CleanArch.Application.WeatherForecasts.GetWeatherForecasts;
 
 public class WeatherForecast
 {

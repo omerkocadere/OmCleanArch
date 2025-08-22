@@ -1,4 +1,4 @@
-﻿using CleanArch.Infrastructure.Data;
+using CleanArch.Infrastructure.Data;
 using CleanArch.Web.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using NSwag;
