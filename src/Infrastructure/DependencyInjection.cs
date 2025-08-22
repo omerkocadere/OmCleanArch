@@ -1,10 +1,10 @@
-﻿using System.Text;
+using System.Text;
 using CleanArch.Application.Auctions.Consumers;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Infrastructure.Authentication;
 using CleanArch.Infrastructure.BackgroundJobs;
-using CleanArch.Infrastructure.Configuration;
+using CleanArch.Infrastructure.Options;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Idempotence;
 using CleanArch.Infrastructure.Services;

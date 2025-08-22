@@ -1,4 +1,4 @@
-﻿using CleanArch.Application.Common.Interfaces.Authentication;
+using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;

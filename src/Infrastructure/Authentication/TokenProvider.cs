@@ -1,8 +1,8 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using System.Text;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Domain.Users;
-using CleanArch.Infrastructure.Configuration;
+using CleanArch.Infrastructure.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;

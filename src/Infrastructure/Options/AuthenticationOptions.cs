@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace CleanArch.Infrastructure.Configuration;
+namespace CleanArch.Infrastructure.Options;
 
 /// <summary>
 /// Configuration options for authentication settings.

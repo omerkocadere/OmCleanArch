@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using Microsoft.AspNetCore.Http;
 

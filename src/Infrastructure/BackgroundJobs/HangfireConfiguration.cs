@@ -37,10 +37,10 @@ public static class HangfireConfiguration
         }
 
         // Background jobs are enabled, register Hangfire services
-        return services.AddBackgroundJobs(configuration);
+        return services.AddBackgroundJobs();
     }
 
-    private static IServiceCollection AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddBackgroundJobs(this IServiceCollection services)
     {
         services.AddHangfire(
             (sp, configuration) =>

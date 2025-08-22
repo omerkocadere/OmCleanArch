@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Infrastructure.Configuration;
+using CleanArch.Infrastructure.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 

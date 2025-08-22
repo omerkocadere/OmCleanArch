@@ -19,10 +19,11 @@ public static class DatabaseConfiguration
         IConfiguration configuration
     )
     {
-        services.ConfigureOptions<DatabaseOptionsSetup>();
+        // Configure DatabaseOptions directly from configuration
+        services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SectionName));
 
         // Log database provider selection once during startup
-        var dbOptions = configuration.GetSection(DatabaseOptionsSetup.ConfigurationSectionName).Get<DatabaseOptions>();
+        var dbOptions = configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>();
         if (dbOptions != null)
         {
             // Create a temporary logger for startup logging
@@ -82,7 +83,7 @@ public static class DatabaseConfiguration
 
     private static void AddConditionalHealthChecks(IServiceCollection services, IConfiguration configuration)
     {
-        var dbOptions = configuration.GetSection(DatabaseOptionsSetup.ConfigurationSectionName).Get<DatabaseOptions>();
+        var dbOptions = configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>();
         if (dbOptions?.Provider == DbProvider.Postgres)
         {
             ValidateConnectionString(dbOptions.PostgresConnectionString, DbProvider.Postgres);

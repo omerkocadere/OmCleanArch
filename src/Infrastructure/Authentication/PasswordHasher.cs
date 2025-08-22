@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using CleanArch.Application.Common.Interfaces.Authentication;
 
 namespace CleanArch.Infrastructure.Authentication;

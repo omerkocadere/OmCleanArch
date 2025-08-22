@@ -1,4 +1,4 @@
-namespace CleanArch.Infrastructure.Configuration;
+namespace CleanArch.Infrastructure.Options;
 
 public sealed class RabbitMQOptions
 {

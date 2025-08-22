@@ -1,8 +1,8 @@
-﻿using CleanArch.Domain.TodoLists;
+using CleanArch.Domain.TodoLists;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace CleanArch.Infrastructure.Data.Configurations;
+namespace CleanArch.Infrastructure.Data.EntityConfigurations;
 
 public class TodoListConfiguration : IEntityTypeConfiguration<TodoList>
 {
