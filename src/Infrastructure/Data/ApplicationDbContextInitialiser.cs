@@ -125,7 +125,7 @@ public static class ApplicationDbContextInitialiser
             var user = new User
             {
                 Id = userDto.Id,
-                Email = userDto.Email,
+                Email = Email.Create(userDto.Email).Value,
                 DisplayName = userDto.DisplayName,
                 FirstName = userDto.FirstName,
                 LastName = userDto.LastName,

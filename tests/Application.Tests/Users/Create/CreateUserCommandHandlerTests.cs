@@ -74,7 +74,7 @@ public class CreateUserCommandHandlerTests
         var existingUser = new User
         {
             Id = Guid.NewGuid(),
-            Email = existingEmail,
+            Email = Email.Create(existingEmail).Value,
             DisplayName = "Existing User",
             FirstName = "Existing",
             LastName = "User",
@@ -203,7 +203,7 @@ public class CreateUserCommandHandlerTests
         var existingUser = new User
         {
             Id = Guid.NewGuid(),
-            Email = "test@example.com", // Lowercase email
+            Email = Email.Create("test@example.com").Value, // Lowercase email
             DisplayName = "Existing User",
             FirstName = "Existing",
             LastName = "User",

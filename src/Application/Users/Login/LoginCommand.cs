@@ -22,7 +22,7 @@ internal sealed class LoginCommandHandler(
     public async Task<Result<UserDto>> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
         var user = await context.Users.SingleOrDefaultAsync(
-            u => u.Email.ToLower() == command.Email.ToLower(),
+            u => u.Email == command.Email,
             cancellationToken
         );
 
