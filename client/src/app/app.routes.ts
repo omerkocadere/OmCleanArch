@@ -12,6 +12,7 @@ import { Messages } from '../features/messages/messages';
 import { TestErrors } from '../features/test-errors/test-errors';
 import { NotFound } from '../shared/errors/not-found/not-found';
 import { ServerError } from '../shared/errors/server-error/server-error';
+import { preventUnsavedChangesGuard } from '../core/guards/prevent-unsaved-changes-guard';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -28,7 +29,12 @@ export const routes: Routes = [
         component: MemberDetailed,
         children: [
           { path: '', redirectTo: 'profile', pathMatch: 'full' },
-          { path: 'profile', component: MemberProfile, title: 'Profile' },
+          {
+            path: 'profile',
+            component: MemberProfile,
+            title: 'Profile',
+            canDeactivate: [preventUnsavedChangesGuard],
+          },
           { path: 'photos', component: MemberPhotos, title: 'Photos' },
           { path: 'messages', component: MemberMessages, title: 'Messages' },
         ],
