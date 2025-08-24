@@ -21,11 +21,14 @@ internal sealed class LoginCommandHandler(
 {
     public async Task<Result<UserDto>> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
-        var user = await context.Users.SingleOrDefaultAsync(
-            u => u.Email == command.Email,
-            cancellationToken
-        );
-
+        var emailResult = Email.Create(command.Email);
+        if (emailResult.IsFailure)
+        {
+            return Result.Failure<UserDto>(emailResult.Error);
+        }
+    
+        var user = await context.Users.SingleOrDefaultAsync(u => u.Email == emailResult.Value, cancellationToken);
+    
         if (user == null)
         {
             return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
