@@ -3,6 +3,7 @@ using CleanArch.Application.Members.Queries.GetMember;
 using CleanArch.Application.Members.Queries.GetMemberPhotos;
 using CleanArch.Application.Members.Queries.GetMembers;
 using CleanArch.Web.Api.Extensions;
+using Asp.Versioning;
 
 namespace CleanArch.Web.Api.Endpoints;
 
@@ -12,12 +13,23 @@ public class Members : EndpointGroupBase
     {
         groupBuilder.RequireAuthorization();
 
+        // Version 1 endpoints
         groupBuilder
             .MapGet("/", GetMembers)
             .WithName("GetMembers")
             .WithSummary("Get all members")
             .WithDescription("Retrieves a list of all members with their photos")
-            .Produces<List<MemberDto>>();
+            .Produces<List<MemberDto>>()
+            .MapToApiVersion(1);
+
+        // Version 2 endpoint - dummy implementation
+        groupBuilder
+            .MapGet("/", GetMembersV2)
+            .WithName("GetMembersV2")
+            .WithSummary("Get all members (V2)")
+            .WithDescription("Retrieves a list of all members with their photos - Version 2 with additional features")
+            .Produces<List<MemberDto>>()
+            .MapToApiVersion(2);
 
         groupBuilder
             .MapGet("/{id:guid}", GetMember)
@@ -25,14 +37,16 @@ public class Members : EndpointGroupBase
             .WithSummary("Get member by ID")
             .WithDescription("Retrieves a specific member by their ID")
             .Produces<MemberDto>()
-            .Produces(404);
+            .Produces(404)
+            .MapToApiVersion(1);
 
         groupBuilder
             .MapGet("/{id:guid}/photos", GetMemberPhotos)
             .WithName("GetMemberPhotos")
             .WithSummary("Get member photos")
             .WithDescription("Retrieves all photos for a specific member")
-            .Produces<List<PhotoDto>>();
+            .Produces<List<PhotoDto>>()
+            .MapToApiVersion(1);
 
         groupBuilder
             .MapPut("/", UpdateMember)
@@ -40,13 +54,31 @@ public class Members : EndpointGroupBase
             .WithSummary("Update member profile")
             .WithDescription("Updates the current member's profile information")
             .Produces(204)
-            .Produces(404);
+            .Produces(404)
+            .MapToApiVersion(1);
     }
 
     private static async Task<IResult> GetMembers(IMediator mediator)
     {
         var result = await mediator.Send(new GetMembersQuery());
         return result.Match(Results.Ok, CustomResults.Problem);
+    }
+
+    private static async Task<IResult> GetMembersV2(IMediator mediator)
+    {
+        // Dummy implementation for V2 - just for learning API versioning
+        var result = await mediator.Send(new GetMembersQuery());
+        
+        // V2 could include additional processing, different response format, etc.
+        // For now, we'll just add a dummy property to show it's V2
+        return result.Match(
+            success => Results.Ok(new { 
+                Version = "2.0", 
+                Members = success,
+                AdditionalInfo = "This is version 2 of the API with enhanced features" 
+            }),
+            CustomResults.Problem
+        );
     }
 
     private static async Task<IResult> GetMember(Guid id, IMediator mediator)

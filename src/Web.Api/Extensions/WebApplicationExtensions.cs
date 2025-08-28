@@ -1,4 +1,5 @@
 using System.Reflection;
+using Asp.Versioning;
 
 namespace CleanArch.Web.Api.Extensions;
 
@@ -8,7 +9,17 @@ public static class WebApplicationExtensions
     {
         var groupName = group.GroupName ?? group.GetType().Name;
 
-        return app.MapGroup($"/api/{groupName}").WithGroupName(groupName).WithTags(groupName);
+        // Create API version set for this group
+        var apiVersionSet = app.NewApiVersionSet()
+            .HasApiVersion(new ApiVersion(1))
+            .HasApiVersion(new ApiVersion(2))
+            .ReportApiVersions()
+            .Build();
+
+        return app.MapGroup($"/api/v{{version:apiVersion}}/{groupName}")
+            .WithApiVersionSet(apiVersionSet)
+            .WithGroupName(groupName)
+            .WithTags(groupName);
     }
 
     public static WebApplication MapEndpoints(this WebApplication app)

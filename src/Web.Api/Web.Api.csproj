@@ -16,6 +16,8 @@
 
 
   <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Http" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
     <PackageReference Include="Aspire.Seq" />
     <PackageReference Include="Bogus" />
     <PackageReference Include="DotNetEnv" />

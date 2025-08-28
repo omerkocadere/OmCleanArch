@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Web.Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,25 @@ public static class DependencyInjection
 
         // Customise default API behaviour
         services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
+
+        // Add API Versioning
+        services
+            .AddApiVersioning(options =>
+            {
+                options.DefaultApiVersion = new ApiVersion(1);
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ReportApiVersions = true;
+                options.ApiVersionReader = ApiVersionReader.Combine(
+                    new UrlSegmentApiVersionReader(),
+                    new QueryStringApiVersionReader("version"),
+                    new HeaderApiVersionReader("X-Version")
+                );
+            })
+            .AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
 
         // Registers services required for minimal API endpoint discovery and Swagger/OpenAPI documentation generation.
         services.AddEndpointsApiExplorer();
