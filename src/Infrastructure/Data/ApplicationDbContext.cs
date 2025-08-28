@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Domain.Auctions;
-using CleanArch.Domain.Comments;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Photos;
@@ -25,7 +24,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Auction> Auctions => Set<Auction>();
     public DbSet<Member> Members => Set<Member>();
     public DbSet<Photo> Photos => Set<Photo>();
-    public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     public DbSet<OutboxMessageConsumer> OutboxMessageConsumers => Set<OutboxMessageConsumer>();
 

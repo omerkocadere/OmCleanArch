@@ -1,5 +1,4 @@
 using CleanArch.Domain.Auctions;
-using CleanArch.Domain.Comments;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Photos;
 using CleanArch.Domain.TodoItems;
@@ -16,7 +15,6 @@ public interface IApplicationDbContext
     DbSet<Auction> Auctions { get; }
     DbSet<Member> Members { get; }
     DbSet<Photo> Photos { get; }
-    DbSet<Comment> Comments { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

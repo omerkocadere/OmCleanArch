@@ -9,17 +9,29 @@ public static class WebApplicationExtensions
     {
         var groupName = group.GroupName ?? group.GetType().Name;
 
-        // Create API version set for this group
-        var apiVersionSet = app.NewApiVersionSet()
-            .HasApiVersion(new ApiVersion(1))
-            .HasApiVersion(new ApiVersion(2))
-            .ReportApiVersions()
-            .Build();
+        // Check if the group needs versioning
+        if (group is IVersionedEndpointGroup versionedGroup)
+        {
+            // Create API version set for versioned groups
+            var apiVersionSetBuilder = app.NewApiVersionSet();
 
-        return app.MapGroup($"/api/v{{version:apiVersion}}/{groupName}")
-            .WithApiVersionSet(apiVersionSet)
-            .WithGroupName(groupName)
-            .WithTags(groupName);
+            foreach (var version in versionedGroup.SupportedVersions)
+            {
+                apiVersionSetBuilder.HasApiVersion(new ApiVersion(version));
+            }
+
+            var apiVersionSet = apiVersionSetBuilder.ReportApiVersions().Build();
+
+            return app.MapGroup($"/api/v{{version:apiVersion}}/{groupName}")
+                .WithApiVersionSet(apiVersionSet)
+                .WithGroupName(groupName)
+                .WithTags(groupName);
+        }
+        else
+        {
+            // Standard non-versioned route for regular groups
+            return app.MapGroup($"/api/{groupName}").WithGroupName(groupName).WithTags(groupName);
+        }
     }
 
     public static WebApplication MapEndpoints(this WebApplication app)
