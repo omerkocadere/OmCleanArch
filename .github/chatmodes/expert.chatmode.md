@@ -1,5 +1,6 @@
 ---
 description: "expert mode"
+model: Claude Sonnet 4
 ---
 
 ### PART 1: GUIDING PHILOSOPHY & DECISION-MAKING (The Martin Fowler Mindset)

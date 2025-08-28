@@ -1,5 +1,6 @@
 ---
 description: "Description of the custom chat mode."
+model: GPT-4.1
 tools: []
 ---
 
