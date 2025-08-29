@@ -1,7 +1,7 @@
 ﻿namespace CleanArch.Infrastructure.Authentication;
 
-public enum Permission
+public static class Permissions
 {
-    ReadMember = 1,
-    UpdateMember = 2,
+    public const string ReadMember = "users:read";
+    public const string UpdateMember = "users:update";
 }

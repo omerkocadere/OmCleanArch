@@ -1,4 +1,5 @@
 using CleanArch.Application.Members.Queries.GetMembers;
+using CleanArch.Infrastructure.Authentication;
 using CleanArch.Web.Api.Extensions;
 
 namespace CleanArch.Web.Api.Endpoints;
@@ -11,11 +12,16 @@ public class MembersVersioned : EndpointGroupBase, IVersionedEndpointGroup
 
     public override void Map(RouteGroupBuilder groupBuilder)
     {
-        groupBuilder.RequireAuthorization();
-
-        groupBuilder.MapGet("", GetMembers).MapToApiVersion(1).Produces<List<MemberDto>>();
-
-        groupBuilder.MapGet("", GetMembersV2).MapToApiVersion(2).Produces<List<MemberDto>>();
+        groupBuilder
+            .MapGet("", GetMembers)
+            .HasPermission(Permissions.ReadMember)
+            .MapToApiVersion(1)
+            .Produces<List<MemberDto>>();
+        groupBuilder
+            .MapGet("", GetMembersV2)
+            .HasPermission(Permissions.ReadMember)
+            .MapToApiVersion(2)
+            .Produces<List<MemberDto>>();
     }
 
     private static async Task<IResult> GetMembers([AsParameters] GetMembersQuery query, IMediator mediator)

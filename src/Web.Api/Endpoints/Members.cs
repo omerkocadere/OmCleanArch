@@ -13,9 +13,7 @@ public class Members : EndpointGroupBase
         groupBuilder.RequireAuthorization();
 
         groupBuilder.MapGet("/{id:guid}", GetMember).Produces<MemberDto>().Produces(404);
-
         groupBuilder.MapGet("/{id:guid}/photos", GetMemberPhotos).Produces<List<PhotoDto>>();
-
         groupBuilder.MapPut("/", UpdateMember).Produces(204).Produces(404);
     }
 
