@@ -1,4 +1,4 @@
-using CleanArch.Application.Auctions.CreateAuction;
+using CleanArch.Application.Auctions.Create;
 using CleanArch.Application.Auctions.DTOs;
 using CleanArch.Application.TodoItems.DTOs;
 using CleanArch.Domain.Auctions;
@@ -13,9 +13,7 @@ public static class MappingConfig
     public static void Configure()
     {
         // Global DateTimeOffset -> DateTime mapping
-        TypeAdapterConfig<DateTimeOffset, DateTime>
-            .NewConfig()
-            .MapWith(src => src.DateTime);
+        TypeAdapterConfig<DateTimeOffset, DateTime>.NewConfig().MapWith(src => src.DateTime);
 
         #region TodoItems
 
@@ -50,9 +48,7 @@ public static class MappingConfig
         TypeAdapterConfig<Auction, AuctionUpdated>.NewConfig().Map(dest => dest, src => src.Item);
 
         // CreateAuctionCommand -> Auction: Item property mapping
-        TypeAdapterConfig<CreateAuctionCommand, Auction>
-            .NewConfig()
-            .Map(dest => dest.Item, src => src);
+        TypeAdapterConfig<CreateAuctionCommand, Auction>.NewConfig().Map(dest => dest.Item, src => src);
 
         // CreateAuctionCommand -> Item: Otomatik
 

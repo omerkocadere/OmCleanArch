@@ -8,7 +8,7 @@ using CleanArch.Domain.Users;
 using Contracts;
 using MassTransit;
 
-namespace CleanArch.Application.Auctions.UpdateAuction;
+namespace CleanArch.Application.Auctions.Update;
 
 public record UpdateAuctionCommand : IQuery<AuctionDto>
 {

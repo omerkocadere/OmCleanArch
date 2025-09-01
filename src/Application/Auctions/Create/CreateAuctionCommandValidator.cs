@@ -1,4 +1,4 @@
-namespace CleanArch.Application.Auctions.CreateAuction;
+namespace CleanArch.Application.Auctions.Create;
 
 public class CreateAuctionCommandValidator : AbstractValidator<CreateAuctionCommand>
 {

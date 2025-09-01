@@ -7,7 +7,7 @@ using CleanArch.Domain.Common;
 using Contracts;
 using MassTransit;
 
-namespace CleanArch.Application.Auctions.CreateAuction;
+namespace CleanArch.Application.Auctions.Create;
 
 public record CreateAuctionCommand : ICommand<AuctionDto>
 {

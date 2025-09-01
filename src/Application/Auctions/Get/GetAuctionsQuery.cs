@@ -3,7 +3,7 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Domain.Common;
 
-namespace CleanArch.Application.Auctions.GetAuctions;
+namespace CleanArch.Application.Auctions.Get;
 
 public record GetAuctionsQuery(string? Date) : IQuery<List<AuctionDto>>;
 

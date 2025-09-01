@@ -4,7 +4,7 @@ using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Common;
 
-namespace CleanArch.Application.Auctions.GetAuctionById;
+namespace CleanArch.Application.Auctions.GetById;
 
 public sealed record GetAuctionByIdQuery(Guid AuctionId) : IQuery<AuctionDto>;
 

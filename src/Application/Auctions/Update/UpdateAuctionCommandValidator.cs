@@ -1,4 +1,4 @@
-namespace CleanArch.Application.Auctions.UpdateAuction;
+namespace CleanArch.Application.Auctions.Update;
 
 public class UpdateAuctionCommandValidator : AbstractValidator<UpdateAuctionCommand>
 {
