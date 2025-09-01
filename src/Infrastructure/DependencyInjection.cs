@@ -4,9 +4,9 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Infrastructure.Authentication;
 using CleanArch.Infrastructure.BackgroundJobs;
-using CleanArch.Infrastructure.Options;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Idempotence;
+using CleanArch.Infrastructure.Options;
 using CleanArch.Infrastructure.Services;
 using MassTransit;
 using MediatR;
@@ -28,6 +28,7 @@ public static class DependencyInjection
     {
         return services
             .AddServices()
+            .AddPhotoServices(configuration)
             .AddCacheServices(configuration)
             .AddDatabase(env, configuration)
             .AddBackgroundJobsConditionally(configuration)
@@ -41,6 +42,13 @@ public static class DependencyInjection
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<ITelemetryService, TelemetryService>();
 
+        return services;
+    }
+
+    private static IServiceCollection AddPhotoServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddScoped<IPhotoService, PhotoService>();
+        services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
         return services;
     }
 

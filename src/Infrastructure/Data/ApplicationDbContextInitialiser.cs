@@ -6,7 +6,9 @@ using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Items;
 using CleanArch.Domain.Members;
+using CleanArch.Domain.Permissions;
 using CleanArch.Domain.Photos;
+using CleanArch.Domain.Roles;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
@@ -82,13 +84,114 @@ public static class ApplicationDbContextInitialiser
         var usersJsonPath = Path.Combine(seedDir, "users.json");
         var listsJsonPath = Path.Combine(seedDir, "todolists.json");
         var auctionsJsonPath = Path.Combine(seedDir, "auctions.json");
+        var permissionsJsonPath = Path.Combine(seedDir, "permissions.json");
+        var rolesJsonPath = Path.Combine(seedDir, "roles.json");
         logger.LogInformation("Users JSON path: {UsersJsonPath}", usersJsonPath);
+
+        await SeedPermissionsAsync(context, logger, permissionsJsonPath);
+        await SeedRolesAsync(context, logger, rolesJsonPath);
 
         var createdUserIds = await SeedUsersAsync(context, logger, passwordHasher, usersJsonPath);
 
         await SeedTodoListsAsync(context, logger, listsJsonPath, createdUserIds);
 
         await SeedAuctionsAsync(context, logger, auctionsJsonPath);
+    }
+
+    private static async Task SeedPermissionsAsync(
+        ApplicationDbContext context,
+        ILogger logger,
+        string permissionsJsonPath
+    )
+    {
+        if (await context.Permissions.AnyAsync())
+            return;
+
+        if (!File.Exists(permissionsJsonPath))
+        {
+            logger.LogWarning("Permissions seed file not found: {Path}", permissionsJsonPath);
+            return;
+        }
+
+        logger.LogInformation("Seeding permissions from {Path}", permissionsJsonPath);
+        var permissionsJson = await File.ReadAllTextAsync(permissionsJsonPath);
+        var permissionsData = JsonSerializer.Deserialize<List<PermissionSeedDto>>(permissionsJson, _jsonOptions);
+
+        if (permissionsData is null || permissionsData.Count == 0)
+        {
+            logger.LogWarning("No data found in permissions.json");
+            return;
+        }
+
+        foreach (var permissionDto in permissionsData)
+        {
+            var permission = new Permission
+            {
+                Id = permissionDto.Id,
+                Name = permissionDto.Name,
+                DisplayName = permissionDto.DisplayName,
+                Description = permissionDto.Description,
+                Category = permissionDto.Category,
+                IsActive = permissionDto.IsActive,
+            };
+            context.Permissions.Add(permission);
+        }
+
+        await context.SaveChangesAsync();
+        logger.LogInformation("Seeded {PermissionCount} permissions.", permissionsData.Count);
+    }
+
+    private static async Task SeedRolesAsync(ApplicationDbContext context, ILogger logger, string rolesJsonPath)
+    {
+        if (await context.Roles.AnyAsync())
+            return;
+
+        if (!File.Exists(rolesJsonPath))
+        {
+            logger.LogWarning("Roles seed file not found: {Path}", rolesJsonPath);
+            return;
+        }
+
+        logger.LogInformation("Seeding roles with permissions from {Path}", rolesJsonPath);
+        var rolesJson = await File.ReadAllTextAsync(rolesJsonPath);
+        var rolesData = JsonSerializer.Deserialize<List<RoleSeedDto>>(rolesJson, _jsonOptions);
+
+        if (rolesData is null || rolesData.Count == 0)
+        {
+            logger.LogWarning("No data found in roles.json");
+            return;
+        }
+
+        // Load all permissions for mapping
+        var permissions = await context.Permissions.ToListAsync();
+
+        foreach (var roleDto in rolesData)
+        {
+            var role = new Role
+            {
+                Id = roleDto.Id,
+                Name = roleDto.Name,
+                NormalizedName = roleDto.NormalizedName,
+                Description = roleDto.Description,
+                IsDefault = roleDto.IsDefault,
+                IsActive = roleDto.IsActive,
+            };
+
+            // Add permissions to role
+            foreach (var permissionId in roleDto.Permissions)
+            {
+                var permission = permissions.FirstOrDefault(p => p.Id == permissionId);
+                if (permission != null)
+                {
+                    role.AddPermission(permission);
+                }
+            }
+
+            context.Roles.Add(role);
+        }
+
+        await context.SaveChangesAsync();
+        logger.LogInformation("Seeded {RoleCount} roles with permissions.", rolesData.Count);
     }
 
     private static async Task<List<Guid>> SeedUsersAsync(
@@ -98,7 +201,7 @@ public static class ApplicationDbContextInitialiser
         string usersJsonPath
     )
     {
-        List<Guid> createdUserIds = new();
+        List<Guid> createdUserIds = [];
         if (await context.Users.AnyAsync())
         {
             createdUserIds = await context.Users.Select(u => u.Id).ToListAsync();
@@ -163,6 +266,39 @@ public static class ApplicationDbContextInitialiser
         }
 
         await context.SaveChangesAsync();
+
+        // Assign roles to users
+        logger.LogInformation("Assigning roles to users...");
+
+        // Load roles from database
+        var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == "Administrator");
+        var memberRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == "Member");
+
+        if (adminRole == null || memberRole == null)
+        {
+            logger.LogWarning("Could not find Administrator or Member roles for user assignment");
+        }
+        else
+        {
+            // Load users with their roles navigation property
+            var users = await context
+                .Users.Include(u => u.Roles)
+                .Where(u => userData.Select(dto => dto.Id).Contains(u.Id))
+                .ToListAsync();
+
+            foreach (var user in users)
+            {
+                // Assign Administrator role to first user, Member role to others
+                var roleToAssign = user.Id == userData[0].Id ? adminRole : memberRole;
+                user.AssignRole(roleToAssign);
+            }
+
+            await context.SaveChangesAsync();
+            logger.LogInformation(
+                "Assigned Administrator role to first user, Member role to {MemberCount} other users.",
+                users.Count - 1
+            );
+        }
 
         // Collect the created user IDs
         createdUserIds = [.. userData.Select(u => u.Id)];
@@ -353,4 +489,27 @@ public class ItemSeedDto
     public required string Color { get; set; }
     public int Mileage { get; set; }
     public required string ImageUrl { get; set; }
+}
+
+// DTO for seeding Permissions from JSON
+public class PermissionSeedDto
+{
+    public required Guid Id { get; set; }
+    public required string Name { get; set; }
+    public required string DisplayName { get; set; }
+    public required string Description { get; set; }
+    public required string Category { get; set; }
+    public bool IsActive { get; set; } = true;
+}
+
+// DTO for seeding Roles from JSON
+public class RoleSeedDto
+{
+    public required Guid Id { get; set; }
+    public required string Name { get; set; }
+    public required string NormalizedName { get; set; }
+    public required string Description { get; set; }
+    public bool IsDefault { get; set; }
+    public bool IsActive { get; set; } = true;
+    public List<Guid> Permissions { get; set; } = [];
 }

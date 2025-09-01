@@ -1,5 +1,6 @@
+using CleanArch.Application.Common.Behaviours;
+using CleanArch.Application.Common.Security;
 using CleanArch.Application.Members.Queries.GetMembers;
-using CleanArch.Infrastructure.Authentication;
 using CleanArch.Web.Api.Extensions;
 
 namespace CleanArch.Web.Api.Endpoints;
@@ -14,12 +15,12 @@ public class MembersVersioned : EndpointGroupBase, IVersionedEndpointGroup
     {
         groupBuilder
             .MapGet("", GetMembers)
-            .HasPermission(Permissions.ReadMember)
+            .HasPermission(PermissionNames.ReadMember)
             .MapToApiVersion(1)
             .Produces<List<MemberDto>>();
         groupBuilder
             .MapGet("", GetMembersV2)
-            .HasPermission(Permissions.ReadMember)
+            .HasPermission(PermissionNames.ReadMember)
             .MapToApiVersion(2)
             .Produces<List<MemberDto>>();
     }

@@ -1,0 +1,114 @@
+[
+  {
+    "Id": "44444444-4444-4444-4444-444444444444",
+    "Name": "members:read",
+    "DisplayName": "Read Members",
+    "Description": "Can view member information",
+    "Category": "Member Management",
+    "IsActive": true
+  },
+  {
+    "Id": "55555555-5555-5555-5555-555555555555",
+    "Name": "members:update",
+    "DisplayName": "Update Members",
+    "Description": "Can modify member information",
+    "Category": "Member Management",
+    "IsActive": true
+  },
+  {
+    "Id": "66666666-6666-6666-6666-666666666666",
+    "Name": "members:delete",
+    "DisplayName": "Delete Members",
+    "Description": "Can delete members",
+    "Category": "Member Management",
+    "IsActive": true
+  },
+  {
+    "Id": "77777777-7777-7777-7777-777777777777",
+    "Name": "members:create",
+    "DisplayName": "Create Members",
+    "Description": "Can create new members",
+    "Category": "Member Management",
+    "IsActive": true
+  },
+  {
+    "Id": "88888888-8888-8888-8888-888888888888",
+    "Name": "users:read",
+    "DisplayName": "Read Users",
+    "Description": "Can view user information",
+    "Category": "User Management",
+    "IsActive": true
+  },
+  {
+    "Id": "99999999-9999-9999-9999-999999999999",
+    "Name": "users:update",
+    "DisplayName": "Update Users",
+    "Description": "Can modify user information",
+    "Category": "User Management",
+    "IsActive": true
+  },
+  {
+    "Id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    "Name": "users:delete",
+    "DisplayName": "Delete Users",
+    "Description": "Can delete users",
+    "Category": "User Management",
+    "IsActive": true
+  },
+  {
+    "Id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+    "Name": "users:create",
+    "DisplayName": "Create Users",
+    "Description": "Can create new users",
+    "Category": "User Management",
+    "IsActive": true
+  },
+  {
+    "Id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+    "Name": "auctions:read",
+    "DisplayName": "Read Auctions",
+    "Description": "Can view auction information",
+    "Category": "Auction Management",
+    "IsActive": true
+  },
+  {
+    "Id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+    "Name": "auctions:update",
+    "DisplayName": "Update Auctions",
+    "Description": "Can modify auction information",
+    "Category": "Auction Management",
+    "IsActive": true
+  },
+  {
+    "Id": "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
+    "Name": "auctions:delete",
+    "DisplayName": "Delete Auctions",
+    "Description": "Can delete auctions",
+    "Category": "Auction Management",
+    "IsActive": true
+  },
+  {
+    "Id": "ffffffff-ffff-ffff-ffff-ffffffffffff",
+    "Name": "auctions:create",
+    "DisplayName": "Create Auctions",
+    "Description": "Can create new auctions",
+    "Category": "Auction Management",
+    "IsActive": true
+  },
+  {
+    "Id": "10101010-1010-1010-1010-101010101010",
+    "Name": "system:admin",
+    "DisplayName": "System Administrator",
+    "Description": "Full system access",
+    "Category": "System Administration",
+    "IsActive": true
+  },
+  {
+    "Id": "20202020-2020-2020-2020-202020202020",
+    "Name": "system:logs",
+    "DisplayName": "View System Logs",
+    "Description": "Can view system logs",
+    "Category": "System Administration",
+    "IsActive": true
+  }
+]

@@ -5,8 +5,6 @@ using CleanArch.Domain.Constants;
 
 namespace CleanArch.Application.TodoLists.PurgeTodoLists;
 
-[Authorize(Roles = Roles.Administrator)]
-[Authorize(Policy = Policies.CanPurge)]
 public record PurgeTodoListsCommand : IRequest<Result>;
 
 public class PurgeTodoListsCommandHandler(IApplicationDbContext context)

@@ -4,7 +4,9 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
+using CleanArch.Domain.Permissions;
 using CleanArch.Domain.Photos;
+using CleanArch.Domain.Roles;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
@@ -21,6 +23,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<TodoList> TodoLists => Set<TodoList>();
     public DbSet<TodoItem> TodoItems => Set<TodoItem>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<Permission> Permissions => Set<Permission>();
     public DbSet<Auction> Auctions => Set<Auction>();
     public DbSet<Member> Members => Set<Member>();
     public DbSet<Photo> Photos => Set<Photo>();

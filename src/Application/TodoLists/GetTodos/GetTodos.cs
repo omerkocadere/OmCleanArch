@@ -8,7 +8,6 @@ using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.TodoLists.GetTodos;
 
-[Authorize]
 public record GetTodosQuery(Guid UserId) : IRequest<Result<TodosVm>>;
 
 public class GetTodosQueryHandler(IApplicationDbContext context, IUserContext userContext)
