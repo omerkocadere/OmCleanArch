@@ -1,9 +1,9 @@
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Application.Members.Queries.GetMembers;
+using CleanArch.Application.Photos.Commands.UploadPhoto;
 using CleanArch.Domain.Common;
 
-namespace CleanArch.Application.Members.Queries.GetMemberPhotos;
+namespace CleanArch.Application.Photos.Queries.GetMemberPhotos;
 
 public record GetMemberPhotosQuery(Guid MemberId) : IQuery<List<PhotoDto>>;
 

@@ -1,6 +1,5 @@
 using CleanArch.Application.Members.Commands.UpdateMember;
 using CleanArch.Application.Members.Queries.GetMember;
-using CleanArch.Application.Members.Queries.GetMemberPhotos;
 using CleanArch.Application.Members.Queries.GetMembers;
 using CleanArch.Web.Api.Extensions;
 
@@ -13,19 +12,12 @@ public class Members : EndpointGroupBase
         groupBuilder.RequireAuthorization();
 
         groupBuilder.MapGet("/{id:guid}", GetMember).Produces<MemberDto>().Produces(404);
-        groupBuilder.MapGet("/{id:guid}/photos", GetMemberPhotos).Produces<List<PhotoDto>>();
         groupBuilder.MapPut("/", UpdateMember).Produces(204).Produces(404);
     }
 
     private static async Task<IResult> GetMember(Guid id, IMediator mediator)
     {
-        var result = await mediator.Send(new GetMemberQuery(id));
-        return result.Match(Results.Ok, CustomResults.Problem);
-    }
-
-    private static async Task<IResult> GetMemberPhotos(Guid id, IMediator mediator)
-    {
-        var result = await mediator.Send(new GetMemberPhotosQuery(id));
+        var result = await mediator.Send(new GetMemberByIdQuery(id));
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 

@@ -1,9 +1,9 @@
-using CleanArch.Application.Auctions.CreateAuction;
-using CleanArch.Application.Auctions.DeleteAuction;
+using CleanArch.Application.Auctions.Create;
+using CleanArch.Application.Auctions.Delete;
 using CleanArch.Application.Auctions.DTOs;
-using CleanArch.Application.Auctions.GetAuctionById;
-using CleanArch.Application.Auctions.GetAuctions;
-using CleanArch.Application.Auctions.UpdateAuction;
+using CleanArch.Application.Auctions.Get;
+using CleanArch.Application.Auctions.GetById;
+using CleanArch.Application.Auctions.Update;
 using CleanArch.Domain.Common;
 using CleanArch.Web.Api.Extensions;
 

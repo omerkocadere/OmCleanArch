@@ -1,49 +1,59 @@
 using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Common;
+using CleanArch.Domain.Members;
+using CleanArch.Domain.Photos;
 using CloudinaryDotNet.Actions;
 
 namespace CleanArch.Application.Photos.Commands.UploadPhoto;
 
-public record UploadPhotoCommand(PhotoUploadRequest PhotoRequest) : ICommand<PhotoUploadResult>;
+public record UploadPhotoCommand(FileDto FileDto) : ICommand<PhotoDto>;
 
-public record PhotoUploadResult(
-    string Url,
-    string PublicId,
-    int Width,
-    int Height
-);
-
-public class UploadPhotoCommandHandler(IPhotoService photoService) : ICommandHandler<UploadPhotoCommand, PhotoUploadResult>
+public class UploadPhotoCommandHandler(
+    IApplicationDbContext context,
+    IPhotoService photoService,
+    IUserContext userContext
+) : ICommandHandler<UploadPhotoCommand, PhotoDto>
 {
-    public async Task<Result<PhotoUploadResult>> Handle(UploadPhotoCommand request, CancellationToken cancellationToken)
+    public async Task<Result<PhotoDto>> Handle(UploadPhotoCommand request, CancellationToken cancellationToken)
     {
-        try
+        var member = await context
+            .Members.Include(x => x.User)
+            .Include(x => x.Photos)
+            .SingleOrDefaultAsync(x => x.Id == userContext.UserId, cancellationToken);
+
+        if (member is null)
         {
-            ImageUploadResult result = await photoService.UploadPhotoAsync(request.PhotoRequest);
-
-            if (result.Error != null)
-            {
-                return Result.Failure<PhotoUploadResult>(
-                    new Error("Photo.UploadFailed", $"Upload failed: {result.Error.Message}")
-                );
-            }
-
-            var photoResult = new PhotoUploadResult(
-                result.SecureUrl.ToString(),
-                result.PublicId,
-                result.Width,
-                result.Height
-            );
-
-            return Result.Success(photoResult);
+            return Result.Failure<PhotoDto>(MemberErrors.NotFound);
         }
-        catch (Exception ex)
+
+        ImageUploadResult result = await photoService.UploadPhotoAsync(request.FileDto);
+
+        if (result.Error != null)
         {
-            return Result.Failure<PhotoUploadResult>(
-                new Error("Photo.UploadError", $"Upload error: {ex.Message}")
-            );
+            return Result.Failure<PhotoDto>(Domain.Common.Error.Failure("PhotoUploadFailed", result.Error.Message));
         }
+
+        var photo = new Photo
+        {
+            Url = result.SecureUrl.AbsoluteUri,
+            PublicId = result.PublicId,
+            MemberId = member.Id,
+            Member = member,
+        };
+
+        if (member.ImageUrl == null)
+        {
+            member.ImageUrl = photo.Url;
+            member.User.ImageUrl = photo.Url;
+        }
+
+        member.Photos.Add(photo);
+        await context.SaveChangesAsync(cancellationToken);
+
+        var photoResult = new PhotoDto(result.SecureUrl.ToString(), result.PublicId, member.Id);
+
+        return Result.Success(photoResult);
     }
 }

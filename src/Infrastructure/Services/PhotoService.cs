@@ -1,5 +1,5 @@
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Models;
+using CleanArch.Application.Photos.Commands.UploadPhoto;
 using CleanArch.Infrastructure.Options;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -17,7 +17,7 @@ public class PhotoService : IPhotoService
         _cloudinary = new Cloudinary(account);
     }
 
-    public async Task<ImageUploadResult> UploadPhotoAsync(PhotoUploadRequest request)
+    public async Task<ImageUploadResult> UploadPhotoAsync(FileDto request)
     {
         var uploadParams = new ImageUploadParams
         {

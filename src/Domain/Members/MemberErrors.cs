@@ -1,5 +1,3 @@
-using CleanArch.Domain.Common;
-
 namespace CleanArch.Domain.Members;
 
 public static class MemberErrors
