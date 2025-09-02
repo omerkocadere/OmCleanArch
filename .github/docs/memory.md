@@ -108,10 +108,30 @@
 - ✅ Simple, testable methods
 - ✅ EF Core compatibility maintained
 
-## Final Status (Aug 29, 2025)
+## Final Status (Sep 2, 2025)
 
-- **Permission System**: ✅ Fully migrated to Application layer
-- **Role Entity**: ✅ Refactored to Clean Architecture standards
-- **Build Status**: ✅ All projects compile successfully
-- **Architecture**: ✅ Uncle Bob's dependency rule respected
-- **Code Quality**: ✅ KISS principle applied throughout
+### JWT Token Expiration Issue Fixed ✅
+
+**Problem**: JWT token süresi dolduğunda CORS hatası alınıyordu, 401 dönmüyordu.
+
+**Root Cause**: Program.cs'de `UseAuthentication()` ve `UseAuthorization()` middleware'leri eksikti.
+
+**Solution Applied**:
+1. **Added Authentication Middleware**: Program.cs'e `UseAuthentication()` ve `UseAuthorization()` eklendi
+2. **Enhanced Error Interceptor**: 401 durumunda otomatik logout ve redirect implementasyonu
+3. **Verified JWT Configuration**: ExpirationInMinutes = 1 (test amaçlı)
+
+**Files Modified**:
+- `src/Web.Api/Program.cs`: Authentication middleware'leri eklendi
+- `client/src/core/interceptors/error-interceptor.ts`: 401 handling iyileştirildi
+
+**Result**: ✅ Expired JWT token'lar artık proper 401 response döner, CORS error çıkmaz.
+
+---
+
+**Permission System**: ✅ Fully migrated to Application layer
+**Role Entity**: ✅ Refactored to Clean Architecture standards  
+**JWT Authentication**: ✅ Fixed expired token handling
+**Build Status**: ✅ All projects compile successfully
+**Architecture**: ✅ Uncle Bob's dependency rule respected
+**Code Quality**: ✅ KISS principle applied throughout

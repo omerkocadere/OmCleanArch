@@ -6,9 +6,4 @@ public static class MemberErrors
         "Members.NotFound",
         "The member with the specified identifier was not found."
     );
-
-    public static readonly Error NoPhotos = Error.NotFound(
-        "Members.NoPhotos",
-        "No photos found for the specified member."
-    );
 }

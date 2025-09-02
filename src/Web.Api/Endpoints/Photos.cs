@@ -1,4 +1,5 @@
 using CleanArch.Application.Photos.Commands.DeletePhoto;
+using CleanArch.Application.Photos.Commands.SetMainPhoto;
 using CleanArch.Application.Photos.Commands.UploadPhoto;
 using CleanArch.Application.Photos.Queries.GetMemberPhotos;
 using CleanArch.Domain.Common;
@@ -12,8 +13,9 @@ public class Photos : EndpointGroupBase
     {
         groupBuilder.RequireAuthorization();
         groupBuilder.MapGet("/{id:guid}", GetMemberPhotos).Produces<List<PhotoDto>>();
-        groupBuilder.MapPost("upload", AddPhoto).DisableAntiforgery();
-        groupBuilder.MapDelete("{publicId}", DeletePhoto);
+        groupBuilder.MapPost("upload", AddPhoto);
+        groupBuilder.MapPut("set-main-photo/{photoId:guid}", SetMainPhoto);
+        groupBuilder.MapDelete("delete-photo/{photoId:guid}", DeletePhoto);
     }
 
     private static async Task<IResult> GetMemberPhotos(Guid id, IMediator mediator)
@@ -30,19 +32,25 @@ public class Photos : EndpointGroupBase
         using var fileStream = file.OpenReadStream();
 
         var fileDto = new FileDto(fileStream, file.FileName, file.ContentType, file.Length);
-
         var command = new UploadPhotoCommand(fileDto);
-
-        Result<PhotoDto> result = await sender.Send(command);
+        Result<Application.Photos.Commands.UploadPhoto.PhotoDto> result = await sender.Send(command);
 
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    private static async Task<IResult> DeletePhoto(string publicId, ISender sender)
+    private static async Task<IResult> DeletePhoto(Guid photoId, ISender sender)
     {
-        var command = new DeletePhotoCommand(publicId);
+        var command = new DeletePhotoCommand(photoId);
         Result result = await sender.Send(command);
 
         return result.Match(() => Results.Ok(new { Message = "Photo deleted successfully" }), CustomResults.Problem);
+    }
+
+    private static async Task<IResult> SetMainPhoto(Guid photoId, ISender sender)
+    {
+        var command = new SetMainPhotoCommand(photoId);
+        Result result = await sender.Send(command);
+
+        return result.Match(Results.NoContent, CustomResults.Problem);
     }
 }

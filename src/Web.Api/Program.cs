@@ -67,6 +67,9 @@ app.UseStaticFiles();
 
 app.UseCors("LocalCorsPolicy");
 
+// app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseRequestContextLogging();
 
 //app.UseSerilogRequestLogging();

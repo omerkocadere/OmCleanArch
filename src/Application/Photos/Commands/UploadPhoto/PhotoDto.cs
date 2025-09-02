@@ -1,3 +1,3 @@
 namespace CleanArch.Application.Photos.Commands.UploadPhoto;
 
-public record PhotoDto(string Url, string PublicId, Guid MemberId);
+public record PhotoDto(Guid Id, string Url, string PublicId, Guid MemberId);

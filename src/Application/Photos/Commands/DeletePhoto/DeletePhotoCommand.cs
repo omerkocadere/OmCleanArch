@@ -1,32 +1,52 @@
 using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Domain.Common;
+using CleanArch.Domain.Members;
 using CleanArch.Domain.Photos;
 using CloudinaryDotNet.Actions;
 
 namespace CleanArch.Application.Photos.Commands.DeletePhoto;
 
-public record DeletePhotoCommand(string PublicId) : ICommand;
+public record DeletePhotoCommand(Guid PhotoId) : ICommand;
 
-public class DeletePhotoCommandHandler(IPhotoService photoService)
-    : ICommandHandler<DeletePhotoCommand>
+public class DeletePhotoCommandHandler(
+    IApplicationDbContext context,
+    IPhotoService photoService,
+    IUserContext userContext
+) : ICommandHandler<DeletePhotoCommand>
 {
     public async Task<Result> Handle(DeletePhotoCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            DeletionResult result = await photoService.DeletePhotoAsync(request.PublicId);
+        var member = await context
+            .Members.Include(x => x.User)
+            .Include(x => x.Photos)
+            .SingleOrDefaultAsync(x => x.Id == userContext.UserId, cancellationToken);
 
+        if (member is null)
+        {
+            return Result.Failure(MemberErrors.NotFound);
+        }
+
+        var photo = member.Photos.SingleOrDefault(x => x.Id == request.PhotoId);
+
+        if (photo == null || photo.Url == member.ImageUrl)
+        {
+            return Result.Failure(PhotoErrors.CannotDelete);
+        }
+
+        if (photo.PublicId != null)
+        {
+            var result = await photoService.DeletePhotoAsync(photo.PublicId);
             if (result.Error != null)
             {
-                return Result.Failure(PhotoErrors.DeleteFailed);
+                return Result.Failure(Domain.Common.Error.Failure("Photo.DeleteFailed", result.Error.Message));
             }
+        }
 
-            return Result.Success();
-        }
-        catch (Exception)
-        {
-            return Result.Failure(PhotoErrors.DeleteError);
-        }
+        member.Photos.Remove(photo);
+        await context.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
     }
 }

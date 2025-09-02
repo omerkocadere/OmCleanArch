@@ -32,7 +32,7 @@ public class UploadPhotoCommandHandler(
 
         if (result.Error != null)
         {
-            return Result.Failure<PhotoDto>(Domain.Common.Error.Failure("PhotoUploadFailed", result.Error.Message));
+            return Result.Failure<PhotoDto>(Domain.Common.Error.Failure("Photo.UploadFailed", result.Error.Message));
         }
 
         var photo = new Photo
@@ -52,7 +52,7 @@ public class UploadPhotoCommandHandler(
         member.Photos.Add(photo);
         await context.SaveChangesAsync(cancellationToken);
 
-        var photoResult = new PhotoDto(result.SecureUrl.ToString(), result.PublicId, member.Id);
+        var photoResult = new PhotoDto(photo.Id, result.SecureUrl.ToString(), result.PublicId, member.Id);
 
         return Result.Success(photoResult);
     }

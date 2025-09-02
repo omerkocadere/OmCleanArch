@@ -9,10 +9,12 @@ import { NavigationExtras, Router } from '@angular/router';
 import { catchError, tap } from 'rxjs';
 import { ProblemDetails, ValidationError } from '../../types/error';
 import { ToastService } from '../services/toast-service';
+import { AccountService } from '../services/account-service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(ToastService);
   const router = inject(Router);
+  const accountService = inject(AccountService);
 
   logRequest(req);
 
@@ -35,7 +37,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             toast.error(errorMessage);
             break;
           case 401:
-            toast.error(errorMessage);
+            toast.error('Your session has expired. Please login again.');
+            accountService.logout();
+            router.navigateByUrl('/');
             break;
           case 404:
             router.navigateByUrl('/not-found');
