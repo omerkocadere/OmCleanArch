@@ -13,14 +13,15 @@ public class MembersVersioned : EndpointGroupBase, IVersionedEndpointGroup
 
     public override void Map(RouteGroupBuilder groupBuilder)
     {
+        groupBuilder.RequireAuthorization();
         groupBuilder
             .MapGet("", GetMembers)
-            .HasPermission(PermissionNames.ReadMember)
+            // .HasPermission(PermissionNames.ReadMember)
             .MapToApiVersion(1)
             .Produces<List<MemberDto>>();
         groupBuilder
             .MapGet("", GetMembersV2)
-            .HasPermission(PermissionNames.ReadMember)
+            // .HasPermission(PermissionNames.ReadMember)
             .MapToApiVersion(2)
             .Produces<List<MemberDto>>();
     }

@@ -1,4 +1,9 @@
-import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+import {
+  HttpErrorResponse,
+  HttpEventType,
+  HttpInterceptorFn,
+  HttpRequest,
+} from '@angular/common/http';
 import { inject } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { catchError, tap } from 'rxjs';
@@ -12,8 +17,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   logRequest(req);
 
   return next(req).pipe(
-    tap((response) => {
-      logResponse(req, undefined, response);
+    tap((event) => {
+      // Only log when we get the actual HttpResponse (not intermediate events)
+      if (event.type === HttpEventType.Response) {
+        // HttpEventType.Response
+        logResponse(req, undefined, event);
+      }
     }),
     catchError((error: HttpErrorResponse) => {
       logResponse(req, error);

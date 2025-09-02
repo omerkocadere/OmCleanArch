@@ -10,18 +10,10 @@ public class Photos : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {
+        groupBuilder.RequireAuthorization();
         groupBuilder.MapGet("/{id:guid}", GetMemberPhotos).Produces<List<PhotoDto>>();
-
-        groupBuilder
-            .MapPost("upload", AddPhoto)
-            .DisableAntiforgery() // Required for file uploads
-            .WithSummary("Upload a photo to Cloudinary")
-            .WithDescription("Uploads a photo file and returns Cloudinary URL");
-
-        groupBuilder
-            .MapDelete("{publicId}", DeletePhoto)
-            .WithSummary("Delete a photo from Cloudinary")
-            .WithDescription("Deletes a photo using its public ID");
+        groupBuilder.MapPost("upload", AddPhoto).DisableAntiforgery();
+        groupBuilder.MapDelete("{publicId}", DeletePhoto);
     }
 
     private static async Task<IResult> GetMemberPhotos(Guid id, IMediator mediator)
