@@ -14,7 +14,7 @@ export class MemberService {
   member = signal<Member | null>(null);
 
   getMembers() {
-    return this.http.get<Member[]>(this.baseUrl + 'members');
+    return this.http.get<Member[]>(this.baseUrl + 'v1/members');
   }
 
   getMember(id: string) {
@@ -26,7 +26,7 @@ export class MemberService {
   }
 
   getMemberPhotos(id: string) {
-    return this.http.get<Photo[]>(this.baseUrl + 'members/' + id + '/photos');
+    return this.http.get<Photo[]>(this.baseUrl + 'members/' + id);
   }
 
   updateMember(member: EditableMember) {

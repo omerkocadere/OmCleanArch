@@ -5,13 +5,16 @@ function Log {
     Write-Host "[$timestamp] $message"
 }
 
-# Set paths
-$angularClientPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\client"
-$WebApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\src\Web.Api"
-$DummyApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\Dummy.Api"
-$SearchApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\SearchService"
-$IdentityApiPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\IdentityService"
-$GatewayPath = "D:\Codes\Omer\CleanArchitecture\OmCleanArch\other-services\GatewayService"
+# Get the current script directory
+$scriptDir = $PSScriptRoot
+
+# Set paths (relative to script directory)
+$angularClientPath = Join-Path $scriptDir "client"                          # Angular frontend
+$WebApiPath = Join-Path $scriptDir "src\Web.Api"                           # Main Web API
+$DummyApiPath = Join-Path $scriptDir "other-services\Dummy.Api"            # Test/Demo API
+$SearchApiPath = Join-Path $scriptDir "other-services\SearchService"       # Search microservice
+$IdentityApiPath = Join-Path $scriptDir "other-services\IdentityService"   # Identity/Auth service
+$GatewayPath = Join-Path $scriptDir "other-services\GatewayService"        # API Gateway
 
 # Start Angular Client
 Log "Checking Angular dependencies in '$angularClientPath'..."

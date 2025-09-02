@@ -29,3 +29,9 @@ docker run -e "ACCEPT_EULA=1" -e "MSSQL_SA_PASSWORD=Aa123456!" -p 1433:1433 --na
 ```sh
 docker build -f src/Web.Api/Dockerfile -t testing123 .
 ```
+
+
+```sh
+dotnet dev-certs https --trust
+```
+
