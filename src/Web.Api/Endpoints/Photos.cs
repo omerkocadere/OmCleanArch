@@ -13,7 +13,7 @@ public class Photos : EndpointGroupBase
     {
         groupBuilder.RequireAuthorization();
         groupBuilder.MapGet("/{id:guid}", GetMemberPhotos).Produces<List<PhotoDto>>();
-        groupBuilder.MapPost("upload", AddPhoto);
+        groupBuilder.MapPost("upload", AddPhoto).DisableAntiforgery();
         groupBuilder.MapPut("set-main-photo/{photoId:guid}", SetMainPhoto);
         groupBuilder.MapDelete("delete-photo/{photoId:guid}", DeletePhoto);
     }
