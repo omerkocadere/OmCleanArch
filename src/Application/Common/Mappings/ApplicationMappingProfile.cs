@@ -1,8 +1,11 @@
 using CleanArch.Application.Auctions.Create;
 using CleanArch.Application.Auctions.DTOs;
 using CleanArch.Application.TodoItems.DTOs;
+using CleanArch.Application.Users.Create;
 using CleanArch.Domain.Auctions;
+using CleanArch.Domain.Members;
 using CleanArch.Domain.TodoItems;
+using CleanArch.Domain.Users;
 using Contracts;
 using Mapster;
 
@@ -35,8 +38,7 @@ public static class MappingConfig
 
         #region Users
 
-        // User -> UserDto: Otomatik
-        // CreateUserCommand -> User: Otomatik
+        TypeAdapterConfig<CreateUserCommand, User>.NewConfig().Ignore(dest => dest.Email);
 
         #endregion
 

@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 using CleanArch.Domain.Photos;
 using CleanArch.Domain.Users;
 
 namespace CleanArch.Domain.Members;
 
-public class Member : BaseAuditableEntity<Guid> // Dependent Entity - ISoftDelete YOK
+public class Member : BaseAuditableEntity<Guid>
 {
     public DateOnly DateOfBirth { get; set; }
     public string? ImageUrl { get; set; }

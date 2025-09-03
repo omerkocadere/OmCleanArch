@@ -14,7 +14,7 @@
       }
     },
     {
-      "name": "C#: Web.API Debug",
+      "name": "C#: Web.API Debug (HTTPS)",
       "type": "dotnet",
       "request": "launch",
       "projectPath": "${workspaceFolder}/src/Web.Api/Web.Api.csproj"

@@ -26,9 +26,9 @@ internal sealed class LoginCommandHandler(
         {
             return Result.Failure<UserDto>(emailResult.Error);
         }
-    
+
         var user = await context.Users.SingleOrDefaultAsync(u => u.Email == emailResult.Value, cancellationToken);
-    
+
         if (user == null)
         {
             return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
@@ -40,9 +40,8 @@ internal sealed class LoginCommandHandler(
             return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
         }
 
-        string token = tokenProvider.Create(user);
         var userDto = user.Adapt<UserDto>();
-        userDto.Token = token;
+        userDto.Token = tokenProvider.Create(user);
 
         return userDto;
     }
