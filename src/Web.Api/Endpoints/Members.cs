@@ -12,8 +12,8 @@ public class Members : EndpointGroupBase
         groupBuilder.RequireAuthorization();
         groupBuilder.AddUserActivityTracking();
 
-        groupBuilder.MapGet("/{id:guid}", GetMember).Produces<MemberDto>().Produces(404);
         groupBuilder.MapPut("/", UpdateMember).Produces(204).Produces(404);
+        groupBuilder.MapGet("/{id:guid}", GetMember).Produces<MemberDto>().Produces(404);
     }
 
     private static async Task<IResult> GetMember(Guid id, IMediator mediator)
