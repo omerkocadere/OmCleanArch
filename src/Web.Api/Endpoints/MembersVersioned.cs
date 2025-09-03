@@ -1,4 +1,5 @@
 using CleanArch.Application.Common.Behaviours;
+using CleanArch.Application.Common.Models;
 using CleanArch.Application.Common.Security;
 using CleanArch.Application.Members.Queries.GetMembers;
 using CleanArch.Web.Api.Extensions;
@@ -18,31 +19,37 @@ public class MembersVersioned : EndpointGroupBase, IVersionedEndpointGroup
             .MapGet("", GetMembers)
             // .HasPermission(PermissionNames.ReadMember)
             .MapToApiVersion(1)
-            .Produces<List<MemberDto>>();
+            .Produces<PaginatedList<MemberDto>>();
         groupBuilder
             .MapGet("", GetMembersV2)
             // .HasPermission(PermissionNames.ReadMember)
             .MapToApiVersion(2)
-            .Produces<List<MemberDto>>();
+            .Produces<PaginatedList<MemberDto>>();
     }
 
-    private static async Task<IResult> GetMembers([AsParameters] GetMembersQuery query, IMediator mediator)
+    private static async Task<IResult> GetMembers(IMediator mediator, int pageNumber = 1, int pageSize = 10)
     {
-        var result = await mediator.Send(query);
+        var pagingParams = new PagingParams { PageNumber = pageNumber, PageSize = pageSize };
+        var result = await mediator.Send(new GetMembersQuery(pagingParams));
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    private static async Task<IResult> GetMembersV2([AsParameters] GetMembersQuery query, IMediator mediator)
+    private static async Task<IResult> GetMembersV2(IMediator mediator, int pageNumber = 1, int pageSize = 10)
     {
-        var result = await mediator.Send(query);
+        var pagingParams = new PagingParams { PageNumber = pageNumber, PageSize = pageSize };
+        var result = await mediator.Send(new GetMembersQuery(pagingParams));
         return result.Match(
             members =>
                 Results.Ok(
                     new
                     {
-                        Data = members,
+                        Data = members.Items,
                         Version = "2.0",
-                        members.Count,
+                        Count = members.TotalCount,
+                        PageNumber = members.PageNumber,
+                        TotalPages = members.TotalPages,
+                        HasNextPage = members.HasNextPage,
+                        HasPreviousPage = members.HasPreviousPage,
                     }
                 ),
             CustomResults.Problem

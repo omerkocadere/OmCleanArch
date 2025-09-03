@@ -1,16 +1,26 @@
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Common.Mappings;
+using CleanArch.Application.Common.Models;
 using CleanArch.Domain.Common;
 
 namespace CleanArch.Application.Members.Queries.GetMembers;
 
-public record GetMembersQuery : IQuery<List<MemberDto>>;
+public record GetMembersQuery(PagingParams PagingParams) : IQuery<PaginatedList<MemberDto>>;
 
-public class GetMembersQueryHandler(IApplicationDbContext context) : IQueryHandler<GetMembersQuery, List<MemberDto>>
+public class GetMembersQueryHandler(IApplicationDbContext context)
+    : IQueryHandler<GetMembersQuery, PaginatedList<MemberDto>>
 {
-    public async Task<Result<List<MemberDto>>> Handle(GetMembersQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PaginatedList<MemberDto>>> Handle(
+        GetMembersQuery request,
+        CancellationToken cancellationToken
+    )
     {
-        return await context.Members.ProjectToListAsync<MemberDto>();
+        var query = context.Members.OrderBy(x => x.DisplayName);
+
+        return await query.ProjectToPaginatedListAsync<MemberDto>(
+            request.PagingParams.PageNumber,
+            request.PagingParams.PageSize
+        );
     }
 }
