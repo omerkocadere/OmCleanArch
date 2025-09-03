@@ -68,4 +68,25 @@ public static class WebApplicationExtensions
     {
         return routeGroupBuilder.AddEndpointFilter<UserActivityEndpointFilter>();
     }
+
+    /// <summary>
+    /// Adds authorization requirement and automatically includes user activity tracking.
+    /// Use this instead of RequireAuthorization() to get automatic activity tracking on auth-required endpoints.
+    /// </summary>
+    public static RouteGroupBuilder RequireAuthorizationWithTracking(this RouteGroupBuilder routeGroupBuilder)
+    {
+        return routeGroupBuilder.RequireAuthorization().AddUserActivityTracking();
+    }
+
+    /// <summary>
+    /// Adds authorization requirement for specific policy and automatically includes user activity tracking.
+    /// Use this instead of RequireAuthorization(policy) to get automatic activity tracking.
+    /// </summary>
+    public static RouteGroupBuilder RequireAuthorizationWithTracking(
+        this RouteGroupBuilder routeGroupBuilder,
+        string policy
+    )
+    {
+        return routeGroupBuilder.RequireAuthorization(policy).AddUserActivityTracking();
+    }
 }

@@ -9,8 +9,8 @@ public class Members : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {
-        groupBuilder.RequireAuthorization();
-        groupBuilder.AddUserActivityTracking();
+        // Authorization + automatic user activity tracking
+        groupBuilder.RequireAuthorizationWithTracking();
 
         groupBuilder.MapPut("/", UpdateMember).Produces(204).Produces(404);
         groupBuilder.MapGet("/{id:guid}", GetMember).Produces<MemberDto>().Produces(404);
