@@ -117,11 +117,13 @@
 **Root Cause**: Program.cs'de `UseAuthentication()` ve `UseAuthorization()` middleware'leri eksikti.
 
 **Solution Applied**:
+
 1. **Added Authentication Middleware**: Program.cs'e `UseAuthentication()` ve `UseAuthorization()` eklendi
 2. **Enhanced Error Interceptor**: 401 durumunda otomatik logout ve redirect implementasyonu
 3. **Verified JWT Configuration**: ExpirationInMinutes = 1 (test amaçlı)
 
 **Files Modified**:
+
 - `src/Web.Api/Program.cs`: Authentication middleware'leri eklendi
 - `client/src/core/interceptors/error-interceptor.ts`: 401 handling iyileştirildi
 
@@ -132,6 +134,70 @@
 **Permission System**: ✅ Fully migrated to Application layer
 **Role Entity**: ✅ Refactored to Clean Architecture standards  
 **JWT Authentication**: ✅ Fixed expired token handling
+**User Activity Tracking**: ✅ Implemented with CQRS and middleware pattern
 **Build Status**: ✅ All projects compile successfully
 **Architecture**: ✅ Uncle Bob's dependency rule respected
 **Code Quality**: ✅ KISS principle applied throughout
+
+### User Activity Tracking Implementation - BEST PRACTICE VERSION (Sep 4, 2025)
+
+**Problem**: Need to track user activity (LastActive) for authenticated users on every API request.
+
+**Research Conducted**:
+
+- Microsoft official documentation on middleware order
+- Stack Overflow discussions on middleware vs filters
+- ASP.NET Core endpoint filter documentation
+
+**Key Findings**:
+
+1. **Microsoft's Official Middleware Order**: Authentication → Authorization → Endpoints
+2. **Middleware vs Filters Best Practice**:
+   - Middleware: For cross-cutting concerns affecting ALL requests
+   - Endpoint Filters: For logic specific to certain endpoints only
+   - Filters have access to MVC context, middleware works at HttpContext level
+
+**Final Solution - Endpoint Filter Approach (BEST PRACTICE)**:
+
+1. **CQRS Command**: `UpdateUserActivityCommand` in Application layer
+
+   - Uses `IUserContext` to get current user ID
+   - Updates `Member.LastActive` using efficient `ExecuteUpdateAsync`
+   - Graceful handling when user is not authenticated
+
+2. **Endpoint Filter Implementation**: `UserActivityEndpointFilter`
+
+   - Implements `IEndpointFilter` interface
+   - Only runs on specific endpoints where registered
+   - Has access to DI container for `IMediator` and `ILogger`
+   - Uses fire-and-forget pattern to avoid blocking responses
+   - Better performance than middleware (doesn't run on all requests)
+
+3. **Clean Architecture Compliance**:
+   - Business logic in Application layer
+   - Web concerns in Web.Api layer
+   - Proper dependency direction maintained
+
+**Files Created/Modified**:
+
+- **Kept**: `src/Application/Members/Commands/UpdateUserActivity/UpdateUserActivityCommand.cs`
+- **Created**: `src/Web.Api/Filters/UserActivityEndpointFilter.cs` (BEST PRACTICE)
+- **Modified**: `src/Web.Api/Extensions/MiddlewareExtensions.cs` (endpoint filter extensions)
+- **Modified**: `src/Web.Api/Endpoints/Members.cs` (added filter to member endpoints)
+- **Modified**: `src/Web.Api/Program.cs` (removed middleware, fixed auth order)
+- **Removed**: `src/Web.Api/Middleware/UserActivityMiddleware.cs` (replaced with filter)
+
+**Technical Improvements Over Middleware**:
+
+- ✅ **Performance**: Only runs on specific endpoints, not all requests
+- ✅ **Precision**: Only applies to authenticated endpoints
+- ✅ **Context Access**: Has full access to endpoint context and DI
+- ✅ **Best Practice**: Follows Microsoft recommended patterns
+- ✅ **Maintainability**: Easier to test and modify per endpoint
+
+**Authentication Middleware Order Fixed**:
+
+- **Before**: `Authentication → UserActivity → Authorization` (WRONG)
+- **After**: `Authentication → Authorization` (CORRECT per Microsoft docs)
+
+**Result**: ✅ Best practice implementation that only tracks activity on authenticated API endpoints with optimal performance and clean architecture compliance.

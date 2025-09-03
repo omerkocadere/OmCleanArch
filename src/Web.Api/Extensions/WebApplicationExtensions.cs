@@ -1,5 +1,6 @@
 using System.Reflection;
 using Asp.Versioning;
+using CleanArch.Web.Api.Filters;
 
 namespace CleanArch.Web.Api.Extensions;
 
@@ -56,5 +57,15 @@ public static class WebApplicationExtensions
     public static RouteHandlerBuilder HasPermission(this RouteHandlerBuilder app, string permission)
     {
         return app.RequireAuthorization(permission);
+    }
+
+    /// <summary>
+    /// Adds user activity tracking endpoint filter to all endpoints in the route group.
+    /// Best practice: Use endpoint filters instead of middleware for endpoint-specific logic.
+    /// This approach is more efficient as it only runs on specific endpoints rather than all requests.
+    /// </summary>
+    public static RouteGroupBuilder AddUserActivityTracking(this RouteGroupBuilder routeGroupBuilder)
+    {
+        return routeGroupBuilder.AddEndpointFilter<UserActivityEndpointFilter>();
     }
 }
