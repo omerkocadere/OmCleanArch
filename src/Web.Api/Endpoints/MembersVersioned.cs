@@ -27,17 +27,15 @@ public class MembersVersioned : EndpointGroupBase, IVersionedEndpointGroup
             .Produces<PaginatedList<MemberDto>>();
     }
 
-    private static async Task<IResult> GetMembers(IMediator mediator, int pageNumber = 1, int pageSize = 10)
+    private static async Task<IResult> GetMembers(IMediator mediator, [AsParameters] MemberParams memberParams)
     {
-        var pagingParams = new PagingParams { PageNumber = pageNumber, PageSize = pageSize };
-        var result = await mediator.Send(new GetMembersQuery(pagingParams));
+        var result = await mediator.Send(new GetMembersQuery(memberParams));
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
-    private static async Task<IResult> GetMembersV2(IMediator mediator, int pageNumber = 1, int pageSize = 10)
+    private static async Task<IResult> GetMembersV2(IMediator mediator, [AsParameters] MemberParams memberParams)
     {
-        var pagingParams = new PagingParams { PageNumber = pageNumber, PageSize = pageSize };
-        var result = await mediator.Send(new GetMembersQuery(pagingParams));
+        var result = await mediator.Send(new GetMembersQuery(memberParams));
         return result.Match(
             members =>
                 Results.Ok(
@@ -50,6 +48,13 @@ public class MembersVersioned : EndpointGroupBase, IVersionedEndpointGroup
                         TotalPages = members.TotalPages,
                         HasNextPage = members.HasNextPage,
                         HasPreviousPage = members.HasPreviousPage,
+                        Filters = new
+                        {
+                            memberParams.Gender,
+                            memberParams.MinAge,
+                            memberParams.MaxAge,
+                            memberParams.OrderBy
+                        }
                     }
                 ),
             CustomResults.Problem
