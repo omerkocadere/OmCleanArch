@@ -488,4 +488,4 @@ $RECYCLE.BIN/
 **/seq-data
 **/Migrations
 **/.containers
-[src/Web.Api/appsettings.json]
+src/Web.Api/appsettings.json
