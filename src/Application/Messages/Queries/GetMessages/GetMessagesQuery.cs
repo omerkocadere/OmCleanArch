@@ -1,0 +1,51 @@
+using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Authentication;
+using CleanArch.Application.Common.Interfaces.Messaging;
+using CleanArch.Application.Common.Mappings;
+using CleanArch.Application.Common.Models;
+using CleanArch.Application.Messages.Queries.Common;
+using CleanArch.Domain.Common;
+using CleanArch.Domain.Members;
+using CleanArch.Domain.Users;
+using Mapster;
+using Microsoft.EntityFrameworkCore;
+
+namespace CleanArch.Application.Messages.Queries.GetMessages;
+
+public record GetMessagesQuery(MessageParams MessageParams) : IQuery<PaginatedList<MessageDto>>;
+
+public class GetMessagesQueryHandler(IApplicationDbContext context, IUserContext userContext)
+    : IQueryHandler<GetMessagesQuery, PaginatedList<MessageDto>>
+{
+    public async Task<Result<PaginatedList<MessageDto>>> Handle(
+        GetMessagesQuery request,
+        CancellationToken cancellationToken
+    )
+    {
+        var userId = request.MessageParams.MemberId ?? userContext.UserId;
+
+        if (!userId.HasValue)
+            return Result.Failure<PaginatedList<MessageDto>>(UserErrors.NotFound(Guid.Empty));
+
+        // Get member
+        var member = await context.Members.FirstOrDefaultAsync(m => m.Id == userId.Value, cancellationToken);
+
+        if (member == null)
+            return Result.Failure<PaginatedList<MessageDto>>(MemberErrors.NotFound);
+
+        var query = context.Messages.OrderByDescending(x => x.MessageSent).AsQueryable();
+
+        query = request.MessageParams.Container switch
+        {
+            "Outbox" => query.Where(x => x.SenderId == member.Id && !x.SenderDeleted),
+            _ => query.Where(x => x.RecipientId == member.Id && !x.RecipientDeleted),
+        };
+
+        var messageQuery = query.ProjectToType<MessageDto>();
+
+        return await messageQuery.ProjectToPaginatedListAsync<MessageDto>(
+            request.MessageParams.PageNumber,
+            request.MessageParams.PageSize
+        );
+    }
+}

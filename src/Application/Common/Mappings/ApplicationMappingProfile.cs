@@ -1,9 +1,11 @@
 using CleanArch.Application.Auctions.Create;
 using CleanArch.Application.Auctions.DTOs;
+using CleanArch.Application.Messages.Queries.Common;
 using CleanArch.Application.TodoItems.DTOs;
 using CleanArch.Application.Users.Create;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Members;
+using CleanArch.Domain.Messages;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.Users;
 using Contracts;
@@ -60,6 +62,18 @@ public static class MappingConfig
 
         // Member -> MemberDto: Otomatik (property isimleri aynı)
         // Photo -> PhotoDto: Otomatik (property isimleri aynı)
+
+        #endregion
+
+        #region Messages
+
+        // Message -> MessageDto: Map navigation properties
+        TypeAdapterConfig<Message, MessageDto>
+            .NewConfig()
+            .Map(dest => dest.SenderDisplayName, src => src.Sender.DisplayName)
+            .Map(dest => dest.SenderImageUrl, src => src.Sender.ImageUrl ?? string.Empty)
+            .Map(dest => dest.RecipientDisplayName, src => src.Recipient.DisplayName)
+            .Map(dest => dest.RecipientImageUrl, src => src.Recipient.ImageUrl ?? string.Empty);
 
         #endregion
     }
