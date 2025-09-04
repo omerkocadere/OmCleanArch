@@ -19,6 +19,7 @@ public interface IApplicationDbContext
     DbSet<Auction> Auctions { get; }
     DbSet<Member> Members { get; }
     DbSet<Photo> Photos { get; }
+    DbSet<MemberLike> Likes { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

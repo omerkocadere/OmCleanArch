@@ -1,22 +1,22 @@
 import { inject, Injectable } from '@angular/core';
 import { AccountService } from './account-service';
+import { of } from 'rxjs';
+import { LikesService } from './likes-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class InitService {
   private accountService = inject(AccountService);
+  private likesService = inject(LikesService);
 
-  init(): void {
+  init() {
     const userString = localStorage.getItem('user');
-    if (!userString) return;
+    if (!userString) return of(null);
+    const user = JSON.parse(userString);
+    this.accountService.currentUser.set(user);
+    this.likesService.getLikeIds();
 
-    try {
-      const user = JSON.parse(userString);
-      this.accountService.currentUser.set(user);
-    } catch (error) {
-      console.error('Error parsing user data from localStorage:', error);
-      localStorage.removeItem('user'); // Remove corrupted data
-    }
+    return of(null);
   }
 }
