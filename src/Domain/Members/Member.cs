@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using CleanArch.Domain.Messages;
 using CleanArch.Domain.Photos;
 using CleanArch.Domain.Users;
 
@@ -19,7 +20,8 @@ public class Member : BaseAuditableEntity<Guid>
     public List<Photo> Photos { get; set; } = [];
     public List<MemberLike> LikedByMembers { get; set; } = [];
     public List<MemberLike> LikedMembers { get; set; } = [];
-
+    public List<Message> MessagesSent { get; set; } = [];
+    public List<Message> MessagesReceived { get; set; } = [];
 
     [ForeignKey(nameof(Id))]
     public required User User { get; set; }

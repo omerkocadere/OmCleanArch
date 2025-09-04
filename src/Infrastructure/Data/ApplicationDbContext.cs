@@ -4,6 +4,7 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
+using CleanArch.Domain.Messages;
 using CleanArch.Domain.Permissions;
 using CleanArch.Domain.Photos;
 using CleanArch.Domain.Roles;
@@ -29,6 +30,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Member> Members => Set<Member>();
     public DbSet<Photo> Photos => Set<Photo>();
     public DbSet<MemberLike> Likes => Set<MemberLike>();
+    public DbSet<Message> Messages => Set<Message>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     public DbSet<OutboxMessageConsumer> OutboxMessageConsumers => Set<OutboxMessageConsumer>();
 

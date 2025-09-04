@@ -1,5 +1,6 @@
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Members;
+using CleanArch.Domain.Messages;
 using CleanArch.Domain.Permissions;
 using CleanArch.Domain.Photos;
 using CleanArch.Domain.Roles;
@@ -20,6 +21,7 @@ public interface IApplicationDbContext
     DbSet<Member> Members { get; }
     DbSet<Photo> Photos { get; }
     DbSet<MemberLike> Likes { get; }
+    DbSet<Message> Messages { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
