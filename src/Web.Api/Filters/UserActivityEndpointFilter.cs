@@ -32,7 +32,7 @@ public class UserActivityEndpointFilter(
                     await using var scope = serviceScopeFactory.CreateAsyncScope();
                     var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-                    await mediator.Send(new UpdateUserActivityCommand());
+                    await mediator.Send(new UpdateUserActivityCommand(userId));
                 }
                 catch (Exception ex)
                 {
