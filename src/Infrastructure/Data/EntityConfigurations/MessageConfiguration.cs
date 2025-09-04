@@ -8,8 +8,16 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
 {
     public void Configure(EntityTypeBuilder<Message> builder)
     {
-        builder.HasOne(x => x.Recipient).WithMany(m => m.MessagesReceived).OnDelete(DeleteBehavior.Restrict);
+        builder
+            .HasOne(x => x.Recipient)
+            .WithMany(m => m.MessagesReceived)
+            .HasForeignKey(x => x.RecipientId)
+            .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(x => x.Sender).WithMany(m => m.MessagesSent).OnDelete(DeleteBehavior.Restrict);
+        builder
+            .HasOne(x => x.Sender)
+            .WithMany(m => m.MessagesSent)
+            .HasForeignKey(x => x.SenderId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

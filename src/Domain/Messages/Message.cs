@@ -11,8 +11,8 @@ public class Message : BaseEntity<Guid>
     public bool RecipientDeleted { get; set; }
 
     // nav properties
-    public required string SenderId { get; set; }
+    public required Guid SenderId { get; set; }
     public Member Sender { get; set; } = null!;
-    public required string RecipientId { get; set; }
+    public required Guid RecipientId { get; set; }
     public Member Recipient { get; set; } = null!;
 }
