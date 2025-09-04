@@ -52,8 +52,7 @@ public class CreateUserCommandHandler(
         user.Member = member;
 
         // Set the same ID for one-to-one relationship
-        // member.Id = user.Id;
-        // member.User = user;
+        member.Id = user.Id;
 
         user.AddDomainEvent(new UserCreatedDomainEvent(Guid.NewGuid(), user));
 

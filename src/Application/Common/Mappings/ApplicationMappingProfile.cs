@@ -3,6 +3,7 @@ using CleanArch.Application.Auctions.DTOs;
 using CleanArch.Application.Messages.Queries.Common;
 using CleanArch.Application.TodoItems.DTOs;
 using CleanArch.Application.Users.Create;
+using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Messages;
@@ -41,6 +42,10 @@ public static class MappingConfig
         #region Users
 
         TypeAdapterConfig<CreateUserCommand, User>.NewConfig().Ignore(dest => dest.Email);
+
+        // User -> UserDto: Map Email value object to string
+        TypeAdapterConfig<User, UserDto>.NewConfig()
+            .Map(dest => dest.Email, src => src.Email.Value);
 
         #endregion
 

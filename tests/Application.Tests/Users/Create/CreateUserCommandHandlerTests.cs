@@ -1,4 +1,5 @@
 using CleanArch.Application.Users.Create;
+using CleanArch.Application.Common.Mappings;
 
 namespace CleanArch.Application.Tests.Users.Create;
 
@@ -8,6 +9,11 @@ public class CreateUserCommandHandlerTests
     private readonly Mock<IPasswordHasher> _mockPasswordHasher;
     private readonly Mock<ITokenProvider> _mockTokenProvider;
     private readonly CreateUserCommandHandler _handler;
+
+    static CreateUserCommandHandlerTests()
+    {
+        MappingConfig.Configure();
+    }
 
     public CreateUserCommandHandlerTests()
     {
@@ -148,7 +154,7 @@ public class CreateUserCommandHandlerTests
 
         capturedUser.Should().NotBeNull();
         capturedUser!.Id.Should().NotBeEmpty();
-        capturedUser.Email.Should().Be(command.Email);
+        capturedUser.Email.Value.Should().Be(command.Email);
         capturedUser.DisplayName.Should().Be(command.DisplayName);
         capturedUser.FirstName.Should().Be(command.FirstName);
         capturedUser.LastName.Should().Be(command.LastName);
