@@ -5,12 +5,10 @@ using CleanArch.Application.TodoItems.DTOs;
 using CleanArch.Application.Users.Create;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Auctions;
-using CleanArch.Domain.Members;
 using CleanArch.Domain.Messages;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.Users;
 using Contracts;
-using Mapster;
 
 namespace CleanArch.Application.Common.Mappings;
 
@@ -44,8 +42,7 @@ public static class MappingConfig
         TypeAdapterConfig<CreateUserCommand, User>.NewConfig().Ignore(dest => dest.Email);
 
         // User -> UserDto: Map Email value object to string
-        TypeAdapterConfig<User, UserDto>.NewConfig()
-            .Map(dest => dest.Email, src => src.Email.Value);
+        TypeAdapterConfig<User, UserDto>.NewConfig().Map(dest => dest.Email, src => src.Email.Value);
 
         #endregion
 

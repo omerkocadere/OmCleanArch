@@ -6,6 +6,7 @@ using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Messages;
 using CleanArch.Domain.Users;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Application.Messages.Commands.CreateMessage;
@@ -43,24 +44,15 @@ public class CreateMessageCommandHandler(IApplicationDbContext context, IUserCon
             RecipientId = recipient.Id,
             Content = request.Content,
             MessageSent = DateTime.UtcNow,
+            Sender = sender, // Navigation property for Mapster
+            Recipient = recipient, // Navigation property for Mapster
         };
 
         context.Messages.Add(message);
         await context.SaveChangesAsync(cancellationToken);
 
-        var messageDto = new MessageDto
-        {
-            Id = message.Id,
-            SenderId = message.SenderId,
-            RecipientId = message.RecipientId,
-            Content = message.Content,
-            MessageSent = message.MessageSent,
-            DateRead = message.DateRead,
-            SenderDisplayName = sender.DisplayName,
-            SenderImageUrl = sender.ImageUrl ?? string.Empty,
-            RecipientDisplayName = recipient.DisplayName,
-            RecipientImageUrl = recipient.ImageUrl ?? string.Empty,
-        };
+        // Use Mapster to convert Message to MessageDto
+        var messageDto = message.Adapt<MessageDto>();
 
         return Result.Success(messageDto);
     }

@@ -7,8 +7,6 @@ using CleanArch.Application.Messages.Queries.Common;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Users;
-using Mapster;
-using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Application.Messages.Queries.GetMessages;
 

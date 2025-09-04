@@ -1,5 +1,5 @@
-using CleanArch.Application.Users.Create;
 using CleanArch.Application.Common.Mappings;
+using CleanArch.Application.Users.Create;
 
 namespace CleanArch.Application.Tests.Users.Create;
 
