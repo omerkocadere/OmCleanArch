@@ -28,6 +28,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Auction> Auctions => Set<Auction>();
     public DbSet<Member> Members => Set<Member>();
     public DbSet<Photo> Photos => Set<Photo>();
+    public DbSet<MemberLike> MemberLikes { get; set; }
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     public DbSet<OutboxMessageConsumer> OutboxMessageConsumers => Set<OutboxMessageConsumer>();
 

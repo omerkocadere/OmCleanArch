@@ -17,6 +17,9 @@ public class Member : BaseAuditableEntity<Guid>
 
     // Navigation property
     public List<Photo> Photos { get; set; } = [];
+    public List<MemberLike> LikedByMembers { get; set; } = [];
+    public List<MemberLike> LikedMembers { get; set; } = [];
+
 
     [ForeignKey(nameof(Id))]
     public required User User { get; set; }
