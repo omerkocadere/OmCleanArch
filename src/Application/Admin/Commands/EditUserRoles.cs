@@ -12,12 +12,10 @@ public class EditUserRolesCommandHandler(UserManager<User> userManager)
 {
     public async Task<Result<IList<string>>> Handle(EditUserRolesCommand command, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(command.Roles))
-        {
-            return Result.Failure<IList<string>>(UserErrors.RolesRequired);
-        }
-
-        var selectedRoles = command.Roles.Split(',', StringSplitOptions.RemoveEmptyEntries).ToArray();
+        var selectedRoles = command
+            .Roles.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(role => role.Trim())
+            .ToArray();
 
         var user = await userManager.FindByIdAsync(command.UserId.ToString());
         if (user == null)

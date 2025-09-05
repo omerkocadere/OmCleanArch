@@ -286,3 +286,46 @@
 - **After**: `Authentication → Authorization` (CORRECT per Microsoft docs)
 
 **Result**: ✅ Best practice implementation that only tracks activity on authenticated API endpoints with optimal performance and clean architecture compliance.
+
+---
+
+### Admin Feature FluentValidation Implementation (Sep 5, 2025)
+
+**Problem**: EditUserRoles command had validation logic mixed with business logic in the handler.
+
+**Solution Applied - Comprehensive Validation Approach**:
+
+1. **Created `EditUserRolesCommandValidator.cs`** with FluentValidation rules:
+
+   - **UserId Validation**: NotEmpty (required Guid)
+   - **Roles String Validation**: NotEmpty, NotNull
+   - **Role Format Validation**: Comma-separated format check with custom `BeValidRoleFormat` method
+   - **Valid Role Names**: Custom `ContainOnlyValidRoles` method using `UserRoles.All` constants
+
+2. **Cleaned EditUserRoles Handler**: Removed redundant `string.IsNullOrEmpty(command.Roles)` check
+
+   - Validation now handled by FluentValidation pipeline
+   - Handler focuses purely on business logic
+   - Added `.Trim()` to role processing for better data handling
+
+3. **Benefits Achieved**:
+   - ✅ **Separation of Concerns**: Input validation vs business logic
+   - ✅ **Early Failure**: Invalid input caught before handler execution
+   - ✅ **Compile-time Safety**: Uses `UserRoles.All` constants
+   - ✅ **Consistent Pattern**: Follows project's FluentValidation conventions
+   - ✅ **Clean Architecture**: Validation in Application layer, domain constants respected
+
+**Files Modified**:
+
+- **Created**: `src/Application/Admin/Commands/EditUserRolesCommandValidator.cs`
+- **Updated**: `src/Application/Admin/Commands/EditUserRoles.cs` (removed redundant validation)
+
+**Validation Rules Implemented**:
+
+```csharp
+- UserId: NotEmpty (Guid required)
+- Roles: NotEmpty, NotNull, BeValidRoleFormat, ContainOnlyValidRoles
+- Custom Methods: Format checking and domain constant validation
+```
+
+**Result**: ✅ Clean separation between input validation and business logic following Clean Architecture best practices.
