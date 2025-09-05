@@ -2,6 +2,7 @@ using System.Text;
 using CleanArch.Application.Auctions.Consumers;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
+using CleanArch.Domain.Constants;
 using CleanArch.Domain.Users;
 using CleanArch.Infrastructure.Authentication;
 using CleanArch.Infrastructure.Authorization;
@@ -131,7 +132,12 @@ public static class DependencyInjection
 
     private static IServiceCollection AddAuthorizationInternal(this IServiceCollection services)
     {
-        services.AddAuthorization();
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(AuthorizationPolicies.AdminOnly, policy => policy.RequireRole(UserRoles.Admin));
+            options.AddPolicy(AuthorizationPolicies.MemberOnly, policy => policy.RequireRole(UserRoles.Member));
+            options.AddPolicy(AuthorizationPolicies.ModeratorOnly, policy => policy.RequireRole(UserRoles.Moderator));
+        });
 
         services
             .AddIdentityCore<User>(options =>

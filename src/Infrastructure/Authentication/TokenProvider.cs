@@ -1,16 +1,18 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Domain.Users;
 using CleanArch.Infrastructure.Authorization;
 using CleanArch.Infrastructure.Options;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CleanArch.Infrastructure.Authentication;
 
-internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions, PermissionProvider permissionProvider)
+internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions, UserManager<User> userManager)
     : ITokenProvider
 {
     private readonly JwtOptions _jwtOptions = authOptions.Value.Jwt;
@@ -34,22 +36,22 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
             Audience = _jwtOptions.Audience,
         };
 
-        var handler = new JsonWebTokenHandler();
-        string token = handler.CreateToken(tokenDescriptor);
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.CreateToken(tokenDescriptor);
 
-        return token;
+        return handler.WriteToken(token);
     }
 
     private async Task<List<Claim>> CreateClaims(User user)
     {
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Email, user.Email ?? string.Empty),
         };
 
-        var permissions = await permissionProvider.GetForUserIdAsync(user.Id);
-        claims.AddRange(permissions.Select(p => new Claim(CustomClaims.Permissions, p)));
+        var roles = await userManager.GetRolesAsync(user);
+        claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
 
         return claims;
     }

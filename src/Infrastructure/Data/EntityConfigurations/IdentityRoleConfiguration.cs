@@ -1,3 +1,4 @@
+using CleanArch.Domain.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -13,22 +14,22 @@ internal sealed class IdentityRoleConfiguration : IEntityTypeConfiguration<Ident
             new IdentityRole<Guid>
             {
                 Id = Guid.Parse("10000000-0000-0000-0000-000000000001"),
-                Name = "Member",
-                NormalizedName = "MEMBER",
+                Name = UserRoles.Member,
+                NormalizedName = UserRoles.Member.ToUpperInvariant(),
                 ConcurrencyStamp = "10000000-0000-0000-0000-000000000001",
             },
             new IdentityRole<Guid>
             {
                 Id = Guid.Parse("10000000-0000-0000-0000-000000000002"),
-                Name = "Moderator",
-                NormalizedName = "MODERATOR",
+                Name = UserRoles.Moderator,
+                NormalizedName = UserRoles.Moderator.ToUpperInvariant(),
                 ConcurrencyStamp = "10000000-0000-0000-0000-000000000002",
             },
             new IdentityRole<Guid>
             {
                 Id = Guid.Parse("10000000-0000-0000-0000-000000000003"),
-                Name = "Admin",
-                NormalizedName = "ADMIN",
+                Name = UserRoles.Admin,
+                NormalizedName = UserRoles.Admin.ToUpperInvariant(),
                 ConcurrencyStamp = "10000000-0000-0000-0000-000000000003",
             }
         );

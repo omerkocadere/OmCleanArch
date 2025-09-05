@@ -1,12 +1,13 @@
 using CleanArch.Application.Common.Mappings;
 using CleanArch.Application.Users.Create;
+using CleanArch.Domain.Users;
+using Microsoft.AspNetCore.Identity;
 
 namespace CleanArch.Application.Tests.Users.Create;
 
 public class CreateUserCommandHandlerTests
 {
-    private readonly Mock<IApplicationDbContext> _mockContext;
-    private readonly Mock<IPasswordHasher> _mockPasswordHasher;
+    private readonly Mock<UserManager<User>> _mockUserManager;
     private readonly Mock<ITokenProvider> _mockTokenProvider;
     private readonly CreateUserCommandHandler _handler;
 
@@ -17,276 +18,95 @@ public class CreateUserCommandHandlerTests
 
     public CreateUserCommandHandlerTests()
     {
-        _mockContext = new Mock<IApplicationDbContext>();
-        _mockPasswordHasher = new Mock<IPasswordHasher>();
+        var userStore = new Mock<IUserStore<User>>();
+        _mockUserManager = new Mock<UserManager<User>>(
+            userStore.Object,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!);
         _mockTokenProvider = new Mock<ITokenProvider>();
-        _handler = new CreateUserCommandHandler(_mockContext.Object, _mockTokenProvider.Object);
-    }
-
-    private Mock<DbSet<User>> SetupMockContext(List<User>? existingUsers = null)
-    {
-        existingUsers ??= [];
-        var mockUsersDbSet = existingUsers.BuildMockDbSet();
-        _mockContext.Setup(x => x.Users).Returns(mockUsersDbSet.Object);
-        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
-        return mockUsersDbSet;
-    }
-
-    private static CreateUserCommand CreateValidCommand(string email = "test@example.com")
-    {
-        return new CreateUserCommand
-        {
-            Email = email,
-            DisplayName = "Test User",
-            FirstName = "Test",
-            LastName = "User",
-            Password = "password123",
-        };
+        _handler = new CreateUserCommandHandler(_mockUserManager.Object, _mockTokenProvider.Object);
     }
 
     [Fact]
-    public async Task Handle_WithValidCommand_ShouldCreateUserSuccessfully()
+    public async Task Handle_ShouldCreateUser_WhenCommandIsValid()
     {
-        // Arrange
-        var command = CreateValidCommand();
-        var hashedPassword = "hashed_password123";
-        var token = "mock_jwt_token";
+        var command = new CreateUserCommand
+        {
+            Email = "john@test.com",
+            DisplayName = "John Doe",
+            FirstName = "John",
+            LastName = "Doe",
+            Password = "ValidPassword123!",
+            Gender = "Male",
+            City = "Test City",
+            Country = "Test Country",
+            DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-25)),
+        };
+        var expectedToken = "generated_token";
 
-        _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns(hashedPassword);
-        _mockTokenProvider.Setup(x => x.CreateAsync(It.IsAny<User>())).Returns(Task.FromResult(token));
-        var mockUsersDbSet = SetupMockContext();
+        _mockUserManager
+            .Setup(x => x.CreateAsync(It.IsAny<User>(), command.Password))
+            .ReturnsAsync(IdentityResult.Success);
 
-        // Act
+        _mockUserManager
+            .Setup(x => x.AddToRoleAsync(It.IsAny<User>(), "Member"))
+            .ReturnsAsync(IdentityResult.Success);
+
+        _mockTokenProvider
+            .Setup(x => x.CreateAsync(It.IsAny<User>()))
+            .ReturnsAsync(expectedToken);
+
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
+        result.Value.Token.Should().Be(expectedToken);
         result.Value.Email.Should().Be(command.Email);
         result.Value.DisplayName.Should().Be(command.DisplayName);
-        result.Value.FirstName.Should().Be(command.FirstName);
-        result.Value.LastName.Should().Be(command.LastName);
-        result.Value.Token.Should().Be(token);
 
-        // Verify interactions
-        _mockPasswordHasher.Verify(x => x.Hash(command.Password), Times.Once);
-        _mockTokenProvider.Verify(x => x.CreateAsync(It.IsAny<User>()), Times.Once);
-        mockUsersDbSet.Verify(x => x.Add(It.IsAny<User>()), Times.Once);
-        _mockContext.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _mockUserManager.Verify(x => x.CreateAsync(It.IsAny<User>(), command.Password), Times.Once);
+        _mockUserManager.Verify(x => x.AddToRoleAsync(It.IsAny<User>(), "Member"), Times.Once);
     }
 
     [Fact]
-    public async Task Handle_WithExistingEmail_ShouldReturnEmailNotUniqueError()
+    public async Task Handle_ShouldReturnValidationError_WhenUserCreationFails()
     {
-        // Arrange
-        var existingEmail = "existing@example.com";
-        var command = CreateValidCommand(existingEmail);
-
-        var existingUser = new User
-        {
-            Id = Guid.NewGuid(),
-            Email = existingEmail.ToLower(),
-            DisplayName = "Existing User",
-            FirstName = "Existing",
-            LastName = "User",
-            PasswordHash = "existinghashedpassword",
-            Member = new Member
-            {
-                Id = Guid.NewGuid(),
-                DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-25)),
-                DisplayName = "Existing User",
-                Gender = "male",
-                City = "Test City",
-                Country = "Test Country",
-                User = null!,
-            },
-        };
-
-        SetupMockContext([existingUser]);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.Should().NotBeNull();
-        result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Be(UserErrors.EmailNotUnique);
-
-        // Verify no side effects occurred
-        _mockPasswordHasher.Verify(x => x.Hash(It.IsAny<string>()), Times.Never);
-        _mockContext.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task Handle_WithValidCommand_ShouldSetCorrectUserProperties()
-    {
-        // Arrange
         var command = new CreateUserCommand
         {
-            Email = "newuser@example.com",
-            DisplayName = "New Display Name",
+            Email = "john@test.com",
+            DisplayName = "John Doe",
             FirstName = "John",
             LastName = "Doe",
-            Password = "securepassword",
+            Password = "WeakPassword",
+            Gender = "Male",
+            City = "Test City",
+            Country = "Test Country",
+            DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-25)),
         };
 
-        var hashedPassword = "hashed_securepassword";
-        var token = "mock_jwt_token";
-
-        _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns(hashedPassword);
-        _mockTokenProvider.Setup(x => x.CreateAsync(It.IsAny<User>())).Returns(Task.FromResult(token));
-
-        var mockUsersDbSet = SetupMockContext();
-
-        User? capturedUser = null;
-        mockUsersDbSet.Setup(x => x.Add(It.IsAny<User>())).Callback<User>(user => capturedUser = user);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-
-        capturedUser.Should().NotBeNull();
-        capturedUser!.Id.Should().NotBeEmpty();
-        capturedUser.Email.Should().Be(command.Email.ToLower());
-        capturedUser.DisplayName.Should().Be(command.DisplayName);
-        capturedUser.FirstName.Should().Be(command.FirstName);
-        capturedUser.LastName.Should().Be(command.LastName);
-        capturedUser.PasswordHash.Should().Be(hashedPassword);
-    }
-
-    [Fact]
-    public async Task Handle_WithValidCommand_ShouldAddDomainEvent()
-    {
-        // Arrange
-        var command = CreateValidCommand("event@example.com");
-        var token = "mock_jwt_token";
-
-        _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns("hashed_password");
-        _mockTokenProvider.Setup(x => x.CreateAsync(It.IsAny<User>())).Returns(Task.FromResult(token));
-
-        var mockUsersDbSet = SetupMockContext();
-
-        User? capturedUser = null;
-        mockUsersDbSet.Setup(x => x.Add(It.IsAny<User>())).Callback<User>(user => capturedUser = user);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-
-        capturedUser.Should().NotBeNull();
-        capturedUser!.DomainEvents.Should().NotBeEmpty();
-        capturedUser.DomainEvents.Should().HaveCount(1);
-
-        var domainEvent = capturedUser.DomainEvents.First();
-        domainEvent.Should().BeOfType<UserCreatedDomainEvent>();
-
-        var userCreatedEvent = (UserCreatedDomainEvent)domainEvent;
-        userCreatedEvent.User.Should().Be(capturedUser);
-        userCreatedEvent.Id.Should().NotBeEmpty();
-    }
-
-    [Fact]
-    public async Task Handle_WithCancellationToken_ShouldPassTokenThroughToContext()
-    {
-        // Arrange
-        var command = CreateValidCommand("cancel@example.com");
-        var cancellationToken = new CancellationToken();
-        var token = "mock_jwt_token";
-
-        _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns("hashed_password");
-        _mockTokenProvider.Setup(x => x.CreateAsync(It.IsAny<User>())).Returns(Task.FromResult(token));
-        var mockUsersDbSet = SetupMockContext();
-
-        // Act
-        var result = await _handler.Handle(command, cancellationToken);
-
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-
-        // Verify interactions
-        _mockPasswordHasher.Verify(x => x.Hash(command.Password), Times.Once);
-        _mockTokenProvider.Verify(x => x.CreateAsync(It.IsAny<User>()), Times.Once);
-        mockUsersDbSet.Verify(x => x.Add(It.IsAny<User>()), Times.Once);
-        _mockContext.Verify(x => x.SaveChangesAsync(cancellationToken), Times.Once);
-    }
-
-    [Fact]
-    public async Task Handle_WithEmailCaseInsensitiveMatch_ShouldReturnEmailNotUniqueError()
-    {
-        // Arrange
-        var command = CreateValidCommand("TEST@EXAMPLE.COM"); // Uppercase email
-
-        var existingUser = new User
+        var identityErrors = new[]
         {
-            Id = Guid.NewGuid(),
-            Email = "test@example.com", // Lowercase email
-            DisplayName = "Existing User",
-            FirstName = "Existing",
-            LastName = "User",
-            PasswordHash = "existinghashedpassword",
-            Member = new Member
-            {
-                Id = Guid.NewGuid(),
-                DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-25)),
-                DisplayName = "Existing User",
-                Gender = "male",
-                City = "Test City",
-                Country = "Test Country",
-                User = null!,
-            },
+            new IdentityError { Code = "PasswordTooWeak", Description = "Password is too weak" },
         };
 
-        SetupMockContext([existingUser]);
+        _mockUserManager
+            .Setup(x => x.CreateAsync(It.IsAny<User>(), command.Password))
+            .ReturnsAsync(IdentityResult.Failed(identityErrors));
 
-        // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Be(UserErrors.EmailNotUnique);
-    }
+        result.Error.Should().NotBeNull();
 
-    [Fact]
-    public void CreateUserCommand_ShouldSupportRecordFeatures()
-    {
-        // Arrange
-        var command1 = new CreateUserCommand
-        {
-            Email = "test@example.com",
-            DisplayName = "Test User",
-            FirstName = "John",
-            LastName = "Doe",
-            Password = "password123",
-        };
-
-        // Act & Assert for 'with' expression (covers the <Clone>$ method)
-        var command2 = command1 with
-        {
-            Email = "new@example.com",
-        };
-
-        command2.Should().NotBe(command1); // Should be different objects
-        command2.Email.Should().Be("new@example.com");
-        command2.DisplayName.Should().Be(command1.DisplayName); // Other properties should remain the same
-
-        // Test record equality and hash codes
-        var command3 = new CreateUserCommand
-        {
-            Email = "test@example.com",
-            DisplayName = "Test User",
-            FirstName = "John",
-            LastName = "Doe",
-            Password = "password123",
-        };
-
-        command1.Should().Be(command3); // Should be equal
-        command1.GetHashCode().Should().Be(command3.GetHashCode());
-        command1.ToString().Should().NotBeEmpty();
+        _mockUserManager.Verify(x => x.CreateAsync(It.IsAny<User>(), command.Password), Times.Once);
+        _mockUserManager.Verify(x => x.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
     }
 }

@@ -1,10 +1,12 @@
-using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
+using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
+using CleanArch.Domain.Constants;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Users;
+using Microsoft.AspNetCore.Identity;
 
 namespace CleanArch.Application.Users.Create;
 
@@ -21,35 +23,30 @@ public sealed record CreateUserCommand : ICommand<UserDto>
     public DateOnly DateOfBirth { get; set; }
 }
 
-public class CreateUserCommandHandler(IApplicationDbContext context, ITokenProvider tokenProvider)
+public class CreateUserCommandHandler(UserManager<User> userManager, ITokenProvider tokenProvider)
     : ICommandHandler<CreateUserCommand, UserDto>
 {
     public async Task<Result<UserDto>> Handle(CreateUserCommand command, CancellationToken cancellationToken)
     {
-        var normalizedEmail = command.Email.ToLower();
-
-        var emailExists = await context.Users.AnyAsync(u => u.Email == normalizedEmail, cancellationToken);
-
-        if (emailExists)
-        {
-            return Result.Failure<UserDto>(UserErrors.EmailNotUnique);
-        }
-
         var user = command.Adapt<User>();
         var member = command.Adapt<Member>();
 
         user.Id = Guid.NewGuid();
-        user.Email = normalizedEmail;
-        user.UserName = normalizedEmail;
+        user.UserName = command.Email.ToLower();
         user.Member = member;
-
-        // Set the same ID for one-to-one relationship
-        member.Id = user.Id;
 
         user.AddDomainEvent(new UserCreatedDomainEvent(Guid.NewGuid(), user));
 
-        context.Users.Add(user);
-        await context.SaveChangesAsync(cancellationToken);
+        var result = await userManager.CreateAsync(user, command.Password);
+
+        if (!result.Succeeded)
+        {
+            var errors = result.Errors.Select(e => Error.Validation(e.Code, e.Description)).ToArray();
+            var validationError = new ValidationError(errors);
+            return Result.Failure<UserDto>(validationError);
+        }
+
+        await userManager.AddToRoleAsync(user, UserRoles.Member);
 
         var userDto = user.Adapt<UserDto>();
         userDto.Token = await tokenProvider.CreateAsync(user);

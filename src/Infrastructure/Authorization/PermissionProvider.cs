@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Infrastructure.Authorization;
 
-internal sealed class PermissionProvider(ApplicationDbContext context)
+internal sealed class PermissionProvider()
 {
-    public async Task<HashSet<string>> GetForUserIdAsync(Guid userId)
+    public HashSet<string> GetForUserIdAsync(Guid userId)
     {
         // IReadOnlyCollection<Role>[] roles = await context
         //     .Users.Include(x => x.Roles)

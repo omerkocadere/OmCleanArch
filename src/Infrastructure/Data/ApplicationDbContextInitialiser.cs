@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CleanArch.Domain.Auctions;
+using CleanArch.Domain.Constants;
 using CleanArch.Domain.Items;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Photos;
@@ -157,7 +158,7 @@ public static class ApplicationDbContextInitialiser
             {
                 logger.LogError(result.Errors.First().Description);
             }
-            await userManager.AddToRoleAsync(user, "Member");
+            await userManager.AddToRoleAsync(user, UserRoles.Member);
         }
 
         var admin = new User
@@ -168,7 +169,7 @@ public static class ApplicationDbContextInitialiser
         };
 
         await userManager.CreateAsync(admin, "Pa$$w0rd");
-        await userManager.AddToRolesAsync(admin, ["Admin", "Moderator"]);
+        await userManager.AddToRolesAsync(admin, [UserRoles.Admin, UserRoles.Moderator]);
 
         // Collect the created user IDs
         createdUserIds = [.. userData.Select(u => u.Id)];
