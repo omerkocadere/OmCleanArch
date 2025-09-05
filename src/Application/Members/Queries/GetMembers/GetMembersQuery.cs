@@ -17,13 +17,13 @@ public class GetMembersQueryHandler(IApplicationDbContext context, IUserContext 
         CancellationToken cancellationToken
     )
     {
-        request.MemberParams.CurrentMemberId ??= userContext.UserId;
+        var currentMemberId = request.MemberParams.CurrentMemberId ?? userContext.UserId;
         var query = context.Members.AsQueryable();
 
-        // Age filtering
+        // Age filtering using computed properties with defaults
         var today = DateOnly.FromDateTime(DateTime.Today);
-        var minDateOfBirth = today.AddYears(-request.MemberParams.MaxAge - 1);
-        var maxDateOfBirth = today.AddYears(-request.MemberParams.MinAge);
+        var minDateOfBirth = today.AddYears(-request.MemberParams.MaxAgeValue - 1);
+        var maxDateOfBirth = today.AddYears(-request.MemberParams.MinAgeValue);
 
         query = query.Where(m => m.DateOfBirth >= minDateOfBirth && m.DateOfBirth <= maxDateOfBirth);
 
@@ -34,13 +34,13 @@ public class GetMembersQueryHandler(IApplicationDbContext context, IUserContext 
         }
 
         // Exclude current member
-        if (request.MemberParams.CurrentMemberId.HasValue)
+        if (currentMemberId.HasValue)
         {
-            query = query.Where(m => m.Id != request.MemberParams.CurrentMemberId.Value);
+            query = query.Where(m => m.Id != currentMemberId.Value);
         }
 
-        // Ordering
-        query = request.MemberParams.OrderBy.ToLower() switch
+        // Ordering using computed property with default
+        query = request.MemberParams.OrderByValue.ToLower() switch
         {
             "created" => query.OrderByDescending(m => m.User.Created),
             "lastactive" => query.OrderByDescending(m => m.LastActive),
@@ -48,8 +48,8 @@ public class GetMembersQueryHandler(IApplicationDbContext context, IUserContext 
         };
 
         return await query.ProjectToPaginatedListAsync<MemberDto>(
-            request.MemberParams.PageNumber,
-            request.MemberParams.PageSize
+            request.MemberParams.PageNumberValue,
+            request.MemberParams.PageSizeValue
         );
     }
 }

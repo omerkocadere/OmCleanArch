@@ -42,8 +42,8 @@ public class GetMessagesQueryHandler(IApplicationDbContext context, IUserContext
         var messageQuery = query.ProjectToType<MessageDto>();
 
         return await messageQuery.ProjectToPaginatedListAsync<MessageDto>(
-            request.MessageParams.PageNumber,
-            request.MessageParams.PageSize
+            request.MessageParams.PageNumberValue,
+            request.MessageParams.PageSizeValue
         );
     }
 }

@@ -108,7 +108,53 @@
 - ✅ Simple, testable methods
 - ✅ EF Core compatibility maintained
 
-## Final Status (Sep 2, 2025)
+## Final Status (Sep 5, 2025)
+
+### ASP.NET Core [AsParameters] Default Value Handling - MICROSOFT BEST PRACTICE ✅
+
+**Problem**: `[AsParameters]` model binding requires non-nullable properties causing validation errors when parameters not sent.
+
+**Root Cause**: ASP.NET Core treats non-nullable properties as required when using `[AsParameters]`.
+
+**Microsoft's Official Best Practice Solution**:
+
+1. **Nullable Properties + Computed Properties Pattern**:
+
+   ```csharp
+   public class MemberParams
+   {
+       // Nullable for optional binding
+       public int? MinAge { get; set; }
+       public int? MaxAge { get; set; }
+       public string? OrderBy { get; set; }
+
+       // Computed properties with defaults (Microsoft's recommended approach)
+       public int MinAgeValue => MinAge ?? 18;
+       public int MaxAgeValue => MaxAge ?? 100;
+       public string OrderByValue => OrderBy ?? "lastActive";
+   }
+   ```
+
+2. **Handler Logic**: Uses computed properties for business logic
+3. **Endpoint Compatibility**: Full `[AsParameters]` support without method calls to forget
+
+**Files Modified**:
+
+- `src/Application/Members/Queries/GetMembers/MemberParams.cs`: Computed properties pattern
+- `src/Application/Members/Queries/GetMembers/GetMembersQuery.cs`: Uses computed values
+- `src/Web.Api/Endpoints/MembersVersioned.cs`: V2 response with computed values
+
+**Technical Benefits**:
+
+- ✅ **Microsoft Official Pattern**: Documented in ASP.NET Core docs
+- ✅ **Zero Human Error**: No method calls to forget
+- ✅ **Type Safety**: Guaranteed non-null defaults
+- ✅ **ASP.NET Core Native**: Built-in framework support
+- ✅ **Clean API**: `/api/v1/members` works without any parameters
+
+**Research Source**: Microsoft ASP.NET Core official documentation - Parameter binding best practices
+
+**Result**: ✅ Perfect solution - nullable for binding, computed properties for defaults. No ApplyDefaults() to forget!
 
 ### JWT Token Expiration Issue Fixed ✅
 

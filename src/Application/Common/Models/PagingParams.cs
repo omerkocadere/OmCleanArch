@@ -3,11 +3,21 @@ namespace CleanArch.Application.Common.Models;
 public class PagingParams
 {
     private const int MaxPageSize = 50;
-    public int PageNumber { get; set; } = 1;
-    private int _pageSize = 10;
-    public int PageSize
+
+    // Nullable for binding, computed properties for business logic
+    public int? PageNumber { get; set; }
+    public int? PageSize { get; set; }
+
+    // Computed properties with defaults
+    public int PageNumberValue => PageNumber ?? 1;
+    public int PageSizeValue
     {
-        get => _pageSize;
-        set => _pageSize = (value > MaxPageSize) ? MaxPageSize : value;
+        get
+        {
+            if (!PageSize.HasValue)
+                return 10;
+
+            return PageSize.Value > MaxPageSize ? MaxPageSize : PageSize.Value;
+        }
     }
 }

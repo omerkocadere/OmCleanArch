@@ -3,6 +3,7 @@ using CleanArch.Application.Auctions.Consumers;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Infrastructure.Authentication;
+using CleanArch.Infrastructure.Authorization;
 using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Idempotence;
@@ -11,6 +12,7 @@ using CleanArch.Infrastructure.Services;
 using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,6 +35,7 @@ public static class DependencyInjection
             .AddDatabase(env, configuration)
             .AddBackgroundJobsConditionally(configuration)
             .AddAuthenticationInternal(configuration)
+            .AddAuthorizationInternal()
             .AddMediatRDecorators()
             .AddMassTransitServices(configuration);
     }
@@ -121,6 +124,16 @@ public static class DependencyInjection
         services.AddScoped<IUserContext, UserContext>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<ITokenProvider, TokenProvider>();
+        return services;
+    }
+
+    private static IServiceCollection AddAuthorizationInternal(this IServiceCollection services)
+    {
+        services.AddAuthorization();
+        services.AddScoped<PermissionProvider>();
+        services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
+
         return services;
     }
 

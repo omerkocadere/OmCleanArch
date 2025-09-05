@@ -17,12 +17,12 @@ public class MembersVersioned : EndpointGroupBase, IVersionedEndpointGroup
         groupBuilder.RequireAuthorization();
         groupBuilder
             .MapGet("", GetMembers)
-            // .HasPermission(PermissionNames.ReadMember)
+            .HasPermission(PermissionNames.ReadMember)
             .MapToApiVersion(1)
             .Produces<PaginatedList<MemberDto>>();
         groupBuilder
             .MapGet("", GetMembersV2)
-            // .HasPermission(PermissionNames.ReadMember)
+            .HasPermission(PermissionNames.ReadMember)
             .MapToApiVersion(2)
             .Produces<PaginatedList<MemberDto>>();
     }
@@ -36,6 +36,7 @@ public class MembersVersioned : EndpointGroupBase, IVersionedEndpointGroup
     private static async Task<IResult> GetMembersV2(IMediator mediator, [AsParameters] MemberParams memberParams)
     {
         var result = await mediator.Send(new GetMembersQuery(memberParams));
+
         return result.Match(
             members =>
                 Results.Ok(
@@ -51,10 +52,10 @@ public class MembersVersioned : EndpointGroupBase, IVersionedEndpointGroup
                         Filters = new
                         {
                             memberParams.Gender,
-                            memberParams.MinAge,
-                            memberParams.MaxAge,
-                            memberParams.OrderBy
-                        }
+                            MinAge = memberParams.MinAgeValue,
+                            MaxAge = memberParams.MaxAgeValue,
+                            OrderBy = memberParams.OrderByValue,
+                        },
                     }
                 ),
             CustomResults.Problem

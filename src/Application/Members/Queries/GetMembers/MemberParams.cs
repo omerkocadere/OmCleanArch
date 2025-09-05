@@ -6,7 +6,14 @@ public class MemberParams : PagingParams
 {
     public string? Gender { get; set; }
     public Guid? CurrentMemberId { get; set; }
-    public int MinAge { get; set; } = 18;
-    public int MaxAge { get; set; } = 100;
-    public string OrderBy { get; set; } = "lastActive";
+
+    // Nullable for binding, computed properties for business logic
+    public int? MinAge { get; set; }
+    public int? MaxAge { get; set; }
+    public string? OrderBy { get; set; }
+
+    // Computed properties with defaults
+    public int MinAgeValue => MinAge ?? 18;
+    public int MaxAgeValue => MaxAge ?? 100;
+    public string OrderByValue => OrderBy ?? "lastActive";
 }

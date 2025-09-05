@@ -64,8 +64,8 @@ public class GetMemberLikesQueryHandler(IApplicationDbContext context, IUserCont
         }
 
         return await result.ProjectToPaginatedListAsync<MemberDto>(
-            request.LikesParams.PageNumber,
-            request.LikesParams.PageSize
+            request.LikesParams.PageNumberValue,
+            request.LikesParams.PageSizeValue
         );
     }
 }
