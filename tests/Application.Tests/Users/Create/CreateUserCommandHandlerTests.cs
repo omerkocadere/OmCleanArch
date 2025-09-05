@@ -20,11 +20,7 @@ public class CreateUserCommandHandlerTests
         _mockContext = new Mock<IApplicationDbContext>();
         _mockPasswordHasher = new Mock<IPasswordHasher>();
         _mockTokenProvider = new Mock<ITokenProvider>();
-        _handler = new CreateUserCommandHandler(
-            _mockContext.Object,
-            _mockPasswordHasher.Object,
-            _mockTokenProvider.Object
-        );
+        _handler = new CreateUserCommandHandler(_mockContext.Object, _mockTokenProvider.Object);
     }
 
     private Mock<DbSet<User>> SetupMockContext(List<User>? existingUsers = null)

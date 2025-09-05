@@ -1,16 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <RootNamespace>CleanArch.Infrastructure</RootNamespace>
     <AssemblyName>CleanArch.Infrastructure</AssemblyName>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Include="Data\Seed\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
     <PackageReference Include="CloudinaryDotNet" />
@@ -33,11 +30,9 @@
     <PackageReference Include="Polly" />
     <PackageReference Include="Scrutor" />
   </ItemGroup>
-
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\other-services\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\Application\Application.csproj" />

@@ -1,19 +1,16 @@
-using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Items;
 using CleanArch.Domain.Members;
-using CleanArch.Domain.Permissions;
 using CleanArch.Domain.Photos;
-using CleanArch.Domain.Roles;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
 using CleanArch.Domain.ValueObjects;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -30,10 +27,10 @@ public static class InitialiserExtensions
             .ServiceProvider.GetRequiredService<ILoggerFactory>()
             .CreateLogger(nameof(ApplicationDbContextInitialiser));
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
         await ApplicationDbContextInitialiser.InitialiseAsync(context);
-        await ApplicationDbContextInitialiser.SeedAsync(context, logger, passwordHasher);
+        await ApplicationDbContextInitialiser.SeedAsync(context, logger, userManager);
     }
 }
 
@@ -60,11 +57,11 @@ public static class ApplicationDbContextInitialiser
         }
     }
 
-    public static async Task SeedAsync(ApplicationDbContext context, ILogger logger, IPasswordHasher passwordHasher)
+    public static async Task SeedAsync(ApplicationDbContext context, ILogger logger, UserManager<User> userManager)
     {
         try
         {
-            await TrySeedAsync(context, logger, passwordHasher);
+            await TrySeedAsync(context, logger, userManager);
         }
         catch (Exception ex)
         {
@@ -72,7 +69,7 @@ public static class ApplicationDbContextInitialiser
         }
     }
 
-    private static async Task TrySeedAsync(ApplicationDbContext context, ILogger logger, IPasswordHasher passwordHasher)
+    private static async Task TrySeedAsync(ApplicationDbContext context, ILogger logger, UserManager<User> userManager)
     {
         var assemblyLocation = Assembly.GetExecutingAssembly().Location;
         var assemblyDirectory =
@@ -84,125 +81,24 @@ public static class ApplicationDbContextInitialiser
         var usersJsonPath = Path.Combine(seedDir, "users.json");
         var listsJsonPath = Path.Combine(seedDir, "todolists.json");
         var auctionsJsonPath = Path.Combine(seedDir, "auctions.json");
-        var permissionsJsonPath = Path.Combine(seedDir, "permissions.json");
-        var rolesJsonPath = Path.Combine(seedDir, "roles.json");
         logger.LogInformation("Users JSON path: {UsersJsonPath}", usersJsonPath);
 
-        await SeedPermissionsAsync(context, logger, permissionsJsonPath);
-        await SeedRolesAsync(context, logger, rolesJsonPath);
-
-        var createdUserIds = await SeedUsersAsync(context, logger, passwordHasher, usersJsonPath);
+        var createdUserIds = await SeedUsersAsync(context, logger, usersJsonPath, userManager);
 
         await SeedTodoListsAsync(context, logger, listsJsonPath, createdUserIds);
 
         await SeedAuctionsAsync(context, logger, auctionsJsonPath);
     }
 
-    private static async Task SeedPermissionsAsync(
-        ApplicationDbContext context,
-        ILogger logger,
-        string permissionsJsonPath
-    )
-    {
-        if (await context.Permissions.AnyAsync())
-            return;
-
-        if (!File.Exists(permissionsJsonPath))
-        {
-            logger.LogWarning("Permissions seed file not found: {Path}", permissionsJsonPath);
-            return;
-        }
-
-        logger.LogInformation("Seeding permissions from {Path}", permissionsJsonPath);
-        var permissionsJson = await File.ReadAllTextAsync(permissionsJsonPath);
-        var permissionsData = JsonSerializer.Deserialize<List<PermissionSeedDto>>(permissionsJson, _jsonOptions);
-
-        if (permissionsData is null || permissionsData.Count == 0)
-        {
-            logger.LogWarning("No data found in permissions.json");
-            return;
-        }
-
-        foreach (var permissionDto in permissionsData)
-        {
-            var permission = new Permission
-            {
-                Id = permissionDto.Id,
-                Name = permissionDto.Name,
-                DisplayName = permissionDto.DisplayName,
-                Description = permissionDto.Description,
-                Category = permissionDto.Category,
-                IsActive = permissionDto.IsActive,
-            };
-            context.Permissions.Add(permission);
-        }
-
-        await context.SaveChangesAsync();
-        logger.LogInformation("Seeded {PermissionCount} permissions.", permissionsData.Count);
-    }
-
-    private static async Task SeedRolesAsync(ApplicationDbContext context, ILogger logger, string rolesJsonPath)
-    {
-        if (await context.Roles.AnyAsync())
-            return;
-
-        if (!File.Exists(rolesJsonPath))
-        {
-            logger.LogWarning("Roles seed file not found: {Path}", rolesJsonPath);
-            return;
-        }
-
-        logger.LogInformation("Seeding roles with permissions from {Path}", rolesJsonPath);
-        var rolesJson = await File.ReadAllTextAsync(rolesJsonPath);
-        var rolesData = JsonSerializer.Deserialize<List<RoleSeedDto>>(rolesJson, _jsonOptions);
-
-        if (rolesData is null || rolesData.Count == 0)
-        {
-            logger.LogWarning("No data found in roles.json");
-            return;
-        }
-
-        // Load all permissions for mapping
-        var permissions = await context.Permissions.ToListAsync();
-
-        foreach (var roleDto in rolesData)
-        {
-            var role = new Role
-            {
-                Id = roleDto.Id,
-                Name = roleDto.Name,
-                NormalizedName = roleDto.NormalizedName,
-                Description = roleDto.Description,
-                IsDefault = roleDto.IsDefault,
-                IsActive = roleDto.IsActive,
-            };
-
-            // Add permissions to role
-            foreach (var permissionId in roleDto.Permissions)
-            {
-                var permission = permissions.FirstOrDefault(p => p.Id == permissionId);
-                if (permission != null)
-                {
-                    role.AddPermission(permission);
-                }
-            }
-
-            context.Roles.Add(role);
-        }
-
-        await context.SaveChangesAsync();
-        logger.LogInformation("Seeded {RoleCount} roles with permissions.", rolesData.Count);
-    }
-
     private static async Task<List<Guid>> SeedUsersAsync(
         ApplicationDbContext context,
         ILogger logger,
-        IPasswordHasher passwordHasher,
-        string usersJsonPath
+        string usersJsonPath,
+        UserManager<User> userManager
     )
     {
         List<Guid> createdUserIds = [];
-        if (await context.Users.AnyAsync())
+        if (await userManager.Users.AnyAsync())
         {
             createdUserIds = await context.Users.Select(u => u.Id).ToListAsync();
             return createdUserIds;
@@ -252,58 +148,32 @@ public static class ApplicationDbContextInitialiser
             // Create a photo for this member using their ImageUrl
             if (!string.IsNullOrEmpty(userDto.ImageUrl))
             {
-                var photo = new Photo
-                {
-                    Url = userDto.ImageUrl,
-                    MemberId = userDto.Id,
-                    Member = user.Member,
-                };
-
+                var photo = new Photo { Url = userDto.ImageUrl, MemberId = userDto.Id };
                 context.Photos.Add(photo);
             }
 
-            context.Users.Add(user);
-        }
-
-        await context.SaveChangesAsync();
-
-        // Assign roles to users
-        logger.LogInformation("Assigning roles to users...");
-
-        // Load roles from database
-        var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == "Administrator");
-        var memberRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == "Member");
-
-        if (adminRole == null || memberRole == null)
-        {
-            logger.LogWarning("Could not find Administrator or Member roles for user assignment");
-        }
-        else
-        {
-            // Load users with their roles navigation property
-            var users = await context
-                .Users.Include(u => u.Roles)
-                .Where(u => userData.Select(dto => dto.Id).Contains(u.Id))
-                .ToListAsync();
-
-            foreach (var user in users)
+            var result = await userManager.CreateAsync(user, "Pa$$w0rd");
+            if (!result.Succeeded)
             {
-                // Assign Administrator role to first user, Member role to others
-                var roleToAssign = user.Id == userData[0].Id ? adminRole : memberRole;
-                user.AssignRole(roleToAssign);
+                logger.LogError(result.Errors.First().Description);
             }
-
-            await context.SaveChangesAsync();
-            logger.LogInformation(
-                "Assigned Administrator role to first user, Member role to {MemberCount} other users.",
-                users.Count - 1
-            );
+            await userManager.AddToRoleAsync(user, "Member");
         }
+
+        var admin = new User
+        {
+            UserName = "admin@test.com",
+            Email = "admin@test.com",
+            DisplayName = "Admin",
+        };
+
+        await userManager.CreateAsync(admin, "Pa$$w0rd");
+        await userManager.AddToRolesAsync(admin, ["Admin", "Moderator"]);
 
         // Collect the created user IDs
         createdUserIds = [.. userData.Select(u => u.Id)];
-
         logger.LogInformation("Seeded {UserCount} users with corresponding members and photos.", userData.Count);
+
         return createdUserIds;
     }
 
@@ -332,52 +202,63 @@ public static class ApplicationDbContextInitialiser
             return;
         }
 
-        var users = await context.Users.ToDictionaryAsync(u => u.Id);
-
         for (int i = 0; i < listsData.Count; i++)
         {
             var listDto = listsData[i];
-            // Assign users in round-robin fashion
             var userId = createdUserIds[i % createdUserIds.Count];
 
-            var todoList = new TodoList
-            {
-                Title = listDto.Title,
-                Colour = Colour.From(listDto.Colour),
-                UserId = userId,
-                User = users[userId],
-            };
-
-            // Add items to the list
-            if (listDto.Items?.Any() is true)
-            {
-                foreach (var itemDto in listDto.Items)
-                {
-                    var todoItem = new TodoItem
-                    {
-                        Title = itemDto.Title,
-                        Note = itemDto.Note,
-                        Priority = (PriorityLevel)itemDto.Priority,
-                        Reminder = itemDto.Reminder?.ToUniversalTime(),
-                        Description = itemDto.Description,
-                        DueDate = itemDto.DueDate?.ToUniversalTime(),
-                        Labels = itemDto.Labels ?? [],
-                        Done = itemDto.Done,
-                        CompletedAt = itemDto.CompletedAt?.ToUniversalTime(),
-                        UserId = userId,
-                        User = users[userId],
-                        List = todoList,
-                    };
-
-                    todoList.Items.Add(todoItem);
-                }
-            }
+            var todoList = CreateTodoList(listDto, userId);
+            ProcessTodoItems(todoList, listDto.Items, userId);
 
             context.TodoLists.Add(todoList);
         }
 
         await context.SaveChangesAsync();
         logger.LogInformation("Seeded {ListCount} lists with proper User IDs.", listsData.Count);
+    }
+
+    private static TodoList CreateTodoList(TodoListSeedDto listDto, Guid userId)
+    {
+        return new TodoList
+        {
+            Title = listDto.Title,
+            Colour = Colour.From(listDto.Colour),
+            UserId = userId,
+        };
+    }
+
+    private static void ProcessTodoItems(TodoList todoList, List<TodoItemSeedDto>? items, Guid userId)
+    {
+        if (items?.Any() != true)
+            return;
+
+        foreach (var itemDto in items)
+        {
+            var todoItem = CreateTodoItem(itemDto, userId, todoList);
+            todoList.Items.Add(todoItem);
+        }
+    }
+
+    private static TodoItem CreateTodoItem(TodoItemSeedDto itemDto, Guid userId, TodoList todoList)
+    {
+        return new TodoItem
+        {
+            Title = itemDto.Title,
+            Note = itemDto.Note,
+            Priority = (PriorityLevel)itemDto.Priority,
+            Reminder = itemDto.Reminder.HasValue
+                ? DateTime.SpecifyKind(itemDto.Reminder.Value, DateTimeKind.Utc)
+                : null,
+            Description = itemDto.Description,
+            DueDate = itemDto.DueDate.HasValue ? DateTime.SpecifyKind(itemDto.DueDate.Value, DateTimeKind.Utc) : null,
+            Labels = itemDto.Labels ?? [],
+            Done = itemDto.Done,
+            CompletedAt = itemDto.CompletedAt.HasValue
+                ? DateTime.SpecifyKind(itemDto.CompletedAt.Value, DateTimeKind.Utc)
+                : null,
+            UserId = userId,
+            List = todoList,
+        };
     }
 
     private static async Task SeedAuctionsAsync(ApplicationDbContext context, ILogger logger, string auctionsJsonPath)

@@ -8,6 +8,6 @@ public class Photo : BaseEntity<Guid>
     public string? PublicId { get; set; }
 
     // Navigation property
-    public required Member Member { get; set; }
+    public Member Member { get; set; } = null!;
     public required Guid MemberId { get; set; }
 }

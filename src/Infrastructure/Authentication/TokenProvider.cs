@@ -45,7 +45,7 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(JwtRegisteredClaimNames.Email, user.Email),
+            new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
         };
 
         var permissions = await permissionProvider.GetForUserIdAsync(user.Id);

@@ -21,14 +21,7 @@ internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUs
 
         UserDto? user = await context
             .Users.Where(u => u.Id == query.UserId)
-            .Select(u => new UserDto
-            {
-                Id = u.Id,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                DisplayName = u.DisplayName,
-            })
+            .ProjectToType<UserDto>()
             .SingleOrDefaultAsync(cancellationToken);
 
         if (user is null)

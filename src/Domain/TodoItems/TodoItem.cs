@@ -24,7 +24,7 @@ public sealed class TodoItem : FullAuditableEntity<int>
         {
             if (value && !_done)
             {
-                AddDomainEvent(new TodoItemCompletedEvent(Guid.NewGuid(), this));
+                AddDomainEvent(TodoItemCompletedEvent.Create(this));
             }
 
             _done = value;
@@ -32,6 +32,6 @@ public sealed class TodoItem : FullAuditableEntity<int>
     }
 
     public Guid UserId { get; set; }
-    public required User User { get; set; }
-    public required TodoList List { get; set; }
+    public User User { get; set; } = null!;
+    public TodoList List { get; set; } = null!;
 }

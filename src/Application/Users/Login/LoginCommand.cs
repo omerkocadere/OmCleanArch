@@ -13,11 +13,8 @@ public sealed record LoginCommand : ICommand<UserDto>
     public required string Password { get; set; }
 }
 
-internal sealed class LoginCommandHandler(
-    IApplicationDbContext context,
-    IPasswordHasher passwordHasher,
-    ITokenProvider tokenProvider
-) : ICommandHandler<LoginCommand, UserDto>
+internal sealed class LoginCommandHandler(IApplicationDbContext context, ITokenProvider tokenProvider)
+    : ICommandHandler<LoginCommand, UserDto>
 {
     public async Task<Result<UserDto>> Handle(LoginCommand command, CancellationToken cancellationToken)
     {

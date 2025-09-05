@@ -5,27 +5,24 @@ using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Messages;
-using CleanArch.Domain.Permissions;
 using CleanArch.Domain.Photos;
-using CleanArch.Domain.Roles;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.Users;
 using CleanArch.Infrastructure.BackgroundJobs.Outbox;
 using MassTransit;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Infrastructure.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : DbContext(options),
+    : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options),
         IApplicationDbContext
 {
     public DbSet<TodoList> TodoLists => Set<TodoList>();
     public DbSet<TodoItem> TodoItems => Set<TodoItem>();
-    public DbSet<User> Users => Set<User>();
-    public DbSet<Role> Roles => Set<Role>();
-    public DbSet<Permission> Permissions => Set<Permission>();
     public DbSet<Auction> Auctions => Set<Auction>();
     public DbSet<Member> Members => Set<Member>();
     public DbSet<Photo> Photos => Set<Photo>();
@@ -34,18 +31,18 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     public DbSet<OutboxMessageConsumer> OutboxMessageConsumers => Set<OutboxMessageConsumer>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        base.OnModelCreating(builder);
+
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         // Configure global query filters for soft delete
         // This automatically excludes soft-deleted entities from all queries
-        ConfigureSoftDeleteQueryFilters(modelBuilder);
-
-        // Add MassTransit outbox tables under auction schema
-        modelBuilder.AddInboxStateEntity(cfg => cfg.ToTable("InboxState", "carsties"));
-        modelBuilder.AddOutboxMessageEntity(cfg => cfg.ToTable("OutboxMessage", "carsties"));
-        modelBuilder.AddOutboxStateEntity(cfg => cfg.ToTable("OutboxState", "carsties"));
+        ConfigureSoftDeleteQueryFilters(builder); // Add MassTransit outbox tables under auction schema
+        builder.AddInboxStateEntity(cfg => cfg.ToTable("InboxState", "carsties"));
+        builder.AddOutboxMessageEntity(cfg => cfg.ToTable("OutboxMessage", "carsties"));
+        builder.AddOutboxStateEntity(cfg => cfg.ToTable("OutboxState", "carsties"));
     }
 
     /// <summary>

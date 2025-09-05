@@ -40,7 +40,6 @@ public static class MappingConfig
         #region Users
 
 
-
         #endregion
 
         #region Auctions

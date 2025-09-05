@@ -10,7 +10,7 @@ public static class DbInitializer
     public static async Task InitDb(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
-        var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(DbInitializer));
+        // var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(DbInitializer));
 
         await DB.InitAsync(
             "SearchDb",
@@ -23,7 +23,7 @@ public static class DbInitializer
             .Key(x => x.Color, KeyType.Text)
             .CreateAsync();
 
-        var count = await DB.CountAsync<Item>();
+        // var count = await DB.CountAsync<Item>();
 
         var httpClient = scope.ServiceProvider.GetRequiredService<AuctionSvcHttpClient>();
 

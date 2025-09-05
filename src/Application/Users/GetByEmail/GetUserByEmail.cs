@@ -15,14 +15,7 @@ internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context)
     {
         UserDto? user = await context
             .Users.Where(u => u.Email == query.Email)
-            .Select(u => new UserDto
-            {
-                Id = u.Id,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email,
-                DisplayName = u.DisplayName,
-            })
+            .ProjectToType<UserDto>()
             .SingleOrDefaultAsync(cancellationToken);
 
         if (user is null)
