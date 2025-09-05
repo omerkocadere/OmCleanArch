@@ -57,7 +57,7 @@ public class CreateUserCommandHandlerTests
         var token = "mock_jwt_token";
 
         _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns(hashedPassword);
-        _mockTokenProvider.Setup(x => x.Create(It.IsAny<User>())).Returns(token);
+        _mockTokenProvider.Setup(x => x.CreateAsync(It.IsAny<User>())).Returns(Task.FromResult(token));
         var mockUsersDbSet = SetupMockContext();
 
         // Act
@@ -75,7 +75,7 @@ public class CreateUserCommandHandlerTests
 
         // Verify interactions
         _mockPasswordHasher.Verify(x => x.Hash(command.Password), Times.Once);
-        _mockTokenProvider.Verify(x => x.Create(It.IsAny<User>()), Times.Once);
+        _mockTokenProvider.Verify(x => x.CreateAsync(It.IsAny<User>()), Times.Once);
         mockUsersDbSet.Verify(x => x.Add(It.IsAny<User>()), Times.Once);
         _mockContext.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -139,7 +139,7 @@ public class CreateUserCommandHandlerTests
         var token = "mock_jwt_token";
 
         _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns(hashedPassword);
-        _mockTokenProvider.Setup(x => x.Create(It.IsAny<User>())).Returns(token);
+        _mockTokenProvider.Setup(x => x.CreateAsync(It.IsAny<User>())).Returns(Task.FromResult(token));
 
         var mockUsersDbSet = SetupMockContext();
 
@@ -169,7 +169,7 @@ public class CreateUserCommandHandlerTests
         var token = "mock_jwt_token";
 
         _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns("hashed_password");
-        _mockTokenProvider.Setup(x => x.Create(It.IsAny<User>())).Returns(token);
+        _mockTokenProvider.Setup(x => x.CreateAsync(It.IsAny<User>())).Returns(Task.FromResult(token));
 
         var mockUsersDbSet = SetupMockContext();
 
@@ -203,7 +203,7 @@ public class CreateUserCommandHandlerTests
         var token = "mock_jwt_token";
 
         _mockPasswordHasher.Setup(x => x.Hash(command.Password)).Returns("hashed_password");
-        _mockTokenProvider.Setup(x => x.Create(It.IsAny<User>())).Returns(token);
+        _mockTokenProvider.Setup(x => x.CreateAsync(It.IsAny<User>())).Returns(Task.FromResult(token));
         var mockUsersDbSet = SetupMockContext();
 
         // Act
@@ -214,7 +214,7 @@ public class CreateUserCommandHandlerTests
 
         // Verify interactions
         _mockPasswordHasher.Verify(x => x.Hash(command.Password), Times.Once);
-        _mockTokenProvider.Verify(x => x.Create(It.IsAny<User>()), Times.Once);
+        _mockTokenProvider.Verify(x => x.CreateAsync(It.IsAny<User>()), Times.Once);
         mockUsersDbSet.Verify(x => x.Add(It.IsAny<User>()), Times.Once);
         _mockContext.Verify(x => x.SaveChangesAsync(cancellationToken), Times.Once);
     }

@@ -4,5 +4,5 @@ namespace CleanArch.Application.Common.Interfaces.Authentication;
 
 public interface ITokenProvider
 {
-    string Create(User user);
+    Task<string> CreateAsync(User user);
 }

@@ -60,7 +60,7 @@ public class CreateUserCommandHandler(
         await context.SaveChangesAsync(cancellationToken);
 
         var userDto = user.Adapt<UserDto>();
-        userDto.Token = tokenProvider.Create(user);
+        userDto.Token = await tokenProvider.CreateAsync(user);
 
         return userDto;
     }

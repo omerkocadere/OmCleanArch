@@ -4,32 +4,23 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanArch.Infrastructure.Authorization;
 
-internal sealed class PermissionAuthorizationHandler(IServiceScopeFactory serviceScopeFactory)
-    : AuthorizationHandler<PermissionRequirement>
+internal sealed class PermissionAuthorizationHandler() : AuthorizationHandler<PermissionRequirement>
 {
-    protected override async Task HandleRequirementAsync(
+    protected override Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         PermissionRequirement requirement
     )
     {
-        if (context.User is { Identity.IsAuthenticated: true })
+        HashSet<string> permissions = context
+            .User.Claims.Where(c => c.Type == CustomClaims.Permissions)
+            .Select(c => c.Value)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        if (permissions.Contains(requirement.Permission))
         {
-            using IServiceScope scope = serviceScopeFactory.CreateScope();
-
-            PermissionProvider permissionProvider = scope.ServiceProvider.GetRequiredService<PermissionProvider>();
-
-            Guid? userId = context.User.GetUserId();
-            if (userId is null)
-            {
-                return;
-            }
-
-            HashSet<string> permissions = await permissionProvider.GetForUserIdAsync(userId.Value);
-
-            if (permissions.Contains(requirement.Permission))
-            {
-                context.Succeed(requirement);
-            }
+            context.Succeed(requirement);
         }
+
+        return Task.CompletedTask;
     }
 }

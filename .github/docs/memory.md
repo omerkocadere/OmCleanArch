@@ -177,6 +177,39 @@
 
 ---
 
+### Async/Await Token Provider Compilation Fix (Sep 5, 2025)
+
+**Problem**: Multiple compilation errors related to async/await pattern with JWT token creation:
+1. `CustomClaims.Permissions` not accessible in TokenProvider 
+2. Missing `await` keywords in LoginCommand and CreateUser handlers
+3. Test mocks returning `string` instead of `Task<string>`
+
+**Root Cause Analysis**:
+- Application layer had compilation errors preventing Infrastructure from building properly
+- `TokenProvider.CreateAsync()` returns `Task<string>` but handlers were treating it as synchronous 
+- Test mocks were not properly configured for async methods
+
+**Solution Applied**:
+1. **Fixed Application Layer**: Added missing `await` keywords in LoginCommand and CreateUser handlers
+2. **Fixed Test Layer**: Updated all TokenProvider mocks to return `Task.FromResult(token)` instead of direct string
+3. **Verified Infrastructure**: CustomClaims class was already present and accessible
+
+**Files Modified**:
+- `src/Application/Users/Login/LoginCommand.cs`: Added `await` to token creation
+- `src/Application/Users/Create/CreateUser.cs`: Added `await` to token creation  
+- `tests/Application.Tests/Users/Create/CreateUserCommandHandlerTests.cs`: Fixed 4 mock setups
+
+**Technical Details**:
+- **Before**: `userDto.Token = tokenProvider.CreateAsync(user);` (❌ missing await)
+- **After**: `userDto.Token = await tokenProvider.CreateAsync(user);` (✅ proper async/await)
+- **Test Mocks**: `.Returns(Task.FromResult(token))` instead of `.Returns(token)`
+
+**Result**: ✅ All projects compile successfully, all tests pass (10/10)
+**Architecture**: ✅ Clean Architecture compliance maintained
+**Build Status**: ✅ Full solution builds without errors
+
+---
+
 **Permission System**: ✅ Fully migrated to Application layer
 **Role Entity**: ✅ Refactored to Clean Architecture standards  
 **JWT Authentication**: ✅ Fixed expired token handling
