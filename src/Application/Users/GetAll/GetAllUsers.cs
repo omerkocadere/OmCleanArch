@@ -16,17 +16,7 @@ internal sealed class GetAllUsersQueryHandler(IApplicationDbContext context)
 {
     public async Task<Result<IEnumerable<UserDto>>> Handle(GetAllUsersQuery query, CancellationToken cancellationToken)
     {
-        var users = await context
-            .Users.AsNoTracking()
-            .Select(u => new UserDto
-            {
-                Id = u.Id,
-                Email = u.Email,
-                DisplayName = u.DisplayName,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-            })
-            .ToListAsync(cancellationToken);
+        var users = await context.Users.AsNoTracking().ProjectToType<UserDto>().ToListAsync(cancellationToken);
 
         return Result.Success<IEnumerable<UserDto>>(users);
     }

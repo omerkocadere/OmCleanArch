@@ -42,7 +42,7 @@ public class GetMembersQueryHandler(IApplicationDbContext context, IUserContext 
         // Ordering using computed property with default
         query = request.MemberParams.OrderByValue.ToLower() switch
         {
-            "created" => query.OrderByDescending(m => m.User.Created),
+            "created" => query.OrderByDescending(m => m.Created),
             "lastactive" => query.OrderByDescending(m => m.LastActive),
             _ => query.OrderByDescending(m => m.LastActive),
         };

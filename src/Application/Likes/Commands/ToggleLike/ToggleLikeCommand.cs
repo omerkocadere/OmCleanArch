@@ -19,7 +19,7 @@ public class ToggleLikeCommandHandler(IApplicationDbContext context, IUserContex
         if (!sourceUserId.HasValue)
             return Result.Failure(UserErrors.NotFound(Guid.Empty));
 
-        // Get source member from userId
+        // Get source member from userId - Member.Id should equal User.Id
         var sourceMember = await context.Members.FirstOrDefaultAsync(
             m => m.Id == sourceUserId.Value,
             cancellationToken

@@ -90,7 +90,7 @@ public class CreateUserCommandHandlerTests
         var existingUser = new User
         {
             Id = Guid.NewGuid(),
-            Email = Email.Create(existingEmail).Value,
+            Email = existingEmail.ToLower(),
             DisplayName = "Existing User",
             FirstName = "Existing",
             LastName = "User",
@@ -154,7 +154,7 @@ public class CreateUserCommandHandlerTests
 
         capturedUser.Should().NotBeNull();
         capturedUser!.Id.Should().NotBeEmpty();
-        capturedUser.Email.Value.Should().Be(command.Email);
+        capturedUser.Email.Should().Be(command.Email.ToLower());
         capturedUser.DisplayName.Should().Be(command.DisplayName);
         capturedUser.FirstName.Should().Be(command.FirstName);
         capturedUser.LastName.Should().Be(command.LastName);
@@ -228,7 +228,7 @@ public class CreateUserCommandHandlerTests
         var existingUser = new User
         {
             Id = Guid.NewGuid(),
-            Email = Email.Create("test@example.com").Value, // Lowercase email
+            Email = "test@example.com", // Lowercase email
             DisplayName = "Existing User",
             FirstName = "Existing",
             LastName = "User",

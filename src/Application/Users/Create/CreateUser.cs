@@ -21,22 +21,14 @@ public sealed record CreateUserCommand : ICommand<UserDto>
     public DateOnly DateOfBirth { get; set; }
 }
 
-public class CreateUserCommandHandler(
-    IApplicationDbContext context,
-    IPasswordHasher passwordHasher,
-    ITokenProvider tokenProvider
-) : ICommandHandler<CreateUserCommand, UserDto>
+public class CreateUserCommandHandler(IApplicationDbContext context, ITokenProvider tokenProvider)
+    : ICommandHandler<CreateUserCommand, UserDto>
 {
     public async Task<Result<UserDto>> Handle(CreateUserCommand command, CancellationToken cancellationToken)
     {
-        var emailResult = Email.Create(command.Email);
+        var normalizedEmail = command.Email.ToLower();
 
-        if (emailResult.IsFailure)
-        {
-            return Result.Failure<UserDto>(emailResult.Error);
-        }
-
-        var emailExists = await context.Users.AnyAsync(u => u.Email == emailResult.Value, cancellationToken);
+        var emailExists = await context.Users.AnyAsync(u => u.Email == normalizedEmail, cancellationToken);
 
         if (emailExists)
         {
@@ -47,8 +39,8 @@ public class CreateUserCommandHandler(
         var member = command.Adapt<Member>();
 
         user.Id = Guid.NewGuid();
-        user.Email = emailResult.Value;
-        user.PasswordHash = passwordHasher.Hash(command.Password);
+        user.Email = normalizedEmail;
+        user.UserName = normalizedEmail;
         user.Member = member;
 
         // Set the same ID for one-to-one relationship

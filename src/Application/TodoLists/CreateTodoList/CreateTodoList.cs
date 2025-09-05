@@ -13,16 +13,20 @@ public class CreateTodoListCommandHandler(IApplicationDbContext context)
 {
     public async Task<Result<TodoListDto>> Handle(CreateTodoListCommand request, CancellationToken cancellationToken)
     {
-        User? user = await context
-            .Users.AsNoTracking()
-            .SingleOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+        // Check if user exists without loading the full entity
+        bool userExists = await context.Users.AsNoTracking().AnyAsync(u => u.Id == request.UserId, cancellationToken);
 
-        if (user is null)
+        if (!userExists)
         {
             return Result.Failure<TodoListDto>(UserErrors.NotFound(request.UserId));
         }
 
-        var entity = new TodoList { Title = request.Title, User = user };
+        var entity = new TodoList
+        {
+            Title = request.Title,
+            UserId = request.UserId,
+            User = null!, // Will be populated by EF Core through the foreign key
+        };
 
         context.TodoLists.Add(entity);
 

@@ -21,21 +21,11 @@ internal sealed class LoginCommandHandler(
 {
     public async Task<Result<UserDto>> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
-        var emailResult = Email.Create(command.Email);
-        if (emailResult.IsFailure)
-        {
-            return Result.Failure<UserDto>(emailResult.Error);
-        }
+        var normalizedEmail = command.Email.ToLower();
 
-        var user = await context.Users.SingleOrDefaultAsync(u => u.Email == emailResult.Value, cancellationToken);
+        var user = await context.Users.SingleOrDefaultAsync(u => u.Email == normalizedEmail, cancellationToken);
 
-        if (user == null)
-        {
-            return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
-        }
-
-        bool verified = passwordHasher.Verify(command.Password, user.PasswordHash);
-        if (!verified)
+        if (user == null || string.IsNullOrEmpty(user.PasswordHash))
         {
             return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
         }

@@ -1,22 +1,50 @@
-﻿using CleanArch.Domain.Members;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using CleanArch.Domain.Members;
 using CleanArch.Domain.Roles;
+using Microsoft.AspNetCore.Identity;
 
 namespace CleanArch.Domain.Users;
 
-public sealed class User : FullAuditableEntity<Guid> // Aggregate Root - ISoftDelete var
+public sealed class User : IdentityUser<Guid>, IHasDomainEvents
 {
     private readonly List<Role> _roles = [];
+    private readonly List<BaseEvent> _domainEvents = [];
 
-    public required Email Email { get; set; }
-    public string? ImageUrl { get; set; }
     public required string DisplayName { get; set; }
+    public string? ImageUrl { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
-    public required string PasswordHash { get; set; }
+    public string? RefreshToken { get; set; }
+
+    private DateTime? _refreshTokenExpiry;
+    public DateTime? RefreshTokenExpiry
+    {
+        get => _refreshTokenExpiry;
+        set => _refreshTokenExpiry = value?.ToUniversalTime(); // Ensure UTC for PostgreSQL
+    }
 
     // Navigation properties
     public required Member Member { get; set; }
     public IReadOnlyCollection<Role> Roles => _roles.AsReadOnly();
+
+    // Domain Events implementation
+    [NotMapped]
+    public IReadOnlyCollection<BaseEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+    public void AddDomainEvent(BaseEvent domainEvent)
+    {
+        _domainEvents.Add(domainEvent);
+    }
+
+    public void RemoveDomainEvent(BaseEvent domainEvent)
+    {
+        _domainEvents.Remove(domainEvent);
+    }
+
+    public void ClearDomainEvents()
+    {
+        _domainEvents.Clear();
+    }
 
     // Business methods - simple and focused
     public void AssignRole(Role role)

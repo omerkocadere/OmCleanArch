@@ -228,12 +228,12 @@ public static class ApplicationDbContextInitialiser
             var user = new User
             {
                 Id = userDto.Id,
-                Email = Email.Create(userDto.Email).Value,
+                Email = userDto.Email.ToLower(),
+                UserName = userDto.Email.ToLower(),
                 DisplayName = userDto.DisplayName,
                 FirstName = userDto.FirstName,
                 LastName = userDto.LastName,
                 ImageUrl = userDto.ImageUrl,
-                PasswordHash = passwordHasher.Hash("111111"),
                 Member = new Member
                 {
                     Id = userDto.Id,
