@@ -132,12 +132,15 @@ public static class DependencyInjection
 
     private static IServiceCollection AddAuthorizationInternal(this IServiceCollection services)
     {
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy(AuthorizationPolicies.AdminOnly, policy => policy.RequireRole(UserRoles.Admin));
-            options.AddPolicy(AuthorizationPolicies.MemberOnly, policy => policy.RequireRole(UserRoles.Member));
-            options.AddPolicy(AuthorizationPolicies.ModeratorOnly, policy => policy.RequireRole(UserRoles.Moderator));
-        });
+        services
+            .AddAuthorizationBuilder()
+            .AddPolicy(AuthorizationPolicies.AdminOnly, policy => policy.RequireRole(UserRoles.Admin))
+            .AddPolicy(AuthorizationPolicies.MemberOnly, policy => policy.RequireRole(UserRoles.Member))
+            .AddPolicy(AuthorizationPolicies.ModeratorOnly, policy => policy.RequireRole(UserRoles.Moderator))
+            .AddPolicy(
+                AuthorizationPolicies.ModeratePhotoRole,
+                policy => policy.RequireRole(UserRoles.Admin, UserRoles.Moderator)
+            );
 
         services
             .AddIdentityCore<User>(options =>

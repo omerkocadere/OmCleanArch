@@ -43,10 +43,10 @@ public class MembersVersioned : EndpointGroupBase, IVersionedEndpointGroup
                         Data = members.Items,
                         Version = "2.0",
                         Count = members.TotalCount,
-                        PageNumber = members.PageNumber,
-                        TotalPages = members.TotalPages,
-                        HasNextPage = members.HasNextPage,
-                        HasPreviousPage = members.HasPreviousPage,
+                        members.PageNumber,
+                        members.TotalPages,
+                        members.HasNextPage,
+                        members.HasPreviousPage,
                         Filters = new
                         {
                             memberParams.Gender,

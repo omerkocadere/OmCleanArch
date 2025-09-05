@@ -28,7 +28,8 @@ public class CreateUserCommandHandlerTests
             null!,
             null!,
             null!,
-            null!);
+            null!
+        );
         _mockTokenProvider = new Mock<ITokenProvider>();
         _handler = new CreateUserCommandHandler(_mockUserManager.Object, _mockTokenProvider.Object);
     }
@@ -54,13 +55,9 @@ public class CreateUserCommandHandlerTests
             .Setup(x => x.CreateAsync(It.IsAny<User>(), command.Password))
             .ReturnsAsync(IdentityResult.Success);
 
-        _mockUserManager
-            .Setup(x => x.AddToRoleAsync(It.IsAny<User>(), "Member"))
-            .ReturnsAsync(IdentityResult.Success);
+        _mockUserManager.Setup(x => x.AddToRoleAsync(It.IsAny<User>(), "Member")).ReturnsAsync(IdentityResult.Success);
 
-        _mockTokenProvider
-            .Setup(x => x.CreateAsync(It.IsAny<User>()))
-            .ReturnsAsync(expectedToken);
+        _mockTokenProvider.Setup(x => x.CreateAsync(It.IsAny<User>())).ReturnsAsync(expectedToken);
 
         var result = await _handler.Handle(command, CancellationToken.None);
 
