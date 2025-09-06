@@ -29,7 +29,7 @@ wt -w 0 -d "$angularClientPath" --title "Angular Client" pwsh -NoExit -Command "
 
 # Start .NET API in a new terminal
 Log "Starting .NET APIs ..."
-wt -w 0 -d "$WebApiPath" --title "WebApi" pwsh -NoExit -Command "dotnet run --launch-profile https"
+wt -w 0 -d "$WebApiPath" --title "WebApi" pwsh -NoExit -Command "dotnet watch"
 Start-Sleep -Milliseconds 100
 wt -w 0 -d "$DummyApiPath" --title "DummyApi" pwsh -NoExit -Command "dotnet watch"
 Start-Sleep -Milliseconds 100
