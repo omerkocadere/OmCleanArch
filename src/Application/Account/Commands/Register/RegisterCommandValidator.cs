@@ -1,11 +1,10 @@
-using CleanArch.Application.Users.Create;
 using FluentValidation;
 
-namespace CleanArch.Application.Users.CreateUser;
+namespace CleanArch.Application.Account.Commands.Register;
 
-public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
+public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 {
-    public CreateUserCommandValidator()
+    public RegisterCommandValidator()
     {
         RuleFor(x => x.Email)
             .NotEmpty()

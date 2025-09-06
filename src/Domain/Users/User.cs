@@ -13,13 +13,8 @@ public sealed class User : IdentityUser<Guid>, IHasDomainEvents
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiry { get; set; }
 
-    private DateTime? _refreshTokenExpiry;
-    public DateTime? RefreshTokenExpiry
-    {
-        get => _refreshTokenExpiry;
-        set => _refreshTokenExpiry = value?.ToUniversalTime(); // Ensure UTC for PostgreSQL
-    }
 
     // Navigation properties
     public Member Member { get; set; } = null!;

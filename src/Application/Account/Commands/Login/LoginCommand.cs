@@ -5,7 +5,7 @@ using CleanArch.Domain.Common;
 using CleanArch.Domain.Users;
 using Microsoft.AspNetCore.Identity;
 
-namespace CleanArch.Application.Users.Login;
+namespace CleanArch.Application.Account.Commands.Login;
 
 public sealed record LoginCommand : ICommand<UserDto>
 {

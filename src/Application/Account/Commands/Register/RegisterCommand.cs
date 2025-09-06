@@ -8,9 +8,9 @@ using CleanArch.Domain.Members;
 using CleanArch.Domain.Users;
 using Microsoft.AspNetCore.Identity;
 
-namespace CleanArch.Application.Users.Create;
+namespace CleanArch.Application.Account.Commands.Register;
 
-public sealed record CreateUserCommand : ICommand<UserDto>
+public sealed record RegisterCommand : ICommand<UserDto>
 {
     public string Email { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
@@ -23,10 +23,10 @@ public sealed record CreateUserCommand : ICommand<UserDto>
     public DateOnly DateOfBirth { get; set; }
 }
 
-public class CreateUserCommandHandler(UserManager<User> userManager, ITokenProvider tokenProvider)
-    : ICommandHandler<CreateUserCommand, UserDto>
+public class RegisterCommandHandler(UserManager<User> userManager, ITokenProvider tokenProvider)
+    : ICommandHandler<RegisterCommand, UserDto>
 {
-    public async Task<Result<UserDto>> Handle(CreateUserCommand command, CancellationToken cancellationToken)
+    public async Task<Result<UserDto>> Handle(RegisterCommand command, CancellationToken cancellationToken)
     {
         var user = command.Adapt<User>();
         var member = command.Adapt<Member>();

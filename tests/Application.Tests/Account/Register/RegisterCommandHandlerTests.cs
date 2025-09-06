@@ -1,22 +1,22 @@
+using CleanArch.Application.Account.Commands.Register;
 using CleanArch.Application.Common.Mappings;
-using CleanArch.Application.Users.Create;
 using CleanArch.Domain.Users;
 using Microsoft.AspNetCore.Identity;
 
-namespace CleanArch.Application.Tests.Users.Create;
+namespace CleanArch.Application.Tests.Account.Register;
 
-public class CreateUserCommandHandlerTests
+public class RegisterCommandHandlerTests
 {
     private readonly Mock<UserManager<User>> _mockUserManager;
     private readonly Mock<ITokenProvider> _mockTokenProvider;
-    private readonly CreateUserCommandHandler _handler;
+    private readonly RegisterCommandHandler _handler;
 
-    static CreateUserCommandHandlerTests()
+    static RegisterCommandHandlerTests()
     {
         MappingConfig.Configure();
     }
 
-    public CreateUserCommandHandlerTests()
+    public RegisterCommandHandlerTests()
     {
         var userStore = new Mock<IUserStore<User>>();
         _mockUserManager = new Mock<UserManager<User>>(
@@ -31,13 +31,13 @@ public class CreateUserCommandHandlerTests
             null!
         );
         _mockTokenProvider = new Mock<ITokenProvider>();
-        _handler = new CreateUserCommandHandler(_mockUserManager.Object, _mockTokenProvider.Object);
+        _handler = new RegisterCommandHandler(_mockUserManager.Object, _mockTokenProvider.Object);
     }
 
     [Fact]
     public async Task Handle_ShouldCreateUser_WhenCommandIsValid()
     {
-        var command = new CreateUserCommand
+        var command = new RegisterCommand
         {
             Email = "john@test.com",
             DisplayName = "John Doe",
@@ -75,7 +75,7 @@ public class CreateUserCommandHandlerTests
     [Fact]
     public async Task Handle_ShouldReturnValidationError_WhenUserCreationFails()
     {
-        var command = new CreateUserCommand
+        var command = new RegisterCommand
         {
             Email = "john@test.com",
             DisplayName = "John Doe",

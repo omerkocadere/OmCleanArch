@@ -20,14 +20,14 @@ tests/
 │   ├── Common/
 │   │   ├── ApplicationDbContextFactory.cs  # Mock DbContext factory
 │   │   └── MapperFactory.cs                # AutoMapper test configurasyonu
-│   └── Users/
-│       └── Create/
-│           └── CreateUserCommandHandlerTests.cs  # CreateUserCommandHandler testleri
+│   └── Account/
+│       └── Register/
+│           └── RegisterCommandHandlerTests.cs  # RegisterCommandHandler testleri
 ```
 
 ## Test Örnekleri
 
-### CreateUserCommandHandler Testleri
+### RegisterCommandHandler Testleri
 
 Bu test sınıfı aşağıdaki senaryoları kapsar:
 
@@ -48,7 +48,7 @@ dotnet test tests/Application.Tests
 dotnet test tests/Application.Tests --verbosity normal
 
 # Tek bir test sınıfını çalıştır
-dotnet test tests/Application.Tests --filter "CreateUserCommandHandlerTests"
+dotnet test tests/Application.Tests --filter "RegisterCommandHandlerTests"
 ```
 
 ## Mock Stratejisi

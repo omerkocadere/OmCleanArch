@@ -2,12 +2,9 @@ using CleanArch.Application.Auctions.Create;
 using CleanArch.Application.Auctions.DTOs;
 using CleanArch.Application.Messages.Queries.Common;
 using CleanArch.Application.TodoItems.DTOs;
-using CleanArch.Application.Users.Create;
-using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Messages;
 using CleanArch.Domain.TodoItems;
-using CleanArch.Domain.Users;
 using Contracts;
 
 namespace CleanArch.Application.Common.Mappings;

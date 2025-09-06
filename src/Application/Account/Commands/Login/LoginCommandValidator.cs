@@ -1,4 +1,6 @@
-namespace CleanArch.Application.Users.Login;
+using FluentValidation;
+
+namespace CleanArch.Application.Account.Commands.Login;
 
 public class LoginCommandValidator : AbstractValidator<LoginCommand>
 {
