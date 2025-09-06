@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../core/guards/auth-guard';
+import { preventUnsavedChangesGuard } from '../core/guards/prevent-unsaved-changes-guard';
+import { Admin } from '../features/admin/admin';
 import { Home } from '../features/home/home';
 import { Lists } from '../features/lists/lists';
 import { MemberDetailed } from '../features/members/member-detailed/member-detailed';
@@ -12,7 +14,6 @@ import { Messages } from '../features/messages/messages';
 import { TestErrors } from '../features/test-errors/test-errors';
 import { NotFound } from '../shared/errors/not-found/not-found';
 import { ServerError } from '../shared/errors/server-error/server-error';
-import { preventUnsavedChangesGuard } from '../core/guards/prevent-unsaved-changes-guard';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -41,6 +42,7 @@ export const routes: Routes = [
       },
       { path: 'lists', component: Lists },
       { path: 'messages', component: Messages },
+      { path: 'admin', component: Admin },
     ],
   },
   { path: 'errors', component: TestErrors },

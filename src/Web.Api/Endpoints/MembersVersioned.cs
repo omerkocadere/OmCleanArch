@@ -17,11 +17,7 @@ public class MembersVersioned : EndpointGroupBase, IVersionedEndpointGroup
     public override void Map(RouteGroupBuilder groupBuilder)
     {
         groupBuilder.RequireAuthorization();
-        groupBuilder
-            .MapGet("", GetMembers)
-            .RequireAuthorization(AuthorizationPolicies.AdminOnly)
-            .MapToApiVersion(1)
-            .Produces<PaginatedList<MemberDto>>();
+        groupBuilder.MapGet("", GetMembers).MapToApiVersion(1).Produces<PaginatedList<MemberDto>>();
         groupBuilder.MapGet("", GetMembersV2).MapToApiVersion(2).Produces<PaginatedList<MemberDto>>();
     }
 
