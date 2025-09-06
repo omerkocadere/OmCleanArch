@@ -1,13 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Domain.Users;
-using CleanArch.Infrastructure.Authorization;
 using CleanArch.Infrastructure.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CleanArch.Infrastructure.Authentication;
@@ -54,5 +53,11 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
         claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
 
         return claims;
+    }
+
+    public string GenerateRefreshToken()
+    {
+        var randomBytes = RandomNumberGenerator.GetBytes(64);
+        return Convert.ToBase64String(randomBytes);
     }
 }
