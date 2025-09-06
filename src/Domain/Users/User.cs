@@ -14,7 +14,7 @@ public sealed class User : IdentityUser<Guid>, IHasDomainEvents
     public string? LastName { get; set; }
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiry { get; set; }
-
+    public DateTime? RefreshTokenCreatedAt { get; set; }
 
     // Navigation properties
     public Member Member { get; set; } = null!;

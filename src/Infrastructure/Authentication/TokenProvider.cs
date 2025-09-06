@@ -3,8 +3,12 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using CleanArch.Application.Common.Interfaces.Authentication;
+using CleanArch.Application.Common.Models;
+using CleanArch.Application.Users.DTOs;
+using CleanArch.Domain.Common;
 using CleanArch.Domain.Users;
 using CleanArch.Infrastructure.Options;
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -55,7 +59,53 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
         return claims;
     }
 
-    public string GenerateRefreshToken()
+    public async Task<Result<UserDto>> CreateUserWithTokensAsync(User user, bool preserveCreatedAt = false)
+    {
+        // Set refresh token
+        var refreshTokenResult = await SetRefreshTokenAsync(user, preserveCreatedAt);
+        if (refreshTokenResult.IsFailure)
+        {
+            return Result.Failure<UserDto>(refreshTokenResult.Error);
+        }
+
+        var (refreshToken, expiry) = refreshTokenResult.Value;
+
+        // Create UserDto with all tokens
+        var userDto = user.Adapt<UserDto>();
+        userDto.Token = await CreateAsync(user);
+        userDto.RefreshToken = refreshToken;
+        userDto.RefreshTokenExpiry = expiry;
+
+        return Result.Success(userDto);
+    }
+
+    private async Task<Result<(string refreshToken, DateTime expiry)>> SetRefreshTokenAsync(
+        User user,
+        bool preserveCreatedAt = false
+    )
+    {
+        var refreshToken = GenerateRefreshToken();
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(3);
+
+        if (!preserveCreatedAt)
+        {
+            user.RefreshTokenCreatedAt = DateTime.UtcNow;
+        }
+        // If preserveCreatedAt = true, keep original RefreshTokenCreatedAt to maintain absolute session limit
+
+        var updateResult = await userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            var errors = updateResult.Errors.Select(e => Error.Validation(e.Code, e.Description)).ToArray();
+            var validationError = new ValidationError(errors);
+            return Result.Failure<(string refreshToken, DateTime expiry)>(validationError);
+        }
+
+        return Result.Success((refreshToken, user.RefreshTokenExpiry.Value));
+    }
+
+    private static string GenerateRefreshToken()
     {
         var randomBytes = RandomNumberGenerator.GetBytes(64);
         return Convert.ToBase64String(randomBytes);

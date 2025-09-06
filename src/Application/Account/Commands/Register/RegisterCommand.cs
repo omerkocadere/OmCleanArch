@@ -48,9 +48,7 @@ public class RegisterCommandHandler(UserManager<User> userManager, ITokenProvide
 
         await userManager.AddToRoleAsync(user, UserRoles.Member);
 
-        var userDto = user.Adapt<UserDto>();
-        userDto.Token = await tokenProvider.CreateAsync(user);
-
-        return userDto;
+        // Create UserDto with tokens using centralized method
+        return await tokenProvider.CreateUserWithTokensAsync(user);
     }
 }

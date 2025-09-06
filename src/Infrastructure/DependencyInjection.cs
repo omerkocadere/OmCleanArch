@@ -170,6 +170,10 @@ public static class DependencyInjection
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret)),
                     ValidIssuer = jwtOptions.Issuer,
                     ValidAudience = jwtOptions.Audience,
+                    ValidateIssuer = true, // SECURITY: Validate issuer (default: true)
+                    ValidateAudience = true, // SECURITY: Validate audience (default: true)
+                    ValidateLifetime = true, // SECURITY: Validate token expiration (default: true)
+                    ValidateIssuerSigningKey = true, // SECURITY: Validate signing key (default: false - explicitly enabled)
                     ClockSkew = jwtOptions.ClockSkew,
                 };
             });

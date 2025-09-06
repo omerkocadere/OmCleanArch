@@ -29,9 +29,8 @@ internal sealed class LoginCommandHandler(UserManager<User> userManager, ITokenP
         {
             return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
         }
-        var userDto = user.Adapt<UserDto>();
-        userDto.Token = await tokenProvider.CreateAsync(user);
 
-        return userDto;
+        // Create UserDto with tokens using centralized method
+        return await tokenProvider.CreateUserWithTokensAsync(user);
     }
 }
