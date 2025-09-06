@@ -14,6 +14,7 @@ import { Messages } from '../features/messages/messages';
 import { TestErrors } from '../features/test-errors/test-errors';
 import { NotFound } from '../shared/errors/not-found/not-found';
 import { ServerError } from '../shared/errors/server-error/server-error';
+import { adminGuard } from '../core/guards/admin-guard';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -42,7 +43,7 @@ export const routes: Routes = [
       },
       { path: 'lists', component: Lists },
       { path: 'messages', component: Messages },
-      { path: 'admin', component: Admin },
+      { path: 'admin', component: Admin, canActivate: [adminGuard] },
     ],
   },
   { path: 'errors', component: TestErrors },
