@@ -41,7 +41,7 @@ public class RegisterCommandHandlerTests
             Country = "Test Country",
             DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-25)),
         };
-        
+
         var expectedUserDto = new UserDto
         {
             Email = command.Email,
@@ -50,7 +50,7 @@ public class RegisterCommandHandlerTests
             LastName = command.LastName,
             Token = "generated_token",
             RefreshToken = "refresh_token",
-            RefreshTokenExpiry = DateTime.UtcNow.AddDays(3)
+            RefreshTokenExpiry = DateTime.UtcNow.AddDays(3),
         };
 
         _mockIdentityService

@@ -1,12 +1,11 @@
 using CleanArch.Application.Account.Commands.Login;
 using CleanArch.Application.Account.Commands.RefreshToken;
 using CleanArch.Application.Account.Commands.Register;
+using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Users;
 using CleanArch.Web.Api.Extensions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Web.Api.Endpoints;
 
@@ -58,11 +57,7 @@ public class Account : EndpointGroupBase
         );
     }
 
-    public static async Task<IResult> RefreshToken(
-        ISender sender,
-        HttpContext httpContext,
-        UserManager<User> userManager
-    )
+    public static async Task<IResult> RefreshToken(ISender sender, HttpContext httpContext)
     {
         var refreshToken = httpContext.Request.Cookies[RefreshTokenCookieName];
         if (refreshToken == null)
@@ -87,19 +82,19 @@ public class Account : EndpointGroupBase
         );
     }
 
-    public static async Task<IResult> Logout(HttpContext httpContext, UserManager<User> userManager)
+    public static async Task<IResult> Logout(HttpContext httpContext, IIdentityService identityService)
     {
         var refreshToken = httpContext.Request.Cookies[RefreshTokenCookieName];
         if (!string.IsNullOrEmpty(refreshToken))
         {
             // Find user by refresh token and invalidate it
-            var user = await userManager.Users.FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);
+            var user = await identityService.FindByRefreshTokenAsync(refreshToken);
             if (user != null)
             {
                 user.RefreshToken = null;
                 user.RefreshTokenExpiry = DateTime.UtcNow; // Expire immediately
                 user.RefreshTokenCreatedAt = null; // Clear creation time
-                await userManager.UpdateAsync(user);
+                await identityService.UpdateUserAsync(user);
             }
         }
 
