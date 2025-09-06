@@ -1,3 +1,4 @@
+using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Common.Models;
@@ -6,7 +7,6 @@ using CleanArch.Domain.Common;
 using CleanArch.Domain.Constants;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace CleanArch.Application.Account.Commands.Register;
 
@@ -23,7 +23,7 @@ public sealed record RegisterCommand : ICommand<UserDto>
     public DateOnly DateOfBirth { get; set; }
 }
 
-public class RegisterCommandHandler(UserManager<User> userManager, ITokenProvider tokenProvider)
+public class RegisterCommandHandler(IIdentityService identityService, ITokenProvider tokenProvider)
     : ICommandHandler<RegisterCommand, UserDto>
 {
     public async Task<Result<UserDto>> Handle(RegisterCommand command, CancellationToken cancellationToken)
@@ -37,16 +37,18 @@ public class RegisterCommandHandler(UserManager<User> userManager, ITokenProvide
 
         user.AddDomainEvent(new UserCreatedDomainEvent(Guid.NewGuid(), user));
 
-        var result = await userManager.CreateAsync(user, command.Password);
+        var result = await identityService.CreateUserAsync(user, command.Password);
 
-        if (!result.Succeeded)
+        if (!result.IsSuccess)
         {
-            var errors = result.Errors.Select(e => Error.Validation(e.Code, e.Description)).ToArray();
-            var validationError = new ValidationError(errors);
-            return Result.Failure<UserDto>(validationError);
+            return Result.Failure<UserDto>(result.Error);
         }
 
-        await userManager.AddToRoleAsync(user, UserRoles.Member);
+        var addRoleResult = await identityService.AddToRoleAsync(user, UserRoles.Member);
+        if (!addRoleResult.IsSuccess)
+        {
+            return Result.Failure<UserDto>(addRoleResult.Error);
+        }
 
         // Create UserDto with tokens using centralized method
         return await tokenProvider.CreateUserWithTokensAsync(user);

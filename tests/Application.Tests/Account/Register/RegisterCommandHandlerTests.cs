@@ -1,13 +1,16 @@
 using CleanArch.Application.Account.Commands.Register;
+using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Mappings;
+using CleanArch.Application.Users.DTOs;
+using CleanArch.Domain.Common;
 using CleanArch.Domain.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace CleanArch.Application.Tests.Account.Register;
 
 public class RegisterCommandHandlerTests
 {
-    private readonly Mock<UserManager<User>> _mockUserManager;
+    private readonly Mock<IIdentityService> _mockIdentityService;
     private readonly Mock<ITokenProvider> _mockTokenProvider;
     private readonly RegisterCommandHandler _handler;
 
@@ -18,20 +21,9 @@ public class RegisterCommandHandlerTests
 
     public RegisterCommandHandlerTests()
     {
-        var userStore = new Mock<IUserStore<User>>();
-        _mockUserManager = new Mock<UserManager<User>>(
-            userStore.Object,
-            null!,
-            null!,
-            null!,
-            null!,
-            null!,
-            null!,
-            null!,
-            null!
-        );
+        _mockIdentityService = new Mock<IIdentityService>();
         _mockTokenProvider = new Mock<ITokenProvider>();
-        _handler = new RegisterCommandHandler(_mockUserManager.Object, _mockTokenProvider.Object);
+        _handler = new RegisterCommandHandler(_mockIdentityService.Object, _mockTokenProvider.Object);
     }
 
     [Fact]
@@ -49,27 +41,39 @@ public class RegisterCommandHandlerTests
             Country = "Test Country",
             DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-25)),
         };
-        var expectedToken = "generated_token";
+        
+        var expectedUserDto = new UserDto
+        {
+            Email = command.Email,
+            DisplayName = command.DisplayName,
+            FirstName = command.FirstName,
+            LastName = command.LastName,
+            Token = "generated_token",
+            RefreshToken = "refresh_token",
+            RefreshTokenExpiry = DateTime.UtcNow.AddDays(3)
+        };
 
-        _mockUserManager
-            .Setup(x => x.CreateAsync(It.IsAny<User>(), command.Password))
-            .ReturnsAsync(IdentityResult.Success);
+        _mockIdentityService
+            .Setup(x => x.CreateUserAsync(It.IsAny<User>(), command.Password))
+            .ReturnsAsync(Result.Success());
 
-        _mockUserManager.Setup(x => x.AddToRoleAsync(It.IsAny<User>(), "Member")).ReturnsAsync(IdentityResult.Success);
+        _mockIdentityService.Setup(x => x.AddToRoleAsync(It.IsAny<User>(), "Member")).ReturnsAsync(Result.Success());
 
-        _mockTokenProvider.Setup(x => x.CreateAsync(It.IsAny<User>())).ReturnsAsync(expectedToken);
+        _mockTokenProvider
+            .Setup(x => x.CreateUserWithTokensAsync(It.IsAny<User>(), false))
+            .ReturnsAsync(Result.Success(expectedUserDto));
 
         var result = await _handler.Handle(command, CancellationToken.None);
 
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
-        result.Value.Token.Should().Be(expectedToken);
         result.Value.Email.Should().Be(command.Email);
         result.Value.DisplayName.Should().Be(command.DisplayName);
 
-        _mockUserManager.Verify(x => x.CreateAsync(It.IsAny<User>(), command.Password), Times.Once);
-        _mockUserManager.Verify(x => x.AddToRoleAsync(It.IsAny<User>(), "Member"), Times.Once);
+        _mockIdentityService.Verify(x => x.CreateUserAsync(It.IsAny<User>(), command.Password), Times.Once);
+        _mockIdentityService.Verify(x => x.AddToRoleAsync(It.IsAny<User>(), "Member"), Times.Once);
+        _mockTokenProvider.Verify(x => x.CreateUserWithTokensAsync(It.IsAny<User>(), false), Times.Once);
     }
 
     [Fact]
@@ -88,14 +92,11 @@ public class RegisterCommandHandlerTests
             DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-25)),
         };
 
-        var identityErrors = new[]
-        {
-            new IdentityError { Code = "PasswordTooWeak", Description = "Password is too weak" },
-        };
+        var error = Error.Validation("PasswordTooWeak", "Password is too weak");
 
-        _mockUserManager
-            .Setup(x => x.CreateAsync(It.IsAny<User>(), command.Password))
-            .ReturnsAsync(IdentityResult.Failed(identityErrors));
+        _mockIdentityService
+            .Setup(x => x.CreateUserAsync(It.IsAny<User>(), command.Password))
+            .ReturnsAsync(Result.Failure(error));
 
         var result = await _handler.Handle(command, CancellationToken.None);
 
@@ -103,7 +104,7 @@ public class RegisterCommandHandlerTests
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().NotBeNull();
 
-        _mockUserManager.Verify(x => x.CreateAsync(It.IsAny<User>(), command.Password), Times.Once);
-        _mockUserManager.Verify(x => x.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
+        _mockIdentityService.Verify(x => x.CreateUserAsync(It.IsAny<User>(), command.Password), Times.Once);
+        _mockIdentityService.Verify(x => x.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
     }
 }

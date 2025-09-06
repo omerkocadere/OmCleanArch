@@ -9,6 +9,7 @@ using CleanArch.Infrastructure.Authorization;
 using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Idempotence;
+using CleanArch.Infrastructure.Identity;
 using CleanArch.Infrastructure.Options;
 using CleanArch.Infrastructure.Services;
 using MassTransit;
@@ -127,6 +128,7 @@ public static class DependencyInjection
         services.AddScoped<IUserContext, UserContext>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ITokenProvider, TokenProvider>();
+        services.AddScoped<IIdentityService, IdentityService>();
         return services;
     }
 

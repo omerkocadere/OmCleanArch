@@ -1,25 +1,22 @@
+using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Users;
-using Microsoft.AspNetCore.Identity;
 
 namespace CleanArch.Application.Account.Commands.RefreshToken;
 
 public sealed record RefreshTokenCommand(string RefreshToken) : IRequest<Result<UserDto>>;
 
-public sealed class RefreshTokenCommandHandler(UserManager<User> userManager, ITokenProvider tokenProvider)
+public sealed class RefreshTokenCommandHandler(IIdentityService identityService, ITokenProvider tokenProvider)
     : IRequestHandler<RefreshTokenCommand, Result<UserDto>>
 {
     public async Task<Result<UserDto>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         // Find user by refresh token
-        var user = await userManager.Users.FirstOrDefaultAsync(
-            x => x.RefreshToken == request.RefreshToken && x.RefreshTokenExpiry > DateTime.UtcNow,
-            cancellationToken
-        );
+        var user = await identityService.FindByRefreshTokenAsync(request.RefreshToken);
 
-        if (user == null)
+        if (user == null || user.RefreshTokenExpiry <= DateTime.UtcNow)
         {
             return Result.Failure<UserDto>(
                 Error.Unauthorized("Authentication.InvalidRefreshToken", "Invalid or expired refresh token")
@@ -48,6 +45,6 @@ public sealed class RefreshTokenCommandHandler(UserManager<User> userManager, IT
         user.RefreshToken = null;
         user.RefreshTokenExpiry = DateTime.UtcNow;
         user.RefreshTokenCreatedAt = null;
-        await userManager.UpdateAsync(user);
+        await identityService.UpdateUserAsync(user);
     }
 }

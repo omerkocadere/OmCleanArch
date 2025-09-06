@@ -2,20 +2,19 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
-using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Users;
 using CleanArch.Infrastructure.Options;
 using Mapster;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CleanArch.Infrastructure.Authentication;
 
-internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions, UserManager<User> userManager)
+internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions, IIdentityService identityService)
     : ITokenProvider
 {
     private readonly JwtOptions _jwtOptions = authOptions.Value.Jwt;
@@ -53,7 +52,7 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
             new(ClaimTypes.Email, user.Email ?? string.Empty),
         };
 
-        var roles = await userManager.GetRolesAsync(user);
+        var roles = await identityService.GetUserRolesAsync(user);
         claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
 
         return claims;
@@ -94,12 +93,10 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
         }
         // If preserveCreatedAt = true, keep original RefreshTokenCreatedAt to maintain absolute session limit
 
-        var updateResult = await userManager.UpdateAsync(user);
-        if (!updateResult.Succeeded)
+        var updateResult = await identityService.UpdateUserAsync(user);
+        if (updateResult.IsFailure)
         {
-            var errors = updateResult.Errors.Select(e => Error.Validation(e.Code, e.Description)).ToArray();
-            var validationError = new ValidationError(errors);
-            return Result.Failure<(string refreshToken, DateTime expiry)>(validationError);
+            return Result.Failure<(string refreshToken, DateTime expiry)>(updateResult.Error);
         }
 
         return Result.Success((refreshToken, user.RefreshTokenExpiry.Value));
