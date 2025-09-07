@@ -3,7 +3,6 @@ using CleanArch.Application.Auctions.Consumers;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Domain.Constants;
-using CleanArch.Domain.Users;
 using CleanArch.Infrastructure.Authentication;
 using CleanArch.Infrastructure.Authorization;
 using CleanArch.Infrastructure.BackgroundJobs;
@@ -145,7 +144,7 @@ public static class DependencyInjection
             );
 
         services
-            .AddIdentityCore<User>(options =>
+            .AddIdentityCore<ApplicationUser>(options =>
             {
                 options.Password.RequireNonAlphanumeric = false;
                 options.User.RequireUniqueEmail = true;

@@ -19,7 +19,7 @@ public class DeletePhotoCommandHandler(
     public async Task<Result> Handle(DeletePhotoCommand request, CancellationToken cancellationToken)
     {
         var member = await context
-            .Members.Include(x => x.User)
+            .Members.AsNoTracking()
             .Include(x => x.Photos)
             .SingleOrDefaultAsync(x => x.Id == userContext.UserId, cancellationToken);
 

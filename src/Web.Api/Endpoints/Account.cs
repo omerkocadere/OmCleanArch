@@ -4,7 +4,6 @@ using CleanArch.Application.Account.Commands.Register;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
-using CleanArch.Domain.Users;
 using CleanArch.Web.Api.Extensions;
 
 namespace CleanArch.Web.Api.Endpoints;
@@ -88,13 +87,10 @@ public class Account : EndpointGroupBase
         if (!string.IsNullOrEmpty(refreshToken))
         {
             // Find user by refresh token and invalidate it
-            var user = await identityService.FindByRefreshTokenAsync(refreshToken);
-            if (user != null)
+            var userDto = await identityService.FindUserByRefreshTokenAsync(refreshToken);
+            if (userDto != null)
             {
-                user.RefreshToken = null;
-                user.RefreshTokenExpiry = DateTime.UtcNow; // Expire immediately
-                user.RefreshTokenCreatedAt = null; // Clear creation time
-                await identityService.UpdateUserAsync(user);
+                await identityService.UpdateRefreshTokenAsync(userDto.Id, null, DateTime.UtcNow, null);
             }
         }
 

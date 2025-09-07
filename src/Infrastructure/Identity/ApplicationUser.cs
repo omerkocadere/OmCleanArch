@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using CleanArch.Domain.Members;
+using System.ComponentModel.DataAnnotations.Schema;
+using CleanArch.Domain.Common;
 using Microsoft.AspNetCore.Identity;
 
-namespace CleanArch.Domain.Users;
+namespace CleanArch.Infrastructure.Identity;
 
-public sealed class User : IdentityUser<Guid>, IHasDomainEvents
+public sealed class ApplicationUser : IdentityUser<Guid>, IHasDomainEvents
 {
     private readonly List<BaseEvent> _domainEvents = [];
 
@@ -16,8 +16,8 @@ public sealed class User : IdentityUser<Guid>, IHasDomainEvents
     public DateTime? RefreshTokenExpiry { get; set; }
     public DateTime? RefreshTokenCreatedAt { get; set; }
 
-    // Navigation properties
-    public Member Member { get; set; } = null!;
+    // Note: Member entity shares the same ID but is managed separately
+    // No navigation property to maintain Clean Architecture boundaries
 
     // Domain Events implementation
     [NotMapped]

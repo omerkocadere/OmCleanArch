@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CleanArch.Application.Common.Interfaces;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Constants;
 using CleanArch.Domain.Items;
@@ -8,10 +9,8 @@ using CleanArch.Domain.Members;
 using CleanArch.Domain.Photos;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
-using CleanArch.Domain.Users;
 using CleanArch.Domain.ValueObjects;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -28,10 +27,10 @@ public static class InitialiserExtensions
             .ServiceProvider.GetRequiredService<ILoggerFactory>()
             .CreateLogger(nameof(ApplicationDbContextInitialiser));
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        var identityService = scope.ServiceProvider.GetRequiredService<IIdentityService>();
 
         await ApplicationDbContextInitialiser.InitialiseAsync(context);
-        await ApplicationDbContextInitialiser.SeedAsync(context, logger, userManager);
+        await ApplicationDbContextInitialiser.SeedAsync(context, logger, identityService);
     }
 }
 
@@ -58,11 +57,11 @@ public static class ApplicationDbContextInitialiser
         }
     }
 
-    public static async Task SeedAsync(ApplicationDbContext context, ILogger logger, UserManager<User> userManager)
+    public static async Task SeedAsync(ApplicationDbContext context, ILogger logger, IIdentityService identityService)
     {
         try
         {
-            await TrySeedAsync(context, logger, userManager);
+            await TrySeedAsync(context, logger, identityService);
         }
         catch (Exception ex)
         {
@@ -70,7 +69,11 @@ public static class ApplicationDbContextInitialiser
         }
     }
 
-    private static async Task TrySeedAsync(ApplicationDbContext context, ILogger logger, UserManager<User> userManager)
+    private static async Task TrySeedAsync(
+        ApplicationDbContext context,
+        ILogger logger,
+        IIdentityService identityService
+    )
     {
         var assemblyLocation = Assembly.GetExecutingAssembly().Location;
         var assemblyDirectory =
@@ -84,7 +87,7 @@ public static class ApplicationDbContextInitialiser
         var auctionsJsonPath = Path.Combine(seedDir, "auctions.json");
         logger.LogInformation("Users JSON path: {UsersJsonPath}", usersJsonPath);
 
-        var createdUserIds = await SeedUsersAsync(context, logger, usersJsonPath, userManager);
+        var createdUserIds = await SeedUsersAsync(context, logger, usersJsonPath, identityService);
 
         await SeedTodoListsAsync(context, logger, listsJsonPath, createdUserIds);
 
@@ -95,11 +98,11 @@ public static class ApplicationDbContextInitialiser
         ApplicationDbContext context,
         ILogger logger,
         string usersJsonPath,
-        UserManager<User> userManager
+        IIdentityService identityService
     )
     {
         List<Guid> createdUserIds = [];
-        if (await userManager.Users.AnyAsync())
+        if (await identityService.HasAnyUsersAsync())
         {
             createdUserIds = await context.Users.Select(u => u.Id).ToListAsync();
             return createdUserIds;
@@ -122,54 +125,75 @@ public static class ApplicationDbContextInitialiser
 
         foreach (var userDto in userData)
         {
-            var user = new User
+            // Create User with IdentityService (just the ApplicationUser)
+            var createResult = await identityService.CreateUserAsync(
+                userDto.Email,
+                userDto.Email,
+                "Pa$$w0rd",
+                userDto.DisplayName,
+                userDto.FirstName,
+                userDto.LastName
+            );
+
+            if (!createResult.Result.IsSuccess || createResult.UserDto == null)
             {
-                Id = userDto.Id,
-                Email = userDto.Email.ToLower(),
-                UserName = userDto.Email.ToLower(),
+                logger.LogError(
+                    "Failed to create user {Email}: {Error}",
+                    userDto.Email,
+                    createResult.Result.Error?.Description
+                );
+                continue;
+            }
+
+            // Create Member separately with the same ID (manual shared primary key)
+            var member = new Member
+            {
+                Id = createResult.UserDto.Id, // Use the User's ID for shared primary key
+                DateOfBirth = DateOnly.FromDateTime(userDto.DateOfBirth),
                 DisplayName = userDto.DisplayName,
-                FirstName = userDto.FirstName,
-                LastName = userDto.LastName,
-                ImageUrl = userDto.ImageUrl,
-                Member = new Member
-                {
-                    Id = userDto.Id,
-                    DateOfBirth = DateOnly.FromDateTime(DateTime.SpecifyKind(userDto.DateOfBirth, DateTimeKind.Utc)),
-                    ImageUrl = userDto.ImageUrl,
-                    DisplayName = userDto.DisplayName,
-                    LastActive = DateTime.SpecifyKind(userDto.LastActive, DateTimeKind.Utc),
-                    Gender = userDto.Gender,
-                    Description = userDto.Description,
-                    City = userDto.City,
-                    Country = userDto.Country,
-                    User = null!, // Will be set by EF Core
-                },
+                Gender = userDto.Gender,
+                City = userDto.City,
+                Country = userDto.Country,
+                LastActive = DateTime.UtcNow,
+                Description = string.Empty, // Default empty description
             };
+
+            context.Members.Add(member);
 
             // Create a photo for this member using their ImageUrl
             if (!string.IsNullOrEmpty(userDto.ImageUrl))
             {
-                var photo = new Photo { Url = userDto.ImageUrl, MemberId = userDto.Id };
+                var photo = new Photo { Url = userDto.ImageUrl, MemberId = createResult.UserDto.Id };
                 context.Photos.Add(photo);
             }
 
-            var result = await userManager.CreateAsync(user, "Pa$$w0rd");
-            if (!result.Succeeded)
+            var roleResult = await identityService.AddToRolesAsync(createResult.UserDto.Id, [UserRoles.Member]);
+            if (!roleResult.IsSuccess)
             {
-                logger.LogError(result.Errors.First().Description);
+                logger.LogError(
+                    "Failed to add role to user {Email}: {Error}",
+                    userDto.Email,
+                    roleResult.Error?.Description
+                );
             }
-            await userManager.AddToRoleAsync(user, UserRoles.Member);
         }
 
-        var admin = new User
-        {
-            UserName = "admin@test.com",
-            Email = "admin@test.com",
-            DisplayName = "Admin",
-        };
+        // Admin user creation (without Member entity for admin-only functionality)
+        var (Result, UserDto) = await identityService.CreateUserAsync(
+            "admin@test.com",
+            "admin@test.com",
+            "Pa$$w0rd",
+            "Admin"
+        );
 
-        await userManager.CreateAsync(admin, "Pa$$w0rd");
-        await userManager.AddToRolesAsync(admin, [UserRoles.Admin, UserRoles.Moderator]);
+        if (Result.IsSuccess && UserDto != null)
+        {
+            await identityService.AddToRolesAsync(UserDto.Id, [UserRoles.Admin, UserRoles.Moderator]);
+        }
+        else
+        {
+            logger.LogError("Failed to create admin user: {Error}", Result.Error?.Description);
+        }
 
         // Collect the created user IDs
         createdUserIds = [.. userData.Select(u => u.Id)];

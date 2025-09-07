@@ -1,17 +1,22 @@
 using CleanArch.Application.Account.Commands.Register;
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Mappings;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
-using CleanArch.Domain.Users;
+using CleanArch.Domain.Constants;
+using CleanArch.Domain.Members;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Moq;
+using FluentAssertions;
 
 namespace CleanArch.Application.Tests.Account.Register;
 
 public class RegisterCommandHandlerTests
 {
     private readonly Mock<IIdentityService> _mockIdentityService;
-    private readonly Mock<ITokenProvider> _mockTokenProvider;
+    private readonly Mock<IApplicationDbContext> _mockContext;
+    private readonly Mock<IDbContextTransaction> _mockTransaction;
     private readonly RegisterCommandHandler _handler;
 
     static RegisterCommandHandlerTests()
@@ -22,8 +27,17 @@ public class RegisterCommandHandlerTests
     public RegisterCommandHandlerTests()
     {
         _mockIdentityService = new Mock<IIdentityService>();
-        _mockTokenProvider = new Mock<ITokenProvider>();
-        _handler = new RegisterCommandHandler(_mockIdentityService.Object, _mockTokenProvider.Object);
+        _mockContext = new Mock<IApplicationDbContext>();
+
+        var mockMembersDbSet = new Mock<DbSet<Member>>();
+        _mockContext.Setup(x => x.Members).Returns(mockMembersDbSet.Object);
+
+        _mockTransaction = new Mock<IDbContextTransaction>();
+        _mockContext
+            .Setup(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_mockTransaction.Object);
+
+        _handler = new RegisterCommandHandler(_mockIdentityService.Object, _mockContext.Object);
     }
 
     [Fact]
@@ -42,8 +56,10 @@ public class RegisterCommandHandlerTests
             DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-25)),
         };
 
+        var expectedUserId = Guid.NewGuid();
         var expectedUserDto = new UserDto
         {
+            Id = expectedUserId,
             Email = command.Email,
             DisplayName = command.DisplayName,
             FirstName = command.FirstName,
@@ -54,14 +70,27 @@ public class RegisterCommandHandlerTests
         };
 
         _mockIdentityService
-            .Setup(x => x.CreateUserAsync(It.IsAny<User>(), command.Password))
+            .Setup(x =>
+                x.CreateUserAsync(
+                    command.Email.ToLower(),
+                    command.Email,
+                    command.Password,
+                    command.DisplayName,
+                    command.FirstName,
+                    command.LastName
+                )
+            )
+            .ReturnsAsync((Result.Success(), expectedUserDto));
+
+        _mockIdentityService
+            .Setup(x => x.AddToRolesAsync(It.IsAny<Guid>(), new[] { UserRoles.Member }))
             .ReturnsAsync(Result.Success());
 
-        _mockIdentityService.Setup(x => x.AddToRoleAsync(It.IsAny<User>(), "Member")).ReturnsAsync(Result.Success());
+        _mockIdentityService.Setup(x => x.AddToRolesAsync(expectedUserId, new[] { "Member" })).ReturnsAsync(Result.Success());
 
-        _mockTokenProvider
-            .Setup(x => x.CreateUserWithTokensAsync(It.IsAny<User>(), false))
-            .ReturnsAsync(Result.Success(expectedUserDto));
+        _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+        _mockIdentityService.Setup(x => x.GetUserByIdAsync(expectedUserId)).ReturnsAsync(expectedUserDto);
 
         var result = await _handler.Handle(command, CancellationToken.None);
 
@@ -71,9 +100,22 @@ public class RegisterCommandHandlerTests
         result.Value.Email.Should().Be(command.Email);
         result.Value.DisplayName.Should().Be(command.DisplayName);
 
-        _mockIdentityService.Verify(x => x.CreateUserAsync(It.IsAny<User>(), command.Password), Times.Once);
-        _mockIdentityService.Verify(x => x.AddToRoleAsync(It.IsAny<User>(), "Member"), Times.Once);
-        _mockTokenProvider.Verify(x => x.CreateUserWithTokensAsync(It.IsAny<User>(), false), Times.Once);
+        _mockIdentityService.Verify(
+            x =>
+                x.CreateUserAsync(
+                    command.Email.ToLower(),
+                    command.Email,
+                    command.Password,
+                    command.DisplayName,
+                    command.FirstName,
+                    command.LastName
+                ),
+            Times.Once
+        );
+        _mockIdentityService.Verify(x => x.AddToRolesAsync(expectedUserId, new[] { "Member" }), Times.Once);
+        _mockContext.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _mockContext.Verify(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -95,8 +137,17 @@ public class RegisterCommandHandlerTests
         var error = Error.Validation("PasswordTooWeak", "Password is too weak");
 
         _mockIdentityService
-            .Setup(x => x.CreateUserAsync(It.IsAny<User>(), command.Password))
-            .ReturnsAsync(Result.Failure(error));
+            .Setup(x =>
+                x.CreateUserAsync(
+                    command.Email.ToLower(),
+                    command.Email,
+                    command.Password,
+                    command.DisplayName,
+                    command.FirstName,
+                    command.LastName
+                )
+            )
+            .ReturnsAsync((Result.Failure(error), (UserDto)null!));
 
         var result = await _handler.Handle(command, CancellationToken.None);
 
@@ -104,7 +155,20 @@ public class RegisterCommandHandlerTests
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().NotBeNull();
 
-        _mockIdentityService.Verify(x => x.CreateUserAsync(It.IsAny<User>(), command.Password), Times.Once);
-        _mockIdentityService.Verify(x => x.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
+        _mockIdentityService.Verify(
+            x =>
+                x.CreateUserAsync(
+                    command.Email.ToLower(),
+                    command.Email,
+                    command.Password,
+                    command.DisplayName,
+                    command.FirstName,
+                    command.LastName
+                ),
+            Times.Once
+        );
+        _mockIdentityService.Verify(x => x.AddToRolesAsync(It.IsAny<Guid>(), It.IsAny<IEnumerable<string>>()), Times.Never);
+        _mockContext.Verify(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 }

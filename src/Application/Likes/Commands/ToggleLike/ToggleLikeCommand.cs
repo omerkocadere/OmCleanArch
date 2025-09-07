@@ -1,9 +1,9 @@
+using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
-using CleanArch.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Application.Likes.Commands.ToggleLike;
@@ -18,6 +18,9 @@ public class ToggleLikeCommandHandler(IApplicationDbContext context, IUserContex
         var sourceUserId = userContext.UserId;
         if (!sourceUserId.HasValue)
             return Result.Failure(UserErrors.NotFound(Guid.Empty));
+
+        // Start atomic transaction for consistency
+        using var transaction = await context.BeginTransactionAsync(cancellationToken);
 
         // Get source member from userId - Member.Id should equal User.Id
         var sourceMember = await context.Members.FirstOrDefaultAsync(
@@ -57,6 +60,10 @@ public class ToggleLikeCommandHandler(IApplicationDbContext context, IUserContex
         }
 
         await context.SaveChangesAsync(cancellationToken);
+
+        // Commit transaction - operation successful
+        await transaction.CommitAsync(cancellationToken);
+
         return Result.Success();
     }
 }

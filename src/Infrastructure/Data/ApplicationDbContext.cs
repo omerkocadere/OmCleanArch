@@ -8,17 +8,18 @@ using CleanArch.Domain.Messages;
 using CleanArch.Domain.Photos;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
-using CleanArch.Domain.Users;
 using CleanArch.Infrastructure.BackgroundJobs.Outbox;
+using CleanArch.Infrastructure.Identity;
 using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace CleanArch.Infrastructure.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options),
+    : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options),
         IApplicationDbContext
 {
     public DbSet<TodoList> TodoLists => Set<TodoList>();
@@ -70,5 +71,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             // Apply the query filter
             modelBuilder.Entity(entityType).HasQueryFilter(lambda);
         }
+    }
+
+    // Interface implementation - delegates to Database.BeginTransactionAsync
+    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        return Database.BeginTransactionAsync(cancellationToken);
     }
 }

@@ -1,9 +1,9 @@
+using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
-using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Account.Commands.Login;
 
@@ -18,19 +18,19 @@ internal sealed class LoginCommandHandler(IIdentityService identityService, ITok
 {
     public async Task<Result<UserDto>> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
-        var user = await identityService.FindByEmailAsync(command.Email);
-        if (user is null)
+        var userDto = await identityService.GetUserByEmailAsync(command.Email);
+        if (userDto is null)
         {
-            return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
+            return Result.Failure<UserDto>(AuthenticationErrors.InvalidCredentials);
         }
 
-        var result = await identityService.CheckPasswordAsync(user, command.Password);
+        var result = await identityService.CheckPasswordAsync(userDto.Id, command.Password);
         if (!result)
         {
-            return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
+            return Result.Failure<UserDto>(AuthenticationErrors.InvalidCredentials);
         }
 
         // Create UserDto with tokens using centralized method
-        return await tokenProvider.CreateUserWithTokensAsync(user);
+        return await tokenProvider.CreateUserWithTokensAsync(userDto.Id);
     }
 }

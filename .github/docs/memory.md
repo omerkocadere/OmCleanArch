@@ -328,4 +328,226 @@
 - Custom Methods: Format checking and domain constant validation
 ```
 
-**Result**: ✅ Clean separation between input validation and business logic following Clean Architecture best practices.
+**Result**: **Result**: ✅ Clean separation between input validation and business logic following Clean Architecture best practices.
+
+### 3. Domain Error Standardization - AuthenticationErrors Implementation (Sep 6, 2025)
+
+**Problem**: Application layer had inconsistent error handling with ad-hoc `Error.Unauthorized` and `Error.NotFound` calls instead of using centralized domain errors.
+
+**Identified Issues**:
+
+- `RefreshTokenCommand`: 3 instances of generic `Error.Unauthorized("Authentication.InvalidRefreshToken", "...")`
+- `RegisterCommand`: Ad-hoc `Error.NotFound("User.NotFound", "Created user not found")`
+- Inconsistent error codes and messages across authentication flows
+
+**Solution Applied - Domain Error Separation**:
+
+1. **Created `AuthenticationErrors.cs`** - Dedicated error class for authentication domain:
+
+   ```csharp
+   - InvalidCredentials: For login failures
+   - InvalidRefreshToken: For invalid token scenarios
+   - ExpiredRefreshToken: Specific for expired tokens
+   - RefreshTokenNotFound: When token not found in database
+   - SessionExpired: For session timeout scenarios
+   - TokenGenerationFailed: For token creation issues
+   ```
+
+2. **Updated RefreshTokenCommand**: Replaced 3 generic error instances with proper domain errors:
+
+   - Generic refresh token errors → `AuthenticationErrors.InvalidRefreshToken`
+   - Expired token scenario → `AuthenticationErrors.ExpiredRefreshToken` (more specific)
+
+3. **Updated RegisterCommand**: Fixed ad-hoc error usage:
+
+   - `Error.NotFound("User.NotFound", "...")` → `UserErrors.NotFound(Guid.Parse(userId))`
+
+4. **Updated LoginCommand**: Improved domain error semantics:
+   - `UserErrors.NotFoundByEmail` → `AuthenticationErrors.InvalidCredentials` (both cases)
+   - Better semantic meaning for authentication failures
+   - Maintains security (prevents user enumeration attacks)
+
+**Architectural Benefits**:
+
+- ✅ **Domain Separation**: Authentication vs User errors properly separated
+- ✅ **Consistency**: Standardized error codes and messages
+- ✅ **Maintainability**: Centralized error definitions for easy updates
+- ✅ **Type Safety**: Compile-time error checking for domain errors
+- ✅ **API Consistency**: Uniform error responses across endpoints
+
+**Files Created/Modified**:
+
+- **Created**: `src/Application/Common/Errors/AuthenticationErrors.cs`
+- **Updated**: `src/Application/Account/Commands/RefreshToken/RefreshTokenCommand.cs`
+- **Updated**: `src/Application/Account/Commands/Register/RegisterCommand.cs`
+
+**Domain Error Pattern Established**:
+
+```csharp
+// ✅ CORRECT - Use domain errors
+return Result.Failure<UserDto>(AuthenticationErrors.InvalidRefreshToken);
+return Result.Failure<UserDto>(UserErrors.NotFound(userId));
+
+// ❌ WRONG - Don't use ad-hoc errors
+return Result.Failure<UserDto>(Error.Unauthorized("...", "..."));
+return Result.Failure<UserDto>(Error.NotFound("...", "..."));
+```
+
+**Result**: ✅ Consistent domain error handling with proper separation of authentication vs user concerns.
+
+### 4. 30-Day Absolute Session Limit Implementation (Sep 6, 2025)
+
+**Problem**: RefreshTokenCommand had TODO comment for implementing 30-day absolute session limit to prevent infinite token refresh.
+
+**Security Requirement**:
+
+- User sessions should have maximum 30-day lifetime regardless of token refresh frequency
+- Prevents indefinite session extension through refresh token rotation
+
+**Solution Implemented - Absolute Session Expiry**:
+
+1. **Enhanced UserDto**: Added `RefreshTokenCreatedAt` field for session tracking
+
+   ```csharp
+   public DateTime? RefreshTokenCreatedAt { get; set; }
+   ```
+
+2. **Implemented Session Age Check**: Added 30-day absolute limit in RefreshTokenCommand
+
+   ```csharp
+   // SECURITY: Check 30-day absolute session limit
+   if (userDto.RefreshTokenCreatedAt.HasValue)
+   {
+       var sessionAge = DateTime.UtcNow - userDto.RefreshTokenCreatedAt.Value;
+       if (sessionAge.TotalDays > 30)
+       {
+           return Result.Failure<UserDto>(AuthenticationErrors.SessionExpired);
+       }
+   }
+   ```
+
+3. **Token Rotation Logic**: Uses `preserveCreatedAt: true` parameter
+   - **Login**: `preserveCreatedAt = false` → Sets new RefreshTokenCreatedAt
+   - **Refresh**: `preserveCreatedAt = true` → Preserves original session start time
+   - **Infrastructure**: `null` passed to preserve existing RefreshTokenCreatedAt value
+
+**Security Benefits**:
+
+- ✅ **Absolute Session Limit**: Maximum 30-day session lifetime enforced
+- ✅ **Prevents Indefinite Sessions**: No matter how often tokens are refreshed
+- ✅ **Proper Error Response**: Uses domain-specific `AuthenticationErrors.SessionExpired`
+- ✅ **Infrastructure Integration**: Leverages existing `RefreshTokenCreatedAt` database field
+
+**Files Modified**:
+
+- **Updated**: `src/Application/Users/DTOs/UserDto.cs` (added RefreshTokenCreatedAt)
+- **Updated**: `src/Application/Account/Commands/RefreshToken/RefreshTokenCommand.cs` (implemented check, removed TODO)
+
+**Authentication Flow Security**:
+
+```csharp
+Login → RefreshTokenCreatedAt = Now (session start)
+Refresh (Day 1-29) → Allowed, preserves original RefreshTokenCreatedAt
+Refresh (Day 30+) → SessionExpired error, user must re-login
+```
+
+**Result**: ✅ Complete 30-day absolute session limit implementation with proper domain error handling.
+
+### 5. Clean Architecture Database Seeding Refactoring (Sep 6, 2025)
+
+**Problem**: Database seeding was using `UserManager<ApplicationUser>` directly in Infrastructure layer, violating Clean Architecture dependency rules.
+
+**User Question**: "UserManager<ApplicationUser> kullanman mı doğru yoksa identityservice mi?" (Should use UserManager<ApplicationUser> or IdentityService?)
+
+**Research Conducted**:
+
+- Clean Architecture principles from Uncle Bob
+- ASP.NET Core Identity best practices
+- Dependency direction analysis in Clean Architecture
+
+**Options Analyzed**:
+
+1. **Option 1 - Direct UserManager**: Continue using `UserManager<ApplicationUser>` in seeding
+
+   - ✅ Simple and direct
+   - ❌ Violates Clean Architecture (Infrastructure depending on framework directly)
+   - ❌ Bypasses application layer abstractions
+   - ❌ Makes testing harder
+
+2. **Option 2 - IIdentityService** (CHOSEN): Use application layer abstraction
+   - ✅ Maintains Clean Architecture dependency direction
+   - ✅ Consistent with rest of application
+   - ✅ Easier testing with interfaces
+   - ✅ Single source of truth for user operations
+   - ❌ Requires interface extension for seeding needs
+
+**User Choice**: **"option 2 please"** → Clean Architecture approach
+
+**Solution Implemented**:
+
+1. **Extended IIdentityService Interface**:
+
+   ```csharp
+   Task<bool> HasAnyUsersAsync();
+   Task<Result<string>> CreateUserWithMemberAsync(string email, string password, string firstName, string lastName);
+   Task<Result<string>> CreateUserAsync(string email, string password, string firstName, string lastName, bool createMember = true);
+   ```
+
+2. **Enhanced IdentityService Implementation**:
+
+   - Added `HasAnyUsersAsync()` for seeding checks
+   - Enhanced `CreateUserAsync()` with optional Member creation
+   - Maintains clean separation between identity and member concerns
+   - Uses proper domain error handling
+
+3. **Fixed Foreign Key Constraint Issue**:
+
+   - **Problem**: FK constraint violation `FK_AspNetUsers_Members_MemberId` (NOT NULL)
+   - **Root Cause**: Admin users weren't getting Member entities, but database required them
+   - **Solution**: Modified `CreateUserAsync` to create Members by default for consistency
+   - **Result**: All users (regular and admin) now have proper Member entities
+
+4. **Updated Database Seeding**:
+   - Replaced direct `UserManager` usage with `IIdentityService`
+   - Maintains proper Clean Architecture layering
+   - Uses consistent error handling patterns
+
+**Technical Benefits**:
+
+- ✅ **Clean Architecture Compliance**: Proper dependency direction maintained
+- ✅ **Consistent Patterns**: All user creation goes through same service
+- ✅ **Database Integrity**: 1:1 ApplicationUser-Member relationship enforced
+- ✅ **Error Handling**: Consistent Result<T> patterns used
+- ✅ **Testability**: Interface-based design enables easy testing
+
+**Database Relationship Design**:
+
+```csharp
+ApplicationUser (1) ←→ (1) Member
+- MemberId: NOT NULL FK to Members table
+- All users must have corresponding Member entity
+- Consistent data model across regular and admin users
+```
+
+**Files Modified**:
+
+- **Extended**: `src/Application/Common/Interfaces/IIdentityService.cs`
+- **Enhanced**: `src/Infrastructure/Identity/IdentityService.cs`
+- **Updated**: `src/Infrastructure/Data/ApplicationDbContextInitialiser.cs`
+- **Fixed**: `tests/Application.Tests/Account/Register/RegisterCommandHandlerTests.cs`
+
+**Final Validation Results**:
+
+- ✅ **All Projects Build**: Clean compilation across entire solution
+- ✅ **All Tests Pass**: 5/5 tests passing
+- ✅ **Database Seeding Works**: 10 users + Members + Photos + TodoLists + Auctions created
+- ✅ **No FK Violations**: Complete 1:1 relationship integrity maintained
+- ✅ **API Starts Successfully**: No runtime errors, proper dependency injection
+
+**Architectural Achievement**: Successfully refactored from direct framework dependency to proper Clean Architecture abstraction while maintaining full functionality and database integrity.
+
+**Result**: ✅ Clean Architecture compliance achieved with consistent user creation patterns and resolved foreign key constraints.
+
+```
+
+```

@@ -1,5 +1,4 @@
 ﻿using CleanArch.Domain.TodoLists;
-using CleanArch.Domain.Users;
 
 namespace CleanArch.Domain.TodoItems;
 
@@ -32,6 +31,7 @@ public sealed class TodoItem : FullAuditableEntity<int>
     }
 
     public Guid UserId { get; set; }
-    public User User { get; set; } = null!;
+
+    // Note: UserId references ApplicationUser.Id in Infrastructure layer
     public TodoList List { get; set; } = null!;
 }

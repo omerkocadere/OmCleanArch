@@ -1,3 +1,4 @@
+using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
@@ -6,7 +7,6 @@ using CleanArch.Application.Common.Models;
 using CleanArch.Application.Messages.Queries.Common;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
-using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Messages.Queries.GetMessages;
 

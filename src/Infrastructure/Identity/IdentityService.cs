@@ -1,103 +1,182 @@
+using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Models;
+using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Users;
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Infrastructure.Identity;
 
-internal sealed class IdentityService(UserManager<User> userManager) : IIdentityService
+internal sealed class IdentityService(UserManager<ApplicationUser> userManager) : IIdentityService
 {
-    public async Task<IList<string>> GetUserRolesAsync(User user)
+    public async Task<bool> CheckPasswordAsync(Guid userId, string password)
     {
-        return await userManager.GetRolesAsync(user);
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        return user != null && await userManager.CheckPasswordAsync(user, password);
     }
 
-    public async Task<Result> UpdateUserAsync(User user)
+    public async Task<UserDto?> GetUserByIdAsync(Guid userId)
     {
-        var result = await userManager.UpdateAsync(user);
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+            return null;
 
-        return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
+        return user.Adapt<UserDto>();
     }
 
-    public async Task<string?> GetUserNameAsync(string userId)
+    public async Task<UserDto?> GetUserByEmailAsync(string email)
     {
-        var user = await userManager.FindByIdAsync(userId);
-        return user?.UserName;
+        var user = await userManager.FindByEmailAsync(email);
+        return user?.Adapt<UserDto>();
     }
 
-    public async Task<Result> CreateUserAsync(User user, string password)
+    public async Task<List<UserDto>> GetAllUsersAsync()
     {
-        var result = await userManager.CreateAsync(user, password);
-
-        return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
+        var users = await userManager.Users.ToListAsync();
+        return users.Adapt<List<UserDto>>();
     }
 
-    public async Task<bool> IsInRoleAsync(string userId, string role)
+    public async Task<UserDto?> FindUserByRefreshTokenAsync(string refreshToken)
     {
-        var user = await userManager.FindByIdAsync(userId);
-        return user != null && await userManager.IsInRoleAsync(user, role);
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        return user?.Adapt<UserDto>();
     }
 
-    public async Task<Result> DeleteUserAsync(string userId)
+    public async Task<bool> HasAnyUsersAsync()
     {
-        var user = await userManager.FindByIdAsync(userId);
+        return await userManager.Users.AnyAsync();
+    }
 
-        if (user == null)
+    public async Task<(Result Result, UserDto? UserDto)> CreateUserAsync(
+        string userName,
+        string email,
+        string password,
+        string? displayName = null,
+        string? firstName = null,
+        string? lastName = null
+    )
+    {
+        // Step 1: Create ApplicationUser first (principal entity)
+        var user = new ApplicationUser
         {
-            return Result.Success(); // User not found, consider it already deleted
+            UserName = userName,
+            Email = email,
+            DisplayName = displayName ?? userName,
+            FirstName = firstName,
+            LastName = lastName,
+        };
+
+        // Step 2: Create User with Identity
+        var result = await userManager.CreateAsync(user, password);
+        if (!result.Succeeded)
+        {
+            return (Result.Failure(ConvertIdentityErrors(result.Errors)), null);
         }
 
-        var result = await userManager.DeleteAsync(user);
+        // Add domain event immediately after user creation
+        var userCreatedEvent = new UserCreatedDomainEvent(Guid.NewGuid(), user.Id, user.UserName, user.Email);
+        user.AddDomainEvent(userCreatedEvent);
 
+        return (Result.Success(), user.Adapt<UserDto>());
+    }
+
+    public async Task<Result> UpdateUserAsync(
+        Guid userId,
+        string? displayName = null,
+        string? firstName = null,
+        string? lastName = null,
+        string? imageUrl = null
+    )
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+            return Result.Failure(UserErrors.NotFound(userId));
+
+        if (displayName != null)
+            user.DisplayName = displayName;
+        if (firstName != null)
+            user.FirstName = firstName;
+        if (lastName != null)
+            user.LastName = lastName;
+        if (imageUrl != null)
+            user.ImageUrl = imageUrl;
+
+        var result = await userManager.UpdateAsync(user);
         return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
     }
 
-    public async Task<User?> FindByEmailAsync(string email)
+    public async Task<IList<string>> GetUserRolesAsync(Guid userId)
     {
-        return await userManager.FindByEmailAsync(email);
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        return user != null ? await userManager.GetRolesAsync(user) : [];
     }
 
-    public async Task<User?> FindByIdAsync(string userId)
+    public async Task<Result> AddToRolesAsync(Guid userId, IEnumerable<string> roles)
     {
-        return await userManager.FindByIdAsync(userId);
-    }
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+            return Result.Failure(UserErrors.NotFound(userId));
 
-    public async Task<bool> CheckPasswordAsync(User user, string password)
-    {
-        return await userManager.CheckPasswordAsync(user, password);
-    }
-
-    public async Task<Result> AddToRoleAsync(User user, string role)
-    {
-        var result = await userManager.AddToRoleAsync(user, role);
-
-        return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
-    }
-
-    public async Task<Result> AddToRolesAsync(User user, IEnumerable<string> roles)
-    {
         var result = await userManager.AddToRolesAsync(user, roles);
-
         return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
     }
 
-    public async Task<Result> RemoveFromRolesAsync(User user, IEnumerable<string> roles)
+    public async Task<Result> UpdateRefreshTokenAsync(
+        Guid userId,
+        string? refreshToken,
+        DateTime? expiry,
+        DateTime? createdAt
+    )
     {
-        var result = await userManager.RemoveFromRolesAsync(user, roles);
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+            return Result.Failure(UserErrors.NotFound(userId));
 
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiry = expiry;
+        user.RefreshTokenCreatedAt = createdAt;
+
+        var result = await userManager.UpdateAsync(user);
         return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
     }
 
-    public async Task<List<User>> GetAllUsersAsync()
+    public async Task<Result<IList<string>>> UpdateUserRolesAsync(Guid userId, IEnumerable<string> newRoles)
     {
-        return await userManager.Users.ToListAsync();
-    }
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+            return Result.Failure<IList<string>>(UserErrors.NotFound(userId));
 
-    public async Task<User?> FindByRefreshTokenAsync(string refreshToken)
-    {
-        return await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        var selectedRoles = newRoles.ToArray();
+        var currentRoles = await userManager.GetRolesAsync(user);
+
+        // Add new roles that user doesn't have
+        var rolesToAdd = selectedRoles.Except(currentRoles);
+        if (rolesToAdd.Any())
+        {
+            var addResult = await userManager.AddToRolesAsync(user, rolesToAdd);
+            if (!addResult.Succeeded)
+            {
+                return Result.Failure<IList<string>>(UserErrors.RoleAssignmentFailed);
+            }
+        }
+
+        // Remove roles that user has but are not selected
+        var rolesToRemove = currentRoles.Except(selectedRoles);
+        if (rolesToRemove.Any())
+        {
+            var removeResult = await userManager.RemoveFromRolesAsync(user, rolesToRemove);
+            if (!removeResult.Succeeded)
+            {
+                return Result.Failure<IList<string>>(UserErrors.RoleRemovalFailed);
+            }
+        }
+
+        // Get the final roles after all operations
+        var finalRoles = await userManager.GetRolesAsync(user);
+        return Result.Success(finalRoles);
     }
 
     /// <summary>
@@ -106,7 +185,6 @@ internal sealed class IdentityService(UserManager<User> userManager) : IIdentity
     private static ValidationError ConvertIdentityErrors(IEnumerable<IdentityError> identityErrors)
     {
         var errors = identityErrors.Select(e => Error.Validation(e.Code, e.Description)).ToArray();
-
         return new ValidationError(errors);
     }
 }

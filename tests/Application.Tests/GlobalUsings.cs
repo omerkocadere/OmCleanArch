@@ -6,7 +6,6 @@ global using System.Threading.Tasks;
 global using CleanArch.Application.Common.Interfaces;
 global using CleanArch.Application.Common.Interfaces.Authentication;
 global using CleanArch.Domain.Members;
-global using CleanArch.Domain.Users;
 global using FluentAssertions;
 global using Microsoft.EntityFrameworkCore;
 global using MockQueryable.Moq;

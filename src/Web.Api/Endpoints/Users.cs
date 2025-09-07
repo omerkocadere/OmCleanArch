@@ -11,7 +11,7 @@ public class Users : EndpointGroupBase
 {
     public override void Map(RouteGroupBuilder groupBuilder)
     {
-        groupBuilder.MapGet(GetById, "{id:guid}").RequireAuthorization();
+        groupBuilder.MapGet(GetById, "{id:guid}").WithName("GetUserById").RequireAuthorization();
         groupBuilder.MapGet(GetByEmail, "by-email/{email}").RequireAuthorization();
         groupBuilder.MapGet(GetAll, "").RequireAuthorization();
     }

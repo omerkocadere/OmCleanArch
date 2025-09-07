@@ -1,10 +1,9 @@
+using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
-using CleanArch.Domain.Users;
-using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Application.Likes.Queries.GetCurrentMemberLikeIds;
 

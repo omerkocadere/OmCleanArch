@@ -11,13 +11,13 @@ public sealed record GetAllUsersQuery : IQuery<IEnumerable<UserDto>>, ICacheable
     public TimeSpan? Expiration => TimeSpan.FromMinutes(5);
 }
 
-internal sealed class GetAllUsersQueryHandler(IApplicationDbContext context)
+internal sealed class GetAllUsersQueryHandler(IIdentityService identityService)
     : IQueryHandler<GetAllUsersQuery, IEnumerable<UserDto>>
 {
     public async Task<Result<IEnumerable<UserDto>>> Handle(GetAllUsersQuery query, CancellationToken cancellationToken)
     {
-        var users = await context.Users.AsNoTracking().ProjectToType<UserDto>().ToListAsync(cancellationToken);
-
+        // Single efficient call instead of N+1 query pattern
+        var users = await identityService.GetAllUsersAsync();
         return Result.Success<IEnumerable<UserDto>>(users);
     }
 }

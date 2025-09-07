@@ -1,8 +1,8 @@
+using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
-using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Account.Commands.RefreshToken;
 
@@ -14,37 +14,30 @@ public sealed class RefreshTokenCommandHandler(IIdentityService identityService,
     public async Task<Result<UserDto>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         // Find user by refresh token
-        var user = await identityService.FindByRefreshTokenAsync(request.RefreshToken);
+        var userDto = await identityService.FindUserByRefreshTokenAsync(request.RefreshToken);
 
-        if (user == null || user.RefreshTokenExpiry <= DateTime.UtcNow)
+        if (userDto is null)
         {
-            return Result.Failure<UserDto>(
-                Error.Unauthorized("Authentication.InvalidRefreshToken", "Invalid or expired refresh token")
-            );
+            return Result.Failure<UserDto>(AuthenticationErrors.InvalidRefreshToken);
         }
 
-        // SECURITY: Check absolute 30-day session limit
-        if (
-            user.RefreshTokenCreatedAt.HasValue
-            && DateTime.UtcNow.Subtract(user.RefreshTokenCreatedAt.Value).TotalDays > 30
-        )
+        // SECURITY: Check if refresh token is expired
+        if (userDto.RefreshTokenExpiry <= DateTime.UtcNow)
         {
-            // Session exceeded 30 days - force re-authentication
-            await InvalidateUserSession(user);
-            return Result.Failure<UserDto>(
-                Error.Unauthorized("Authentication.SessionExpired", "Session expired. Please log in again.")
-            );
+            return Result.Failure<UserDto>(AuthenticationErrors.ExpiredRefreshToken);
         }
 
-        // SECURITY: Token Rotation - Create UserDto with new tokens, preserving RefreshTokenCreatedAt
-        return await tokenProvider.CreateUserWithTokensAsync(user, preserveCreatedAt: true);
-    }
+        // SECURITY: Check 30-day absolute session limit
+        if (userDto.RefreshTokenCreatedAt.HasValue)
+        {
+            var sessionAge = DateTime.UtcNow - userDto.RefreshTokenCreatedAt.Value;
+            if (sessionAge.TotalDays > 30)
+            {
+                return Result.Failure<UserDto>(AuthenticationErrors.SessionExpired);
+            }
+        }
 
-    private async Task InvalidateUserSession(User user)
-    {
-        user.RefreshToken = null;
-        user.RefreshTokenExpiry = DateTime.UtcNow;
-        user.RefreshTokenCreatedAt = null;
-        await identityService.UpdateUserAsync(user);
+        // SECURITY: Token Rotation - Create UserDto with new tokens
+        return await tokenProvider.CreateUserWithTokensAsync(userDto.Id, preserveCreatedAt: true);
     }
 }

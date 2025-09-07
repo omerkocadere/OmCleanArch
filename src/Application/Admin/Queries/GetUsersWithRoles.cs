@@ -20,9 +20,15 @@ public class GetUsersWithRolesQueryHandler(IIdentityService identityService)
 
         foreach (var user in users)
         {
-            var roles = await identityService.GetUserRolesAsync(user);
-            var userWithRoles = user.Adapt<UserWithRolesDto>();
-            userWithRoles.Roles = roles;
+            var roles = await identityService.GetUserRolesAsync(user.Id);
+
+            var userWithRoles = new UserWithRolesDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Roles = roles,
+            };
+
             userList.Add(userWithRoles);
         }
 

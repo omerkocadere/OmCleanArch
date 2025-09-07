@@ -1,8 +1,4 @@
-﻿using CleanArch.Domain.Roles;
-using CleanArch.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-
-namespace CleanArch.Infrastructure.Authorization;
+﻿namespace CleanArch.Infrastructure.Authorization;
 
 internal sealed class PermissionProvider()
 {

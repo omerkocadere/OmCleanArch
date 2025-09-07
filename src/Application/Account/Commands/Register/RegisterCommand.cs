@@ -1,12 +1,10 @@
+using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Constants;
 using CleanArch.Domain.Members;
-using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Account.Commands.Register;
 
@@ -23,34 +21,55 @@ public sealed record RegisterCommand : ICommand<UserDto>
     public DateOnly DateOfBirth { get; set; }
 }
 
-public class RegisterCommandHandler(IIdentityService identityService, ITokenProvider tokenProvider)
+public class RegisterCommandHandler(IIdentityService identityService, IApplicationDbContext context)
     : ICommandHandler<RegisterCommand, UserDto>
 {
     public async Task<Result<UserDto>> Handle(RegisterCommand command, CancellationToken cancellationToken)
     {
-        var user = command.Adapt<User>();
-        var member = command.Adapt<Member>();
+        // Start database transaction for atomicity
+        using var transaction = await context.BeginTransactionAsync(cancellationToken);
 
-        user.Id = Guid.NewGuid();
-        user.UserName = command.Email.ToLower();
-        user.Member = member;
+        // Create the user with all details in one call
+        var (result, userDto) = await identityService.CreateUserAsync(
+            command.Email.ToLower(),
+            command.Email,
+            command.Password,
+            command.DisplayName,
+            command.FirstName,
+            command.LastName
+        );
 
-        user.AddDomainEvent(new UserCreatedDomainEvent(Guid.NewGuid(), user));
-
-        var result = await identityService.CreateUserAsync(user, command.Password);
-
-        if (!result.IsSuccess)
+        if (!result.IsSuccess || userDto is null)
         {
             return Result.Failure<UserDto>(result.Error);
         }
 
-        var addRoleResult = await identityService.AddToRoleAsync(user, UserRoles.Member);
+        // Add user to Member role
+        var addRoleResult = await identityService.AddToRolesAsync(userDto.Id, [UserRoles.Member]);
         if (!addRoleResult.IsSuccess)
         {
             return Result.Failure<UserDto>(addRoleResult.Error);
         }
 
-        // Create UserDto with tokens using centralized method
-        return await tokenProvider.CreateUserWithTokensAsync(user);
+        // Create Member domain entity
+        var member = new Member
+        {
+            Id = userDto.Id,
+            DateOfBirth = command.DateOfBirth,
+            DisplayName = command.DisplayName,
+            Gender = command.Gender,
+            City = command.City,
+            Country = command.Country,
+            LastActive = DateTime.UtcNow,
+            Description = string.Empty, // Default empty description
+        };
+
+        context.Members.Add(member);
+        await context.SaveChangesAsync(cancellationToken);
+
+        // Commit transaction - all operations successful
+        await transaction.CommitAsync(cancellationToken);
+
+        return Result.Success(userDto);
     }
 }

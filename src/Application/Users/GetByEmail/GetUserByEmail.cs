@@ -1,24 +1,22 @@
+using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
-using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Users.GetByEmail;
 
 public sealed record GetUserByEmailQuery(string Email) : IQuery<UserDto>;
 
-internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context)
+internal sealed class GetUserByEmailQueryHandler(IIdentityService identityService)
     : IQueryHandler<GetUserByEmailQuery, UserDto>
 {
     public async Task<Result<UserDto>> Handle(GetUserByEmailQuery query, CancellationToken cancellationToken)
     {
-        UserDto? user = await context
-            .Users.Where(u => u.Email == query.Email)
-            .ProjectToType<UserDto>()
-            .SingleOrDefaultAsync(cancellationToken);
+        // Single efficient call instead of two-step query
+        var user = await identityService.GetUserByEmailAsync(query.Email);
 
-        if (user is null)
+        if (user == null)
         {
             return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
         }

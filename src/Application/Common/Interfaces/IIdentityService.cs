@@ -1,35 +1,44 @@
+using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
-using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Common.Interfaces;
 
 public interface IIdentityService
 {
-    Task<IList<string>> GetUserRolesAsync(User user);
+    Task<bool> CheckPasswordAsync(Guid userId, string password);
+    Task<UserDto?> FindUserByRefreshTokenAsync(string refreshToken);
+    Task<(Result Result, UserDto? UserDto)> CreateUserAsync(
+        string userName,
+        string email,
+        string password,
+        string? displayName = null,
+        string? firstName = null,
+        string? lastName = null
+    );
+    Task<Result<IList<string>>> UpdateUserRolesAsync(Guid userId, IEnumerable<string> newRoles);
 
-    Task<Result> UpdateUserAsync(User user);
+    Task<UserDto?> GetUserByIdAsync(Guid userId);
 
-    Task<string?> GetUserNameAsync(string userId);
+    Task<IList<string>> GetUserRolesAsync(Guid userId);
 
-    Task<Result> CreateUserAsync(User user, string password);
+    Task<Result> UpdateUserAsync(
+        Guid userId,
+        string? displayName = null,
+        string? firstName = null,
+        string? lastName = null,
+        string? imageUrl = null
+    );
 
-    Task<bool> IsInRoleAsync(string userId, string role);
+    Task<Result> AddToRolesAsync(Guid userId, IEnumerable<string> roles);
 
-    Task<Result> DeleteUserAsync(string userId);
+    Task<Result> UpdateRefreshTokenAsync(Guid userId, string? refreshToken, DateTime? expiry, DateTime? createdAt);
 
-    Task<User?> FindByEmailAsync(string email);
+    // Efficient method to get all users at once (replaces N+1 query pattern)
+    Task<List<UserDto>> GetAllUsersAsync();
 
-    Task<User?> FindByIdAsync(string userId);
+    // Direct email lookup method (replaces two-step query pattern)
+    Task<UserDto?> GetUserByEmailAsync(string email);
 
-    Task<bool> CheckPasswordAsync(User user, string password);
-
-    Task<Result> AddToRoleAsync(User user, string role);
-
-    Task<Result> AddToRolesAsync(User user, IEnumerable<string> roles);
-
-    Task<Result> RemoveFromRolesAsync(User user, IEnumerable<string> roles);
-
-    Task<List<User>> GetAllUsersAsync();
-
-    Task<User?> FindByRefreshTokenAsync(string refreshToken);
+    // Methods for seeding operations
+    Task<bool> HasAnyUsersAsync();
 }

@@ -3,7 +3,6 @@ using CleanArch.Application.Common.Models;
 using CleanArch.Application.Common.Security;
 using CleanArch.Application.Members.Queries.GetMembers;
 using CleanArch.Domain.Constants;
-using CleanArch.Domain.Users;
 using CleanArch.Web.Api.Extensions;
 
 namespace CleanArch.Web.Api.Endpoints;

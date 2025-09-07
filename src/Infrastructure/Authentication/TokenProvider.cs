@@ -2,11 +2,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
-using CleanArch.Domain.Users;
 using CleanArch.Infrastructure.Options;
 using Mapster;
 using Microsoft.Extensions.Options;
@@ -19,7 +19,7 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
 {
     private readonly JwtOptions _jwtOptions = authOptions.Value.Jwt;
 
-    public async Task<string> CreateAsync(User user)
+    public async Task<string> CreateAsync(Guid userId)
     {
         if (string.IsNullOrWhiteSpace(_jwtOptions.Secret))
             throw new InvalidOperationException("JWT Secret is not configured");
@@ -27,7 +27,7 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Secret));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var claims = await CreateClaims(user);
+        var claims = await CreateClaims(userId);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -44,24 +44,26 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
         return handler.WriteToken(token);
     }
 
-    private async Task<List<Claim>> CreateClaims(User user)
+    private async Task<List<Claim>> CreateClaims(Guid userId)
     {
+        var user = await identityService.GetUserByIdAsync(userId);
+
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Email, user.Email ?? string.Empty),
+            new(ClaimTypes.NameIdentifier, userId.ToString()),
+            new(ClaimTypes.Email, user?.Email ?? string.Empty),
         };
 
-        var roles = await identityService.GetUserRolesAsync(user);
+        var roles = await identityService.GetUserRolesAsync(userId);
         claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
 
         return claims;
     }
 
-    public async Task<Result<UserDto>> CreateUserWithTokensAsync(User user, bool preserveCreatedAt = false)
+    public async Task<Result<UserDto>> CreateUserWithTokensAsync(Guid userId, bool preserveCreatedAt = false)
     {
         // Set refresh token
-        var refreshTokenResult = await SetRefreshTokenAsync(user, preserveCreatedAt);
+        var refreshTokenResult = await SetRefreshTokenAsync(userId, preserveCreatedAt);
         if (refreshTokenResult.IsFailure)
         {
             return Result.Failure<UserDto>(refreshTokenResult.Error);
@@ -69,9 +71,15 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
 
         var (refreshToken, expiry) = refreshTokenResult.Value;
 
-        // Create UserDto with all tokens
-        var userDto = user.Adapt<UserDto>();
-        userDto.Token = await CreateAsync(user);
+        // Get user details
+        var userDto = await identityService.GetUserByIdAsync(userId);
+        if (userDto == null)
+        {
+            return Result.Failure<UserDto>(UserErrors.NotFound(userId));
+        }
+
+        // Add tokens to UserDto
+        userDto.Token = await CreateAsync(userId);
         userDto.RefreshToken = refreshToken;
         userDto.RefreshTokenExpiry = expiry;
 
@@ -79,27 +87,21 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
     }
 
     private async Task<Result<(string refreshToken, DateTime expiry)>> SetRefreshTokenAsync(
-        User user,
+        Guid userId,
         bool preserveCreatedAt = false
     )
     {
         var refreshToken = GenerateRefreshToken();
-        user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(3);
+        var expiry = DateTime.UtcNow.AddDays(3);
+        var createdAt = preserveCreatedAt ? (DateTime?)null : DateTime.UtcNow;
 
-        if (!preserveCreatedAt)
-        {
-            user.RefreshTokenCreatedAt = DateTime.UtcNow;
-        }
-        // If preserveCreatedAt = true, keep original RefreshTokenCreatedAt to maintain absolute session limit
-
-        var updateResult = await identityService.UpdateUserAsync(user);
+        var updateResult = await identityService.UpdateRefreshTokenAsync(userId, refreshToken, expiry, createdAt);
         if (updateResult.IsFailure)
         {
             return Result.Failure<(string refreshToken, DateTime expiry)>(updateResult.Error);
         }
 
-        return Result.Success((refreshToken, user.RefreshTokenExpiry.Value));
+        return Result.Success((refreshToken, expiry));
     }
 
     private static string GenerateRefreshToken()
