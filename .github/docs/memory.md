@@ -548,6 +548,42 @@ ApplicationUser (1) ←→ (1) Member
 
 **Result**: ✅ Clean Architecture compliance achieved with consistent user creation patterns and resolved foreign key constraints.
 
-```
+### 6. User Creation & Domain Events with CustomUserManager (Sep 7, 2025)
 
-```
+**Problem**: Need to implement clean user creation process with domain events after solving FK constraint issues.
+
+**Current Build Status**: 
+- ✅ Main projects build successfully 
+- ❌ Test failures due to missing required UserDto properties (Gender, DateOfBirth)
+- ❌ Expression tree optional parameter issues in mock setups
+
+**Technical Context**:
+- CustomUserManager implemented to add domain events on user creation
+- UserDto updated with required properties for complete user profile
+- IIdentityService interface simplified for clean separation
+
+**Files Status**:
+- **Active**: CustomUserManager.cs - Domain events on user creation
+- **Updated**: UserDto.cs - Added Gender and DateOfBirth as required fields
+- **Active**: DependencyInjection.cs - CustomUserManager registration
+- **Needs Fix**: RegisterCommandHandlerTests.cs - Test compilation errors
+
+**Next Steps**:
+1. Fix test compilation errors (missing UserDto required properties)
+2. Fix IIdentityService mock setup issues (optional parameters in expression trees)
+3. Create clean migration for database schema
+4. Test complete user creation flow with domain events
+
+### 7. DateOfBirth Format Change to DateOnly (Sep 7, 2025)
+
+**Decision**: Changed all "DateOfBirth" fields in users.json from ISO 8601 full format to DateOnly format (YYYY-MM-DD).
+
+**Rationale**:
+- Simplifies date representation for seed data.
+- Aligns with potential C# DateOnly type usage in the application.
+- Removes unnecessary time component (all were T00:00:00Z anyway).
+
+**Files Affected**:
+- Updated: `src/Infrastructure/Data/Seed/users.json` (10 DateOfBirth fields)
+
+**Build Status**: ✅ JSON syntax verified, no compilation issues.

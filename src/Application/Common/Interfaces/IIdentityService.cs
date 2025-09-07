@@ -13,7 +13,8 @@ public interface IIdentityService
         string password,
         string? displayName = null,
         string? firstName = null,
-        string? lastName = null
+        string? lastName = null,
+        string? imageUrl = null
     );
     Task<Result<IList<string>>> UpdateUserRolesAsync(Guid userId, IEnumerable<string> newRoles);
 

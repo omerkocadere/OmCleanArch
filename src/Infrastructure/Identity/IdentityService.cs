@@ -56,10 +56,11 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
         string password,
         string? displayName = null,
         string? firstName = null,
-        string? lastName = null
+        string? lastName = null,
+        string? imageUrl = null
     )
     {
-        // Step 1: Create ApplicationUser first (principal entity)
+        // Create ApplicationUser entity
         var user = new ApplicationUser
         {
             UserName = userName,
@@ -67,18 +68,18 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
             DisplayName = displayName ?? userName,
             FirstName = firstName,
             LastName = lastName,
+            ImageUrl = imageUrl,
         };
 
-        // Step 2: Create User with Identity
+        // Create User with Identity
         var result = await userManager.CreateAsync(user, password);
         if (!result.Succeeded)
         {
             return (Result.Failure(ConvertIdentityErrors(result.Errors)), null);
         }
 
-        // Add domain event immediately after user creation
-        var userCreatedEvent = new UserCreatedDomainEvent(Guid.NewGuid(), user.Id, user.UserName, user.Email);
-        user.AddDomainEvent(userCreatedEvent);
+        // Note: Domain events will be added in the calling handler where SaveChanges is called
+        // This ensures the SaveChanges interceptor can properly process the events
 
         return (Result.Success(), user.Adapt<UserDto>());
     }

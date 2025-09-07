@@ -61,6 +61,8 @@ public class RegisterCommandHandlerTests
         {
             Id = expectedUserId,
             Email = command.Email,
+            Gender = command.Gender,
+            DateOfBirth = command.DateOfBirth.ToDateTime(TimeOnly.MinValue),
             DisplayName = command.DisplayName,
             FirstName = command.FirstName,
             LastName = command.LastName,
@@ -77,7 +79,8 @@ public class RegisterCommandHandlerTests
                     command.Password,
                     command.DisplayName,
                     command.FirstName,
-                    command.LastName
+                    command.LastName,
+                    null // imageUrl
                 )
             )
             .ReturnsAsync((Result.Success(), expectedUserDto));
@@ -108,7 +111,8 @@ public class RegisterCommandHandlerTests
                     command.Password,
                     command.DisplayName,
                     command.FirstName,
-                    command.LastName
+                    command.LastName,
+                    null // imageUrl
                 ),
             Times.Once
         );
@@ -144,7 +148,8 @@ public class RegisterCommandHandlerTests
                     command.Password,
                     command.DisplayName,
                     command.FirstName,
-                    command.LastName
+                    command.LastName,
+                    null // imageUrl
                 )
             )
             .ReturnsAsync((Result.Failure(error), (UserDto)null!));
@@ -163,7 +168,8 @@ public class RegisterCommandHandlerTests
                     command.Password,
                     command.DisplayName,
                     command.FirstName,
-                    command.LastName
+                    command.LastName,
+                    null // imageUrl
                 ),
             Times.Once
         );

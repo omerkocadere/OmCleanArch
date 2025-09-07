@@ -16,8 +16,9 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IHasDomainEvents
     public DateTime? RefreshTokenExpiry { get; set; }
     public DateTime? RefreshTokenCreatedAt { get; set; }
 
-    // Note: Member entity shares the same ID but is managed separately
-    // No navigation property to maintain Clean Architecture boundaries
+    // Note: Relationship with Member maintained through shared ID (ApplicationUser.Id == Member.Id)
+    // No navigation property to avoid FK constraint issues
+    // Use manual queries when you need to access related Member: context.Members.Find(user.Id)
 
     // Domain Events implementation
     [NotMapped]

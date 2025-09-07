@@ -152,6 +152,9 @@ public static class DependencyInjection
             .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
+        // Replace default UserManager with CustomUserManager for domain events
+        services.AddScoped<UserManager<ApplicationUser>, CustomUserManager>();
+
         services.AddScoped<PermissionProvider>();
         services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
         services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();

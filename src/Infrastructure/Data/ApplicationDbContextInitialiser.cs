@@ -10,6 +10,7 @@ using CleanArch.Domain.Photos;
 using CleanArch.Domain.TodoItems;
 using CleanArch.Domain.TodoLists;
 using CleanArch.Domain.ValueObjects;
+using Mapster;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -132,10 +133,11 @@ public static class ApplicationDbContextInitialiser
                 "Pa$$w0rd",
                 userDto.DisplayName,
                 userDto.FirstName,
-                userDto.LastName
+                userDto.LastName,
+                userDto.ImageUrl
             );
 
-            if (!createResult.Result.IsSuccess || createResult.UserDto == null)
+            if (!createResult.Result.IsSuccess || createResult.UserDto is null)
             {
                 logger.LogError(
                     "Failed to create user {Email}: {Error}",
@@ -146,17 +148,8 @@ public static class ApplicationDbContextInitialiser
             }
 
             // Create Member separately with the same ID (manual shared primary key)
-            var member = new Member
-            {
-                Id = createResult.UserDto.Id, // Use the User's ID for shared primary key
-                DateOfBirth = DateOnly.FromDateTime(userDto.DateOfBirth),
-                DisplayName = userDto.DisplayName,
-                Gender = userDto.Gender,
-                City = userDto.City,
-                Country = userDto.Country,
-                LastActive = DateTime.UtcNow,
-                Description = string.Empty, // Default empty description
-            };
+            var member = userDto.Adapt<Member>();
+            member.Id = createResult.UserDto.Id; // Use the User's ID for shared primary key
 
             context.Members.Add(member);
 
@@ -339,7 +332,7 @@ public class UserSeedDto
     public required Guid Id { get; set; }
     public required string Email { get; set; }
     public required string Gender { get; set; }
-    public required DateTime DateOfBirth { get; set; }
+    public required DateOnly DateOfBirth { get; set; }
     public required string DisplayName { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
