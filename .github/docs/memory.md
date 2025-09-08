@@ -552,23 +552,27 @@ ApplicationUser (1) ←→ (1) Member
 
 **Problem**: Need to implement clean user creation process with domain events after solving FK constraint issues.
 
-**Current Build Status**: 
-- ✅ Main projects build successfully 
+**Current Build Status**:
+
+- ✅ Main projects build successfully
 - ❌ Test failures due to missing required UserDto properties (Gender, DateOfBirth)
 - ❌ Expression tree optional parameter issues in mock setups
 
 **Technical Context**:
+
 - CustomUserManager implemented to add domain events on user creation
 - UserDto updated with required properties for complete user profile
 - IIdentityService interface simplified for clean separation
 
 **Files Status**:
+
 - **Active**: CustomUserManager.cs - Domain events on user creation
 - **Updated**: UserDto.cs - Added Gender and DateOfBirth as required fields
 - **Active**: DependencyInjection.cs - CustomUserManager registration
 - **Needs Fix**: RegisterCommandHandlerTests.cs - Test compilation errors
 
 **Next Steps**:
+
 1. Fix test compilation errors (missing UserDto required properties)
 2. Fix IIdentityService mock setup issues (optional parameters in expression trees)
 3. Create clean migration for database schema
@@ -579,11 +583,13 @@ ApplicationUser (1) ←→ (1) Member
 **Decision**: Changed all "DateOfBirth" fields in users.json from ISO 8601 full format to DateOnly format (YYYY-MM-DD).
 
 **Rationale**:
+
 - Simplifies date representation for seed data.
 - Aligns with potential C# DateOnly type usage in the application.
 - Removes unnecessary time component (all were T00:00:00Z anyway).
 
 **Files Affected**:
+
 - Updated: `src/Infrastructure/Data/Seed/users.json` (10 DateOfBirth fields)
 
 **Build Status**: ✅ JSON syntax verified, no compilation issues.
@@ -595,6 +601,7 @@ ApplicationUser (1) ←→ (1) Member
 **Follow-up Clarification**: User emphasized concern about TokenProvider (Infrastructure) accessing IIdentityService (Application interface), questioning if this is architecturally sound.
 
 **Deep Research Conducted**:
+
 1. **Uncle Bob's Dependency Rule**: Infrastructure→Application dependencies via interfaces = ✅ ALLOWED
 2. **Jason Taylor Template**: Identical pattern confirmed - Infrastructure services implement Application interfaces
 3. **Ardalis Clean Architecture**: "Infrastructure project should depend on the Core project and optionally the Use Cases project"
@@ -602,11 +609,13 @@ ApplicationUser (1) ←→ (1) Member
 5. **Industry Consensus**: This is the standard Dependency Inversion Principle implementation
 
 **Key Research Sources**:
+
 - **Jason Taylor CleanArchitecture**: `/jasontaylordev/cleanarchitecture` - Infrastructure.Identity.IdentityService implements Application.Common.Interfaces.IIdentityService
 - **Ardalis CleanArchitecture**: `/ardalis/cleanarchitecture` - ADR-001 confirms Infrastructure→Application dependencies
 - **StackOverflow Evidence**: "How to use Identity UserManager in multi-project solutions" - exact same pattern validation
 
 **Technical Pattern Confirmed**:
+
 ```csharp
 // ✅ CORRECT PATTERN (Industry Standard)
 // Infrastructure Layer
@@ -615,12 +624,13 @@ internal sealed class TokenProvider(IIdentityService identityService) : ITokenPr
     // Infrastructure service uses Application interface - PERFECT!
 }
 
-// Application Layer  
+// Application Layer
 public interface IIdentityService { } // Interface definition
 public interface ITokenProvider { }   // Interface definition
 ```
 
 **Architecture Validation Results**:
+
 - **✅ Dependency Direction**: Infrastructure→Application (allowed by Clean Architecture)
 - **✅ Interface Location**: IIdentityService in Application layer (proper separation)
 - **✅ Implementation Location**: TokenProvider in Infrastructure layer (correct placement)
@@ -632,3 +642,35 @@ public interface ITokenProvider { }   // Interface definition
 **Final Verdict**: **PERFECT IMPLEMENTATION** - No changes needed. Current architecture demonstrates textbook Clean Architecture compliance and industry best practices.
 
 **Architecture Status**: ✅ **GOLD STANDARD CLEAN ARCHITECTURE** - Follows Uncle Bob, Jason Taylor, and Ardalis patterns exactly.
+
+### 9. dotnet-outdated Tool Installation Decision (Sep 8, 2025)
+
+**Decision**: Install `dotnet-outdated-tool` as a global .NET tool for developer convenience.
+
+**Rationale**:
+
+- The project maintainers approved a global installation for ease of use across repositories and interactive workflows.
+- The official `dotnet-outdated` documentation recommends global installation via `dotnet tool install --global dotnet-outdated-tool`.
+- A global install makes the tool immediately available in the user's shells and CI runners that rely on user-scoped tools.
+
+**Alternatives Considered**:
+
+- Local tool manifest (`dotnet new tool-manifest` + `dotnet tool install dotnet-outdated-tool`) for per-repo pinning and CI reproducibility. This was rejected in favor of global install for developer convenience; use local tool if pinning is required.
+- Deprecated `dotnet-outdated` package (v2.9.0) — explicitly not used.
+
+**Next Steps**:
+
+- Install or update the global tool on the developer machine and verify the installed version. (Actioned by automation with approval.)
+
+**Install Verification (Sep 8, 2025)**:
+
+- Execution: Ran `dotnet tool install --global dotnet-outdated-tool` on the developer machine after receiving approval for a global install.
+- Result: Tool `dotnet-outdated-tool` installed successfully.
+- Installed version: 4.6.8 (reported by `dotnet-outdated --version` as `4.6.8+c299fe8ae17f9d5fcfbb2170e2e2d6fce978ea5e`).
+
+**Notes**:
+
+- The tool is available as the command `dotnet-outdated` in PowerShell sessions for the current user.
+- If CI requires a pinned version or per-repo reproducibility, consider switching to a local tool manifest for that environment.
+
+
