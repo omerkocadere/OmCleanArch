@@ -48,7 +48,7 @@ public class RegisterCommandHandler(
             FirstName = command.FirstName,
             LastName = command.LastName,
             ImageUrl = null,
-            Roles = [UserRoles.Member]
+            Roles = [UserRoles.Member],
         };
 
         var result = await identityService.CreateUserAsync(createUserRequest);

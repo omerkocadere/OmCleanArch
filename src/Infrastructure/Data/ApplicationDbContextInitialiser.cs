@@ -139,7 +139,7 @@ public static class ApplicationDbContextInitialiser
                 FirstName = userDto.FirstName,
                 LastName = userDto.LastName,
                 ImageUrl = userDto.ImageUrl,
-                Roles = []
+                Roles = [UserRoles.Member], // Set roles directly in CreateUserRequest
             };
 
             var createResult = await identityService.CreateUserAsync(createUserRequest);
@@ -166,16 +166,6 @@ public static class ApplicationDbContextInitialiser
                 var photo = new Photo { Url = userDto.ImageUrl, MemberId = createResult.Value.Id };
                 context.Photos.Add(photo);
             }
-
-            var roleResult = await identityService.UpdateUserRolesAsync(createResult.Value.Id, [UserRoles.Member]);
-            if (!roleResult.IsSuccess)
-            {
-                logger.LogError(
-                    "Failed to add role to user {Email}: {Error}",
-                    userDto.Email,
-                    roleResult.Error?.Description
-                );
-            }
         }
 
         // Admin user creation (without Member entity for admin-only functionality)
@@ -187,16 +177,12 @@ public static class ApplicationDbContextInitialiser
             RefreshTokenExpiry = DateTime.Now.AddDays(3),
             RefreshToken = "",
             DisplayName = "Admin",
-            Roles = []
+            Roles = [UserRoles.Admin, UserRoles.Moderator], // Set admin roles directly
         };
 
         var result = await identityService.CreateUserAsync(adminRequest);
 
-        if (result.IsSuccess)
-        {
-            await identityService.UpdateUserRolesAsync(result.Value.Id, [UserRoles.Admin, UserRoles.Moderator]);
-        }
-        else
+        if (!result.IsSuccess)
         {
             logger.LogError("Failed to create admin user: {Error}", result.Error?.Description);
         }

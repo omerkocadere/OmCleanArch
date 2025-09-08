@@ -1,5 +1,3 @@
-using FluentValidation;
-
 namespace CleanArch.Application.Messages.Commands.CreateMessage;
 
 public class CreateMessageCommandValidator : AbstractValidator<CreateMessageCommand>
