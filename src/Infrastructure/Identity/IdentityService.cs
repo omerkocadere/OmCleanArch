@@ -2,6 +2,7 @@ using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
+using CleanArch.Application.Users.Models;
 using CleanArch.Domain.Common;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
@@ -34,41 +35,30 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
         return result.Succeeded ? user.Adapt<UserDto>() : Result.Failure<UserDto>(ConvertIdentityErrors(result.Errors));
     }
 
-    public async Task<Result<UserDto>> CreateUserAsync(
-        string userName,
-        string email,
-        string password,
-        DateTime expiry,
-        string refreshToken,
-        string? displayName = null,
-        string? firstName = null,
-        string? lastName = null,
-        string? imageUrl = null,
-        IEnumerable<string> roles = null!
-    )
+    public async Task<Result<UserDto>> CreateUserAsync(CreateUserRequest request)
     {
         // Create ApplicationUser entity
         var user = new ApplicationUser
         {
-            UserName = userName,
-            Email = email,
-            DisplayName = displayName ?? userName,
-            FirstName = firstName,
-            LastName = lastName,
-            ImageUrl = imageUrl,
-            RefreshToken = refreshToken,
-            RefreshTokenExpiry = expiry,
+            UserName = request.UserName,
+            Email = request.Email,
+            DisplayName = request.DisplayName ?? request.UserName,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            ImageUrl = request.ImageUrl,
+            RefreshToken = request.RefreshToken,
+            RefreshTokenExpiry = request.RefreshTokenExpiry,
             RefreshTokenCreatedAt = DateTime.UtcNow,
         };
 
         // Create User with Identity
-        var result = await userManager.CreateAsync(user, password);
+        var result = await userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
         {
             return Result.Failure<UserDto>(ConvertIdentityErrors(result.Errors));
         }
 
-        result = await userManager.AddToRolesAsync(user, roles);
+        result = await userManager.AddToRolesAsync(user, request.Roles);
         if (!result.Succeeded)
         {
             return Result.Failure<UserDto>(ConvertIdentityErrors(result.Errors));

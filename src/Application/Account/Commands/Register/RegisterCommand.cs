@@ -2,6 +2,7 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Users.DTOs;
+using CleanArch.Application.Users.Models;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Constants;
 using CleanArch.Domain.Members;
@@ -36,18 +37,21 @@ public class RegisterCommandHandler(
         using var transaction = await context.BeginTransactionAsync(cancellationToken);
 
         // Create the user with all details in one call
-        var result = await identityService.CreateUserAsync(
-            command.Email.ToLower(),
-            command.Email,
-            command.Password,
-            expiry,
-            token,
-            command.DisplayName,
-            command.FirstName,
-            command.LastName,
-            null,
-            [UserRoles.Member]
-        );
+        var createUserRequest = new CreateUserRequest
+        {
+            UserName = command.Email.ToLower(),
+            Email = command.Email,
+            Password = command.Password,
+            RefreshTokenExpiry = expiry,
+            RefreshToken = token,
+            DisplayName = command.DisplayName,
+            FirstName = command.FirstName,
+            LastName = command.LastName,
+            ImageUrl = null,
+            Roles = [UserRoles.Member]
+        };
+
+        var result = await identityService.CreateUserAsync(createUserRequest);
 
         if (result.IsFailure)
         {

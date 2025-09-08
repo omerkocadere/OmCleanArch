@@ -1,4 +1,5 @@
 using CleanArch.Application.Users.DTOs;
+using CleanArch.Application.Users.Models;
 using CleanArch.Domain.Common;
 
 namespace CleanArch.Application.Common.Interfaces;
@@ -17,18 +18,7 @@ public interface IIdentityService
     Task<IList<string>> GetUserRolesAsync(Guid userId);
     Task<Result<IList<string>>> UpdateUserRolesAsync(Guid userId, List<string> newRoles);
 
-    Task<Result<UserDto>> CreateUserAsync(
-        string userName,
-        string email,
-        string password,
-        DateTime expiry,
-        string refreshToken,
-        string? displayName = null,
-        string? firstName = null,
-        string? lastName = null,
-        string? imageUrl = null,
-        IEnumerable<string> roles = null!
-    );
+    Task<Result<UserDto>> CreateUserAsync(CreateUserRequest request);
 
     Task<Result> UpdateUserAsync(
         Guid userId,

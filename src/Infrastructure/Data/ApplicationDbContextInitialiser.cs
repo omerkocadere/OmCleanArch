@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Users.Models;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Constants;
 using CleanArch.Domain.Items;
@@ -127,17 +128,21 @@ public static class ApplicationDbContextInitialiser
         foreach (var userDto in userData)
         {
             // Create User with IdentityService (just the ApplicationUser)
-            var createResult = await identityService.CreateUserAsync(
-                userDto.Email,
-                userDto.Email,
-                "Pa$$w0rd",
-                DateTime.Now.AddDays(3),
-                "",
-                userDto.DisplayName,
-                userDto.FirstName,
-                userDto.LastName,
-                userDto.ImageUrl
-            );
+            var createUserRequest = new CreateUserRequest
+            {
+                UserName = userDto.Email,
+                Email = userDto.Email,
+                Password = "Pa$$w0rd",
+                RefreshTokenExpiry = DateTime.Now.AddDays(3),
+                RefreshToken = "",
+                DisplayName = userDto.DisplayName,
+                FirstName = userDto.FirstName,
+                LastName = userDto.LastName,
+                ImageUrl = userDto.ImageUrl,
+                Roles = []
+            };
+
+            var createResult = await identityService.CreateUserAsync(createUserRequest);
 
             if (!createResult.IsSuccess)
             {
@@ -174,14 +179,18 @@ public static class ApplicationDbContextInitialiser
         }
 
         // Admin user creation (without Member entity for admin-only functionality)
-        var result = await identityService.CreateUserAsync(
-            "admin@test.com",
-            "admin@test.com",
-            "Pa$$w0rd",
-            DateTime.Now.AddDays(3),
-            "",
-            "Admin"
-        );
+        var adminRequest = new CreateUserRequest
+        {
+            UserName = "admin@test.com",
+            Email = "admin@test.com",
+            Password = "Pa$$w0rd",
+            RefreshTokenExpiry = DateTime.Now.AddDays(3),
+            RefreshToken = "",
+            DisplayName = "Admin",
+            Roles = []
+        };
+
+        var result = await identityService.CreateUserAsync(adminRequest);
 
         if (result.IsSuccess)
         {
