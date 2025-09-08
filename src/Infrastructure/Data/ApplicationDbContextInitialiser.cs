@@ -137,30 +137,30 @@ public static class ApplicationDbContextInitialiser
                 userDto.ImageUrl
             );
 
-            if (!createResult.Result.IsSuccess || createResult.UserDto is null)
+            if (!createResult.IsSuccess)
             {
                 logger.LogError(
                     "Failed to create user {Email}: {Error}",
                     userDto.Email,
-                    createResult.Result.Error?.Description
+                    createResult.Error?.Description
                 );
                 continue;
             }
 
             // Create Member separately with the same ID (manual shared primary key)
             var member = userDto.Adapt<Member>();
-            member.Id = createResult.UserDto.Id; // Use the User's ID for shared primary key
+            member.Id = createResult.Value.Id; // Use the User's ID for shared primary key
 
             context.Members.Add(member);
 
             // Create a photo for this member using their ImageUrl
             if (!string.IsNullOrEmpty(userDto.ImageUrl))
             {
-                var photo = new Photo { Url = userDto.ImageUrl, MemberId = createResult.UserDto.Id };
+                var photo = new Photo { Url = userDto.ImageUrl, MemberId = createResult.Value.Id };
                 context.Photos.Add(photo);
             }
 
-            var roleResult = await identityService.AddToRolesAsync(createResult.UserDto.Id, [UserRoles.Member]);
+            var roleResult = await identityService.AddToRolesAsync(createResult.Value.Id, [UserRoles.Member]);
             if (!roleResult.IsSuccess)
             {
                 logger.LogError(
@@ -172,20 +172,15 @@ public static class ApplicationDbContextInitialiser
         }
 
         // Admin user creation (without Member entity for admin-only functionality)
-        var (Result, UserDto) = await identityService.CreateUserAsync(
-            "admin@test.com",
-            "admin@test.com",
-            "Pa$$w0rd",
-            "Admin"
-        );
+        var result = await identityService.CreateUserAsync("admin@test.com", "admin@test.com", "Pa$$w0rd", "Admin");
 
-        if (Result.IsSuccess && UserDto != null)
+        if (result.IsSuccess)
         {
-            await identityService.AddToRolesAsync(UserDto.Id, [UserRoles.Admin, UserRoles.Moderator]);
+            await identityService.AddToRolesAsync(result.Value.Id, [UserRoles.Admin, UserRoles.Moderator]);
         }
         else
         {
-            logger.LogError("Failed to create admin user: {Error}", Result.Error?.Description);
+            logger.LogError("Failed to create admin user: {Error}", result.Error?.Description);
         }
 
         // Collect the created user IDs

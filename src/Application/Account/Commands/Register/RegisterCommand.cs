@@ -1,4 +1,5 @@
 using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
@@ -20,48 +21,40 @@ public sealed record RegisterCommand : ICommand<UserDto>
     public DateOnly DateOfBirth { get; set; }
 }
 
-public class RegisterCommandHandler(IIdentityService identityService, IApplicationDbContext context)
-    : ICommandHandler<RegisterCommand, UserDto>
+public class RegisterCommandHandler(
+    IIdentityService identityService,
+    IApplicationDbContext context,
+    ITokenProvider tokenProvider
+) : ICommandHandler<RegisterCommand, UserDto>
 {
     public async Task<Result<UserDto>> Handle(RegisterCommand command, CancellationToken cancellationToken)
     {
+        string token = tokenProvider.GenerateRefreshToken();
+
         // Start database transaction for atomicity
         using var transaction = await context.BeginTransactionAsync(cancellationToken);
 
         // Create the user with all details in one call
-        var (result, userDto) = await identityService.CreateUserAsync(
+        var result = await identityService.CreateUserAsync(
             command.Email.ToLower(),
             command.Email,
             command.Password,
+            token,
             command.DisplayName,
             command.FirstName,
-            command.LastName
+            command.LastName,
+            null,
+            [UserRoles.Member]
         );
 
-        if (!result.IsSuccess || userDto is null)
+        if (result.IsFailure)
         {
             return Result.Failure<UserDto>(result.Error);
         }
 
-        // Add user to Member role
-        var addRoleResult = await identityService.AddToRolesAsync(userDto.Id, [UserRoles.Member]);
-        if (!addRoleResult.IsSuccess)
-        {
-            return Result.Failure<UserDto>(addRoleResult.Error);
-        }
-
-        // Create Member domain entity
-        var member = new Member
-        {
-            Id = userDto.Id,
-            DateOfBirth = command.DateOfBirth,
-            DisplayName = command.DisplayName,
-            Gender = command.Gender,
-            City = command.City,
-            Country = command.Country,
-            LastActive = DateTime.UtcNow,
-            Description = string.Empty, // Default empty description
-        };
+        var member = command.Adapt<Member>();
+        member.Id = result.Value.Id;
+        member.LastActive = DateTime.UtcNow;
 
         context.Members.Add(member);
         await context.SaveChangesAsync(cancellationToken);
@@ -69,6 +62,7 @@ public class RegisterCommandHandler(IIdentityService identityService, IApplicati
         // Commit transaction - all operations successful
         await transaction.CommitAsync(cancellationToken);
 
-        return Result.Success(userDto);
+        result.Value.Token = await tokenProvider.CreateAsync(result.Value.Id);
+        return result.Value;
     }
 }

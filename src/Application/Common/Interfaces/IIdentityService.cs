@@ -5,16 +5,19 @@ namespace CleanArch.Application.Common.Interfaces;
 
 public interface IIdentityService
 {
+    Task<Result<UserDto>> Login(string password, string email, string refreshToken);
     Task<bool> CheckPasswordAsync(Guid userId, string password);
     Task<UserDto?> FindUserByRefreshTokenAsync(string refreshToken);
-    Task<(Result Result, UserDto? UserDto)> CreateUserAsync(
+    Task<Result<UserDto>> CreateUserAsync(
         string userName,
         string email,
         string password,
+        string refreshToken,
         string? displayName = null,
         string? firstName = null,
         string? lastName = null,
-        string? imageUrl = null
+        string? imageUrl = null,
+        IEnumerable<string> roles = null!
     );
     Task<Result<IList<string>>> UpdateUserRolesAsync(Guid userId, IEnumerable<string> newRoles);
 
@@ -32,7 +35,7 @@ public interface IIdentityService
 
     Task<Result> AddToRolesAsync(Guid userId, IEnumerable<string> roles);
 
-    Task<Result> UpdateRefreshTokenAsync(Guid userId, string? refreshToken, DateTime? expiry, DateTime? createdAt);
+    Task<Result> UpdateRefreshTokenAsync(Guid userId, DateTime expiry, string? refreshToken);
 
     // Efficient method to get all users at once (replaces N+1 query pattern)
     Task<List<UserDto>> GetAllUsersAsync();

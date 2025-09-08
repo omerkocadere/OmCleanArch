@@ -44,6 +44,12 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
         return handler.WriteToken(token);
     }
 
+    public string GenerateRefreshToken()
+    {
+        var randomBytes = RandomNumberGenerator.GetBytes(64);
+        return Convert.ToBase64String(randomBytes);
+    }
+
     private async Task<List<Claim>> CreateClaims(Guid userId)
     {
         var user = await identityService.GetUserByIdAsync(userId);
@@ -60,53 +66,47 @@ internal sealed class TokenProvider(IOptions<AuthenticationOptions> authOptions,
         return claims;
     }
 
-    public async Task<Result<UserDto>> CreateUserWithTokensAsync(Guid userId, bool preserveCreatedAt = false)
-    {
-        // Set refresh token
-        var refreshTokenResult = await SetRefreshTokenAsync(userId, preserveCreatedAt);
-        if (refreshTokenResult.IsFailure)
-        {
-            return Result.Failure<UserDto>(refreshTokenResult.Error);
-        }
+    // public async Task<Result<UserDto>> CreateUserWithTokensAsync(Guid userId, bool preserveCreatedAt = false)
+    // {
+    //     // Set refresh token
+    //     var refreshTokenResult = await SetRefreshTokenAsync(userId, preserveCreatedAt);
+    //     if (refreshTokenResult.IsFailure)
+    //     {
+    //         return Result.Failure<UserDto>(refreshTokenResult.Error);
+    //     }
 
-        var (refreshToken, expiry) = refreshTokenResult.Value;
+    //     var (refreshToken, expiry) = refreshTokenResult.Value;
 
-        // Get user details
-        var userDto = await identityService.GetUserByIdAsync(userId);
-        if (userDto == null)
-        {
-            return Result.Failure<UserDto>(UserErrors.NotFound(userId));
-        }
+    //     // Get user details
+    //     var userDto = await identityService.GetUserByIdAsync(userId);
+    //     if (userDto == null)
+    //     {
+    //         return Result.Failure<UserDto>(UserErrors.NotFound(userId));
+    //     }
 
-        // Add tokens to UserDto
-        userDto.Token = await CreateAsync(userId);
-        userDto.RefreshToken = refreshToken;
-        userDto.RefreshTokenExpiry = expiry;
+    //     // Add tokens to UserDto
+    //     userDto.Token = await CreateAsync(userId);
+    //     userDto.RefreshToken = refreshToken;
+    //     userDto.RefreshTokenExpiry = expiry;
 
-        return Result.Success(userDto);
-    }
+    //     return Result.Success(userDto);
+    // }
 
-    private async Task<Result<(string refreshToken, DateTime expiry)>> SetRefreshTokenAsync(
-        Guid userId,
-        bool preserveCreatedAt = false
-    )
-    {
-        var refreshToken = GenerateRefreshToken();
-        var expiry = DateTime.UtcNow.AddDays(3);
-        var createdAt = preserveCreatedAt ? (DateTime?)null : DateTime.UtcNow;
+    // private async Task<Result<(string refreshToken, DateTime expiry)>> SetRefreshTokenAsync(
+    //     Guid userId,
+    //     bool preserveCreatedAt = false
+    // )
+    // {
+    //     var refreshToken = GenerateRefreshToken();
+    //     var expiry = DateTime.UtcNow.AddDays(3);
+    //     var createdAt = preserveCreatedAt ? (DateTime?)null : DateTime.UtcNow;
 
-        var updateResult = await identityService.UpdateRefreshTokenAsync(userId, refreshToken, expiry, createdAt);
-        if (updateResult.IsFailure)
-        {
-            return Result.Failure<(string refreshToken, DateTime expiry)>(updateResult.Error);
-        }
+    //     var updateResult = await identityService.UpdateRefreshTokenAsync(userId, refreshToken, expiry, createdAt);
+    //     if (updateResult.IsFailure)
+    //     {
+    //         return Result.Failure<(string refreshToken, DateTime expiry)>(updateResult.Error);
+    //     }
 
-        return Result.Success((refreshToken, expiry));
-    }
-
-    private static string GenerateRefreshToken()
-    {
-        var randomBytes = RandomNumberGenerator.GetBytes(64);
-        return Convert.ToBase64String(randomBytes);
-    }
+    //     return Result.Success((refreshToken, expiry));
+    // }
 }

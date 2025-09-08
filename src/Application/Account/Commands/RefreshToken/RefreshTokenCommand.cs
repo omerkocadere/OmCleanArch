@@ -37,7 +37,19 @@ public sealed class RefreshTokenCommandHandler(IIdentityService identityService,
             }
         }
 
-        // SECURITY: Token Rotation - Create UserDto with new tokens
-        return await tokenProvider.CreateUserWithTokensAsync(userDto.Id, preserveCreatedAt: true);
+        string refreshToken = tokenProvider.GenerateRefreshToken();
+        DateTime expiry = DateTime.UtcNow.AddDays(3);
+
+        var result = await identityService.UpdateRefreshTokenAsync(userDto.Id, expiry, refreshToken);
+
+        if (result.IsFailure)
+        {
+            return Result.Failure<UserDto>(result.Error);
+        }
+
+        userDto.Token = await tokenProvider.CreateAsync(userDto.Id);
+        userDto.RefreshToken = refreshToken;
+        userDto.RefreshTokenExpiry = expiry;
+        return Result.Success(userDto);
     }
 }

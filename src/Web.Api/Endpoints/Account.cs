@@ -90,7 +90,7 @@ public class Account : EndpointGroupBase
             var userDto = await identityService.FindUserByRefreshTokenAsync(refreshToken);
             if (userDto != null)
             {
-                await identityService.UpdateRefreshTokenAsync(userDto.Id, null, DateTime.UtcNow, null);
+                await identityService.UpdateRefreshTokenAsync(userDto.Id, DateTime.UtcNow, null);
             }
         }
 

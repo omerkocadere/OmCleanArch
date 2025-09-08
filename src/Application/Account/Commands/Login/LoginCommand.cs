@@ -18,19 +18,16 @@ internal sealed class LoginCommandHandler(IIdentityService identityService, ITok
 {
     public async Task<Result<UserDto>> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
-        var userDto = await identityService.GetUserByEmailAsync(command.Email);
-        if (userDto is null)
+        string token = tokenProvider.GenerateRefreshToken();
+
+        var result = await identityService.Login(command.Password, command.Email, token);
+
+        if (result.IsFailure)
         {
-            return Result.Failure<UserDto>(AuthenticationErrors.InvalidCredentials);
+            return Result.Failure<UserDto>(result.Error);
         }
 
-        var result = await identityService.CheckPasswordAsync(userDto.Id, command.Password);
-        if (!result)
-        {
-            return Result.Failure<UserDto>(AuthenticationErrors.InvalidCredentials);
-        }
-
-        // Create UserDto with tokens using centralized method
-        return await tokenProvider.CreateUserWithTokensAsync(userDto.Id);
+        result.Value.Token = await tokenProvider.CreateAsync(result.Value.Id);
+        return result.Value;
     }
 }

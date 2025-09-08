@@ -12,6 +12,109 @@ namespace CleanArch.Infrastructure.Identity;
 
 internal sealed class IdentityService(UserManager<ApplicationUser> userManager) : IIdentityService
 {
+    public async Task<Result<UserDto>> Login(string password, string email, string refreshToken)
+    {
+        var user = await userManager.FindByEmailAsync(email);
+        if (user is null)
+        {
+            return Result.Failure<UserDto>(AuthenticationErrors.InvalidCredentials);
+        }
+
+        var isSuccess = await userManager.CheckPasswordAsync(user, password);
+        if (!isSuccess)
+        {
+            return Result.Failure<UserDto>(AuthenticationErrors.InvalidCredentials);
+        }
+
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(3);
+        user.RefreshTokenCreatedAt = DateTime.UtcNow;
+
+        var result = await userManager.UpdateAsync(user);
+
+        return result.Succeeded ? user.Adapt<UserDto>() : Result.Failure<UserDto>(ConvertIdentityErrors(result.Errors));
+    }
+
+    public async Task<Result<UserDto>> CreateUserAsync(
+        string userName,
+        string email,
+        string password,
+        string refreshToken,
+        string? displayName = null,
+        string? firstName = null,
+        string? lastName = null,
+        string? imageUrl = null,
+        IEnumerable<string> roles = null!
+    )
+    {
+        // Create ApplicationUser entity
+        var user = new ApplicationUser
+        {
+            UserName = userName,
+            Email = email,
+            DisplayName = displayName ?? userName,
+            FirstName = firstName,
+            LastName = lastName,
+            ImageUrl = imageUrl,
+            RefreshToken = refreshToken,
+            RefreshTokenExpiry = DateTime.UtcNow.AddDays(3),
+            RefreshTokenCreatedAt = DateTime.UtcNow,
+        };
+
+        // Create User with Identity
+        var result = await userManager.CreateAsync(user, password);
+        if (!result.Succeeded)
+        {
+            return Result.Failure<UserDto>(ConvertIdentityErrors(result.Errors));
+        }
+
+        result = await userManager.AddToRolesAsync(user, roles);
+        if (!result.Succeeded)
+        {
+            return Result.Failure<UserDto>(ConvertIdentityErrors(result.Errors));
+        }
+
+        // Note: Domain events will be added in the calling handler where SaveChanges is called
+        // This ensures the SaveChanges interceptor can properly process the events
+
+        return user.Adapt<UserDto>();
+    }
+
+    public async Task<UserDto?> FindUserByRefreshTokenAsync(string refreshToken)
+    {
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        return user?.Adapt<UserDto>();
+    }
+
+    public async Task<Result> UpdateRefreshTokenAsync(Guid userId, DateTime expiry, string? refreshToken)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+            return Result.Failure(UserErrors.NotFound(userId));
+
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiry = expiry;
+
+        var result = await userManager.UpdateAsync(user);
+        return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
+    }
+
+    public async Task<Result<UserDto>> RefreshToken(string refreshToken)
+    {
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        if (user is null)
+        {
+            return Result.Failure<UserDto>(AuthenticationErrors.InvalidRefreshToken);
+        }
+
+        user.RefreshToken = Guid.NewGuid().ToString();
+        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(3);
+        user.RefreshTokenCreatedAt = DateTime.UtcNow;
+
+        var result = await userManager.UpdateAsync(user);
+        return result.Succeeded ? user.Adapt<UserDto>() : Result.Failure<UserDto>(ConvertIdentityErrors(result.Errors));
+    }
+
     public async Task<bool> CheckPasswordAsync(Guid userId, string password)
     {
         var user = await userManager.FindByIdAsync(userId.ToString());
@@ -39,49 +142,9 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
         return users.Adapt<List<UserDto>>();
     }
 
-    public async Task<UserDto?> FindUserByRefreshTokenAsync(string refreshToken)
-    {
-        var user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
-        return user?.Adapt<UserDto>();
-    }
-
     public async Task<bool> HasAnyUsersAsync()
     {
         return await userManager.Users.AnyAsync();
-    }
-
-    public async Task<(Result Result, UserDto? UserDto)> CreateUserAsync(
-        string userName,
-        string email,
-        string password,
-        string? displayName = null,
-        string? firstName = null,
-        string? lastName = null,
-        string? imageUrl = null
-    )
-    {
-        // Create ApplicationUser entity
-        var user = new ApplicationUser
-        {
-            UserName = userName,
-            Email = email,
-            DisplayName = displayName ?? userName,
-            FirstName = firstName,
-            LastName = lastName,
-            ImageUrl = imageUrl,
-        };
-
-        // Create User with Identity
-        var result = await userManager.CreateAsync(user, password);
-        if (!result.Succeeded)
-        {
-            return (Result.Failure(ConvertIdentityErrors(result.Errors)), null);
-        }
-
-        // Note: Domain events will be added in the calling handler where SaveChanges is called
-        // This ensures the SaveChanges interceptor can properly process the events
-
-        return (Result.Success(), user.Adapt<UserDto>());
     }
 
     public async Task<Result> UpdateUserAsync(
@@ -122,25 +185,6 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
             return Result.Failure(UserErrors.NotFound(userId));
 
         var result = await userManager.AddToRolesAsync(user, roles);
-        return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
-    }
-
-    public async Task<Result> UpdateRefreshTokenAsync(
-        Guid userId,
-        string? refreshToken,
-        DateTime? expiry,
-        DateTime? createdAt
-    )
-    {
-        var user = await userManager.FindByIdAsync(userId.ToString());
-        if (user == null)
-            return Result.Failure(UserErrors.NotFound(userId));
-
-        user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiry = expiry;
-        user.RefreshTokenCreatedAt = createdAt;
-
-        var result = await userManager.UpdateAsync(user);
         return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
     }
 
