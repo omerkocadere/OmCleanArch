@@ -15,7 +15,7 @@ public class EditUserRolesCommandHandler(IIdentityService identityService)
         var selectedRoles = command
             .Roles.Split(',', StringSplitOptions.RemoveEmptyEntries)
             .Select(role => role.Trim())
-            .ToArray();
+            .ToList();
 
         return await identityService.UpdateUserRolesAsync(command.UserId, selectedRoles);
     }

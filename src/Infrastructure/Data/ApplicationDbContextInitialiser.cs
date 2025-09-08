@@ -160,7 +160,7 @@ public static class ApplicationDbContextInitialiser
                 context.Photos.Add(photo);
             }
 
-            var roleResult = await identityService.AddToRolesAsync(createResult.Value.Id, [UserRoles.Member]);
+            var roleResult = await identityService.UpdateUserRolesAsync(createResult.Value.Id, [UserRoles.Member]);
             if (!roleResult.IsSuccess)
             {
                 logger.LogError(
@@ -176,7 +176,7 @@ public static class ApplicationDbContextInitialiser
 
         if (result.IsSuccess)
         {
-            await identityService.AddToRolesAsync(result.Value.Id, [UserRoles.Admin, UserRoles.Moderator]);
+            await identityService.UpdateUserRolesAsync(result.Value.Id, [UserRoles.Admin, UserRoles.Moderator]);
         }
         else
         {

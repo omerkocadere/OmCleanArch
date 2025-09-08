@@ -99,28 +99,6 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
         return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
     }
 
-    public async Task<Result<UserDto>> RefreshToken(string refreshToken)
-    {
-        var user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
-        if (user is null)
-        {
-            return Result.Failure<UserDto>(AuthenticationErrors.InvalidRefreshToken);
-        }
-
-        user.RefreshToken = Guid.NewGuid().ToString();
-        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(3);
-        user.RefreshTokenCreatedAt = DateTime.UtcNow;
-
-        var result = await userManager.UpdateAsync(user);
-        return result.Succeeded ? user.Adapt<UserDto>() : Result.Failure<UserDto>(ConvertIdentityErrors(result.Errors));
-    }
-
-    public async Task<bool> CheckPasswordAsync(Guid userId, string password)
-    {
-        var user = await userManager.FindByIdAsync(userId.ToString());
-        return user != null && await userManager.CheckPasswordAsync(user, password);
-    }
-
     public async Task<UserDto?> GetUserByIdAsync(Guid userId)
     {
         var user = await userManager.FindByIdAsync(userId.ToString());
@@ -142,11 +120,6 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
         return users.Adapt<List<UserDto>>();
     }
 
-    public async Task<bool> HasAnyUsersAsync()
-    {
-        return await userManager.Users.AnyAsync();
-    }
-
     public async Task<Result> UpdateUserAsync(
         Guid userId,
         string? displayName = null,
@@ -159,14 +132,10 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
         if (user == null)
             return Result.Failure(UserErrors.NotFound(userId));
 
-        if (displayName != null)
-            user.DisplayName = displayName;
-        if (firstName != null)
-            user.FirstName = firstName;
-        if (lastName != null)
-            user.LastName = lastName;
-        if (imageUrl != null)
-            user.ImageUrl = imageUrl;
+        user.DisplayName = displayName ?? user.DisplayName;
+        user.FirstName = firstName ?? user.FirstName;
+        user.LastName = lastName ?? user.LastName;
+        user.ImageUrl = imageUrl ?? user.ImageUrl;
 
         var result = await userManager.UpdateAsync(user);
         return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
@@ -178,27 +147,21 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
         return user != null ? await userManager.GetRolesAsync(user) : [];
     }
 
-    public async Task<Result> AddToRolesAsync(Guid userId, IEnumerable<string> roles)
+    public async Task<bool> HasAnyUsersAsync()
     {
-        var user = await userManager.FindByIdAsync(userId.ToString());
-        if (user == null)
-            return Result.Failure(UserErrors.NotFound(userId));
-
-        var result = await userManager.AddToRolesAsync(user, roles);
-        return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
+        return await userManager.Users.AnyAsync();
     }
 
-    public async Task<Result<IList<string>>> UpdateUserRolesAsync(Guid userId, IEnumerable<string> newRoles)
+    public async Task<Result<IList<string>>> UpdateUserRolesAsync(Guid userId, List<string> newRoles)
     {
         var user = await userManager.FindByIdAsync(userId.ToString());
         if (user == null)
             return Result.Failure<IList<string>>(UserErrors.NotFound(userId));
 
-        var selectedRoles = newRoles.ToArray();
         var currentRoles = await userManager.GetRolesAsync(user);
 
         // Add new roles that user doesn't have
-        var rolesToAdd = selectedRoles.Except(currentRoles);
+        var rolesToAdd = newRoles.Except(currentRoles);
         if (rolesToAdd.Any())
         {
             var addResult = await userManager.AddToRolesAsync(user, rolesToAdd);
@@ -209,7 +172,7 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
         }
 
         // Remove roles that user has but are not selected
-        var rolesToRemove = currentRoles.Except(selectedRoles);
+        var rolesToRemove = currentRoles.Except(newRoles);
         if (rolesToRemove.Any())
         {
             var removeResult = await userManager.RemoveFromRolesAsync(user, rolesToRemove);
@@ -219,9 +182,7 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
             }
         }
 
-        // Get the final roles after all operations
-        var finalRoles = await userManager.GetRolesAsync(user);
-        return Result.Success(finalRoles);
+        return newRoles;
     }
 
     /// <summary>
