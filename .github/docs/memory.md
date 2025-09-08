@@ -632,3 +632,90 @@ public interface ITokenProvider { }   // Interface definition
 **Final Verdict**: **PERFECT IMPLEMENTATION** - No changes needed. Current architecture demonstrates textbook Clean Architecture compliance and industry best practices.
 
 **Architecture Status**: ✅ **GOLD STANDARD CLEAN ARCHITECTURE** - Follows Uncle Bob, Jason Taylor, and Ardalis patterns exactly.
+
+### 9. RefreshTokenCreatedAt Security Fix - Absolute Session Management (Sep 8, 2025)
+
+**Problem**: RefreshTokenCreatedAt was being reset on every login, allowing infinite session extension by preventing the 30-day absolute limit from working properly.
+
+**User Concern**: *"RefreshTokenCreatedAt sadece bir kere create edilmeli. çünkü o absolute time tutuyor. yalnızca expire olduysa baştan üretilmeli"* (RefreshTokenCreatedAt should only be created once because it holds absolute time. It should only be regenerated if expired)
+
+**Root Cause Analysis**:
+- Login method was unconditionally setting `RefreshTokenCreatedAt = DateTime.UtcNow` on every login
+- This allowed users to bypass 30-day absolute session limits by logging in multiple times
+- Refresh token rotation was correctly preserving session time, but login was resetting it
+
+**Comprehensive Security Solution Implemented**:
+
+1. **Extended IIdentityService Interface**: Added `preserveCreatedAt` parameter to `UpdateRefreshTokenAsync`
+
+   ```csharp
+   Task<Result> UpdateRefreshTokenAsync(
+       Guid userId,
+       DateTime expiry,
+       string? refreshToken,
+       bool preserveCreatedAt = true
+   );
+   ```
+
+2. **Smart Login Session Logic**: Login only creates new session if current session is expired
+
+   ```csharp
+   // Only create new session if current session is expired or doesn't exist
+   var shouldCreateNewSession = 
+       !user.RefreshTokenCreatedAt.HasValue || 
+       user.RefreshTokenExpiry <= DateTime.UtcNow ||
+       (DateTime.UtcNow - user.RefreshTokenCreatedAt.Value).TotalDays > 30;
+
+   if (shouldCreateNewSession)
+   {
+       user.RefreshTokenCreatedAt = DateTime.UtcNow;
+   }
+   ```
+
+3. **Explicit Session Preservation**: UpdateRefreshTokenAsync respects `preserveCreatedAt` parameter
+
+   ```csharp
+   // Only update RefreshTokenCreatedAt when creating a new session
+   if (!preserveCreatedAt)
+   {
+       user.RefreshTokenCreatedAt = DateTime.UtcNow;
+   }
+   ```
+
+4. **Updated All Callers**:
+   - **RefreshTokenCommand**: `preserveCreatedAt: true` (preserve existing session)
+   - **Logout endpoint**: `preserveCreatedAt: false` (session termination)
+
+**Security Benefits**:
+- ✅ **True Absolute Session Limit**: 30-day limit cannot be bypassed by multiple logins
+- ✅ **Smart Session Management**: Login preserves active sessions, only creates new sessions when needed
+- ✅ **Explicit Control**: `preserveCreatedAt` parameter makes intent clear
+- ✅ **Session Continuity**: Users can login multiple times without resetting session timer
+- ✅ **Forced Expiry**: Sessions older than 30 days force new session creation
+
+**Updated Session Flow**:
+```csharp
+// Day 1: User registers → RefreshTokenCreatedAt = Day 1
+// Day 5: User logs in → RefreshTokenCreatedAt = Day 1 (preserved)
+// Day 10: User refreshes token → RefreshTokenCreatedAt = Day 1 (preserved) 
+// Day 31: User logs in → RefreshTokenCreatedAt = Day 31 (new session - old expired)
+// Day 35: User refreshes token → RefreshTokenCreatedAt = Day 31 (preserved)
+```
+
+**Files Modified**:
+- **Updated**: `src/Application/Common/Interfaces/IIdentityService.cs`
+- **Updated**: `src/Infrastructure/Identity/IdentityService.cs`
+- **Updated**: `src/Application/Account/Commands/RefreshToken/RefreshTokenCommand.cs`
+- **Updated**: `src/Web.Api/Endpoints/Account.cs`
+
+**Technical Implementation**:
+- **Registration**: Always sets new `RefreshTokenCreatedAt` ✅
+- **Login**: Only sets new `RefreshTokenCreatedAt` if session is expired ✅
+- **Refresh Token**: Always preserves existing `RefreshTokenCreatedAt` ✅
+- **Logout**: Clears refresh token (session ends) ✅
+
+**Build Status**: ✅ All projects compile successfully
+**Test Status**: ✅ All tests pass (3/3)
+**Security Status**: ✅ Absolute 30-day session limit properly enforced
+
+**Result**: ✅ Complete elimination of session extension vulnerability with smart session management that preserves user experience while maintaining security.

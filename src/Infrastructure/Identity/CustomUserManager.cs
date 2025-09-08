@@ -9,31 +9,29 @@ namespace CleanArch.Infrastructure.Identity;
 /// Custom UserManager that adds domain events when users are created.
 /// This ensures domain events are fired regardless of where UserManager.CreateAsync is called.
 /// </summary>
-public sealed class CustomUserManager : UserManager<ApplicationUser>
-{
-    public CustomUserManager(
-        IUserStore<ApplicationUser> store,
-        IOptions<IdentityOptions> optionsAccessor,
-        IPasswordHasher<ApplicationUser> passwordHasher,
-        IEnumerable<IUserValidator<ApplicationUser>> userValidators,
-        IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators,
-        ILookupNormalizer keyNormalizer,
-        IdentityErrorDescriber errors,
-        IServiceProvider services,
-        ILogger<CustomUserManager> logger
+public sealed class CustomUserManager(
+    IUserStore<ApplicationUser> store,
+    IOptions<IdentityOptions> optionsAccessor,
+    IPasswordHasher<ApplicationUser> passwordHasher,
+    IEnumerable<IUserValidator<ApplicationUser>> userValidators,
+    IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators,
+    ILookupNormalizer keyNormalizer,
+    IdentityErrorDescriber errors,
+    IServiceProvider services,
+    ILogger<CustomUserManager> logger
+)
+    : UserManager<ApplicationUser>(
+        store,
+        optionsAccessor,
+        passwordHasher,
+        userValidators,
+        passwordValidators,
+        keyNormalizer,
+        errors,
+        services,
+        logger
     )
-        : base(
-            store,
-            optionsAccessor,
-            passwordHasher,
-            userValidators,
-            passwordValidators,
-            keyNormalizer,
-            errors,
-            services,
-            logger
-        ) { }
-
+{
     /// <summary>
     /// Overrides CreateAsync to add domain events after successful user creation.
     /// This method is called by both CreateAsync(user) and CreateAsync(user, password) overloads.

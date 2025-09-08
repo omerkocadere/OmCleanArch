@@ -94,6 +94,7 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
 
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiry = expiry;
+        user.RefreshTokenCreatedAt = refreshToken is null ? null : user.RefreshTokenCreatedAt;
 
         var result = await userManager.UpdateAsync(user);
         return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
