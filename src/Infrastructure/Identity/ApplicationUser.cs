@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using CleanArch.Domain.Common;
+using CleanArch.Domain.Members;
 using Microsoft.AspNetCore.Identity;
 
 namespace CleanArch.Infrastructure.Identity;
@@ -16,9 +17,11 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IHasDomainEvents
     public DateTime? RefreshTokenExpiry { get; set; }
     public DateTime? RefreshTokenCreatedAt { get; set; }
 
-    // Note: Relationship with Member maintained through shared ID (ApplicationUser.Id == Member.Id)
-    // No navigation property to avoid FK constraint issues
-    // Use manual queries when you need to access related Member: context.Members.Find(user.Id)
+    public Member? Member { get; set; }
+
+    // Note: Optional relationship with Member - ApplicationUser can exist without Member
+    // When Member is created, it references ApplicationUser through FK constraint
+    // CASCADE delete: when ApplicationUser is deleted, related Member is also deleted
 
     // Domain Events implementation
     [NotMapped]

@@ -62,7 +62,7 @@ public class RegisterCommandHandlerTests
             Id = expectedUserId,
             Email = command.Email,
             Gender = command.Gender,
-            DateOfBirth = command.DateOfBirth.ToDateTime(TimeOnly.MinValue),
+            DateOfBirth = command.DateOfBirth,
             DisplayName = command.DisplayName,
             FirstName = command.FirstName,
             LastName = command.LastName,
