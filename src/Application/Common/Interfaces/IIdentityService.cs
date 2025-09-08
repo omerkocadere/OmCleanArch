@@ -5,7 +5,7 @@ namespace CleanArch.Application.Common.Interfaces;
 
 public interface IIdentityService
 {
-    Task<Result<UserDto>> Login(string password, string email, string refreshToken);
+    Task<Result<UserDto>> Login(string password, string email, DateTime expiry, string refreshToken);
 
     Task<UserDto?> GetUserByIdAsync(Guid userId);
     Task<UserDto?> GetUserByEmailAsync(string email);
@@ -21,6 +21,7 @@ public interface IIdentityService
         string userName,
         string email,
         string password,
+        DateTime expiry,
         string refreshToken,
         string? displayName = null,
         string? firstName = null,

@@ -30,6 +30,7 @@ public class RegisterCommandHandler(
     public async Task<Result<UserDto>> Handle(RegisterCommand command, CancellationToken cancellationToken)
     {
         string token = tokenProvider.GenerateRefreshToken();
+        DateTime expiry = DateTime.UtcNow.AddDays(3);
 
         // Start database transaction for atomicity
         using var transaction = await context.BeginTransactionAsync(cancellationToken);
@@ -39,6 +40,7 @@ public class RegisterCommandHandler(
             command.Email.ToLower(),
             command.Email,
             command.Password,
+            expiry,
             token,
             command.DisplayName,
             command.FirstName,

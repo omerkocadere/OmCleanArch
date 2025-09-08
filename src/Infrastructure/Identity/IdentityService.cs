@@ -3,7 +3,6 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
-using CleanArch.Domain.Users;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,7 @@ namespace CleanArch.Infrastructure.Identity;
 
 internal sealed class IdentityService(UserManager<ApplicationUser> userManager) : IIdentityService
 {
-    public async Task<Result<UserDto>> Login(string password, string email, string refreshToken)
+    public async Task<Result<UserDto>> Login(string password, string email, DateTime expiry, string refreshToken)
     {
         var user = await userManager.FindByEmailAsync(email);
         if (user is null)
@@ -27,7 +26,7 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
         }
 
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(3);
+        user.RefreshTokenExpiry = expiry;
         user.RefreshTokenCreatedAt = DateTime.UtcNow;
 
         var result = await userManager.UpdateAsync(user);
@@ -39,6 +38,7 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
         string userName,
         string email,
         string password,
+        DateTime expiry,
         string refreshToken,
         string? displayName = null,
         string? firstName = null,
@@ -57,7 +57,7 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
             LastName = lastName,
             ImageUrl = imageUrl,
             RefreshToken = refreshToken,
-            RefreshTokenExpiry = DateTime.UtcNow.AddDays(3),
+            RefreshTokenExpiry = expiry,
             RefreshTokenCreatedAt = DateTime.UtcNow,
         };
 

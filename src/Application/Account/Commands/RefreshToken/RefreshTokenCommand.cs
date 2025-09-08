@@ -31,7 +31,7 @@ public sealed class RefreshTokenCommandHandler(IIdentityService identityService,
         if (userDto.RefreshTokenCreatedAt.HasValue)
         {
             var sessionAge = DateTime.UtcNow - userDto.RefreshTokenCreatedAt.Value;
-            if (sessionAge.TotalDays > 30)
+            if (sessionAge.TotalDays > 5)
             {
                 return Result.Failure<UserDto>(AuthenticationErrors.SessionExpired);
             }

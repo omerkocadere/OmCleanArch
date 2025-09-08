@@ -131,6 +131,8 @@ public static class ApplicationDbContextInitialiser
                 userDto.Email,
                 userDto.Email,
                 "Pa$$w0rd",
+                DateTime.Now.AddDays(3),
+                "",
                 userDto.DisplayName,
                 userDto.FirstName,
                 userDto.LastName,
@@ -172,7 +174,14 @@ public static class ApplicationDbContextInitialiser
         }
 
         // Admin user creation (without Member entity for admin-only functionality)
-        var result = await identityService.CreateUserAsync("admin@test.com", "admin@test.com", "Pa$$w0rd", "Admin");
+        var result = await identityService.CreateUserAsync(
+            "admin@test.com",
+            "admin@test.com",
+            "Pa$$w0rd",
+            DateTime.Now.AddDays(3),
+            "",
+            "Admin"
+        );
 
         if (result.IsSuccess)
         {

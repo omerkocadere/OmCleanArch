@@ -19,8 +19,9 @@ internal sealed class LoginCommandHandler(IIdentityService identityService, ITok
     public async Task<Result<UserDto>> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
         string token = tokenProvider.GenerateRefreshToken();
+        DateTime expiry = DateTime.UtcNow.AddDays(3);
 
-        var result = await identityService.Login(command.Password, command.Email, token);
+        var result = await identityService.Login(command.Password, command.Email, expiry, token);
 
         if (result.IsFailure)
         {
