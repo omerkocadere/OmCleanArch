@@ -133,7 +133,7 @@ public static class ApplicationDbContextInitialiser
                 UserName = userDto.Email,
                 Email = userDto.Email,
                 Password = "Pa$$w0rd",
-                RefreshTokenExpiry = DateTime.Now.AddDays(3),
+                RefreshTokenExpiry = DateTime.UtcNow.AddDays(3),
                 RefreshToken = "",
                 DisplayName = userDto.DisplayName,
                 FirstName = userDto.FirstName,
@@ -174,7 +174,7 @@ public static class ApplicationDbContextInitialiser
             UserName = "admin@test.com",
             Email = "admin@test.com",
             Password = "Pa$$w0rd",
-            RefreshTokenExpiry = DateTime.Now.AddDays(3),
+            RefreshTokenExpiry = DateTime.UtcNow.AddDays(3),
             RefreshToken = "",
             DisplayName = "Admin",
             Roles = [UserRoles.Admin, UserRoles.Moderator], // Set admin roles directly
