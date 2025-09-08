@@ -4,7 +4,6 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Domain.Constants;
 using CleanArch.Infrastructure.Authentication;
-using CleanArch.Infrastructure.Authorization;
 using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Idempotence;
@@ -154,10 +153,6 @@ public static class DependencyInjection
 
         // Replace default UserManager with CustomUserManager for domain events
         services.AddScoped<UserManager<ApplicationUser>, CustomUserManager>();
-
-        services.AddScoped<PermissionProvider>();
-        services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
-        services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
         return services;
     }

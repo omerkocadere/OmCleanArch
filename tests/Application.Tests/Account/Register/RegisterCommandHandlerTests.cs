@@ -5,10 +5,10 @@ using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Constants;
 using CleanArch.Domain.Members;
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Moq;
-using FluentAssertions;
 
 namespace CleanArch.Application.Tests.Account.Register;
 
@@ -89,7 +89,9 @@ public class RegisterCommandHandlerTests
             .Setup(x => x.AddToRolesAsync(It.IsAny<Guid>(), new[] { UserRoles.Member }))
             .ReturnsAsync(Result.Success());
 
-        _mockIdentityService.Setup(x => x.AddToRolesAsync(expectedUserId, new[] { "Member" })).ReturnsAsync(Result.Success());
+        _mockIdentityService
+            .Setup(x => x.AddToRolesAsync(expectedUserId, new[] { "Member" }))
+            .ReturnsAsync(Result.Success());
 
         _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
@@ -173,7 +175,10 @@ public class RegisterCommandHandlerTests
                 ),
             Times.Once
         );
-        _mockIdentityService.Verify(x => x.AddToRolesAsync(It.IsAny<Guid>(), It.IsAny<IEnumerable<string>>()), Times.Never);
+        _mockIdentityService.Verify(
+            x => x.AddToRolesAsync(It.IsAny<Guid>(), It.IsAny<IEnumerable<string>>()),
+            Times.Never
+        );
         _mockContext.Verify(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>()), Times.Once);
         _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
     }

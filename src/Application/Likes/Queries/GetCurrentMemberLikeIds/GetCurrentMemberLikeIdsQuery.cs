@@ -19,17 +19,8 @@ public class GetCurrentMemberLikeIdsQueryHandler(IApplicationDbContext context, 
     {
         var userId = request.MemberId ?? userContext.UserId;
 
-        if (!userId.HasValue)
-            return Result.Failure<IReadOnlyList<Guid>>(UserErrors.NotFound(Guid.Empty));
-
-        // Get member from userId
-        var member = await context.Members.FirstOrDefaultAsync(m => m.Id == userId.Value, cancellationToken);
-
-        if (member == null)
-            return Result.Failure<IReadOnlyList<Guid>>(MemberErrors.NotFound);
-
         var likedMemberIds = await context
-            .Likes.Where(x => x.SourceMemberId == member.Id)
+            .Likes.Where(x => x.SourceMemberId == userId)
             .Select(x => x.TargetMemberId)
             .ToListAsync(cancellationToken);
 

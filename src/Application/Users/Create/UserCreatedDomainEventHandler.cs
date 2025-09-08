@@ -25,7 +25,7 @@ public sealed class UserCreatedDomainEventHandler : INotificationHandler<UserCre
             notification.UserName
         );
 
-        // TODO: Add business logic here
+        // - Add business logic here
         // - Send welcome email to {Email}
         // - Record telemetry for user {UserId}
         // - Initialize user preferences
