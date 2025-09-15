@@ -6,7 +6,7 @@ import { AdminService } from '../../../core/services/admin-service';
   selector: 'app-photo-management',
   imports: [],
   templateUrl: './photo-management.html',
-  styleUrl: './photo-management.css'
+  styleUrl: './photo-management.css',
 })
 export class PhotoManagement implements OnInit {
   photos = signal<Photo[]>([]);
@@ -18,23 +18,25 @@ export class PhotoManagement implements OnInit {
 
   getPhotosForApproval() {
     this.adminService.getPhotosForApproval().subscribe({
-      next: photos => this.photos.set(photos)
-    })
+      next: (photos) => this.photos.set(photos),
+    });
   }
 
   approvePhoto(photoId: string) {
     this.adminService.approvePhoto(photoId).subscribe({
-      next: () => this.photos.update(photos => {
-        return photos.filter(x => x.id !== photoId)
-      })
-    })
+      next: () =>
+        this.photos.update((photos) => {
+          return photos.filter((x) => x.id !== photoId);
+        }),
+    });
   }
 
   rejectPhoto(photoId: string) {
     this.adminService.rejectPhoto(photoId).subscribe({
-      next: () => this.photos.update(photos => {
-        return photos.filter(x => x.id !== photoId)
-      })
-    })
+      next: () =>
+        this.photos.update((photos) => {
+          return photos.filter((x) => x.id !== photoId);
+        }),
+    });
   }
 }

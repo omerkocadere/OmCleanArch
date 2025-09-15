@@ -12,9 +12,7 @@ public class GetMemberPhotosQueryHandler(IApplicationDbContext context)
 {
     public async Task<Result<List<PhotoDto>>> Handle(GetMemberPhotosQuery request, CancellationToken cancellationToken)
     {
-        var query = context
-            .Members.Where(m => m.Id == request.MemberId)
-            .SelectMany(m => m.Photos);
+        var query = context.Members.Where(m => m.Id == request.MemberId).SelectMany(m => m.Photos);
 
         // If current user is viewing their own photos, show all photos (including unapproved)
         if (request.IsCurrentUser)
@@ -22,9 +20,7 @@ public class GetMemberPhotosQueryHandler(IApplicationDbContext context)
             query = query.IgnoreQueryFilters();
         }
 
-        var photos = await query
-            .ProjectToType<PhotoDto>()
-            .ToListAsync(cancellationToken);
+        var photos = await query.ProjectToType<PhotoDto>().ToListAsync(cancellationToken);
 
         return photos;
     }

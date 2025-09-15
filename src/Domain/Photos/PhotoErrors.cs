@@ -8,7 +8,10 @@ public static class PhotoErrors
 
     public static readonly Error CannotDelete = Error.Failure("Photos.CannotDelete", "This photo cannot be deleted");
 
-    public static readonly Error PhotoNotApproved = Error.Failure("Photos.PhotoNotApproved", "Only approved photos can be set as main");
+    public static readonly Error PhotoNotApproved = Error.Failure(
+        "Photos.PhotoNotApproved",
+        "Only approved photos can be set as main"
+    );
 
     public static readonly Error AlreadyApproved = Error.Failure("Photos.AlreadyApproved", "Photo is already approved");
 

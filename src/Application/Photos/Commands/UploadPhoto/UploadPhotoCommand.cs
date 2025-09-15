@@ -55,7 +55,13 @@ public class UploadPhotoCommandHandler(
         member.Photos.Add(photo);
         await context.SaveChangesAsync(cancellationToken);
 
-        var photoResult = new PhotoDto(photo.Id, result.SecureUrl.ToString(), result.PublicId, member.Id, photo.IsApproved);
+        var photoResult = new PhotoDto(
+            photo.Id,
+            result.SecureUrl.ToString(),
+            result.PublicId,
+            member.Id,
+            photo.IsApproved
+        );
         return Result.Success(photoResult);
     }
 }
