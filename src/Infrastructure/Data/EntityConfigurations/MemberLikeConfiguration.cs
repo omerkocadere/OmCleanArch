@@ -22,6 +22,6 @@ public class MemberLikeConfiguration : IEntityTypeConfiguration<MemberLike>
             .HasOne(x => x.TargetMember)
             .WithMany(x => x.LikedByMembers)
             .HasForeignKey(x => x.TargetMemberId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

@@ -6,6 +6,7 @@ using CleanArch.Domain.Constants;
 using CleanArch.Infrastructure.Authentication;
 using CleanArch.Infrastructure.BackgroundJobs;
 using CleanArch.Infrastructure.Data;
+using CleanArch.Infrastructure.Data.Options;
 using CleanArch.Infrastructure.Idempotence;
 using CleanArch.Infrastructure.Identity;
 using CleanArch.Infrastructure.Options;
@@ -231,12 +232,33 @@ public static class DependencyInjection
         IConfiguration configuration
     )
     {
+        // Get database options to determine the correct outbox provider
+        var dbOptions = configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>();
+
         services.AddMassTransit(x =>
         {
             x.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
             {
                 o.QueryDelay = TimeSpan.FromSeconds(10);
-                o.UsePostgres();
+
+                // Configure outbox based on database provider
+                switch (dbOptions?.Provider)
+                {
+                    case DbProvider.Sqlite:
+                        o.UseSqlite();
+                        break;
+                    case DbProvider.Postgres:
+                        o.UsePostgres();
+                        break;
+                    case DbProvider.SqlServer:
+                        o.UseSqlServer();
+                        break;
+                    default:
+                        throw new InvalidOperationException(
+                            $"Unsupported database provider for MassTransit outbox: {dbOptions?.Provider}"
+                        );
+                }
+
                 o.UseBusOutbox();
             });
 
