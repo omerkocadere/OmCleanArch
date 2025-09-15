@@ -91,6 +91,10 @@ public static class DependencyInjection
             }
         );
 
+        // Add SignalR and related services
+        services.AddSignalR();
+        services.AddSingleton<IPresenceTracker, PresenceTracker>();
+
         return services;
     }
 }

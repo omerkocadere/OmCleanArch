@@ -19,9 +19,10 @@ public interface IApplicationDbContext
     DbSet<Photo> Photos { get; }
     DbSet<MemberLike> Likes { get; }
     DbSet<Message> Messages { get; }
-
+    DbSet<Group> Groups { get; }
+    DbSet<Connection> Connections { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
-    
+
     Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
 }

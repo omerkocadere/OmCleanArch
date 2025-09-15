@@ -9,7 +9,7 @@ function Log {
 $scriptDir = $PSScriptRoot
 
 # Set paths (relative to script directory)
-$angularClientPath = Join-Path $scriptDir "client"                          # Angular frontend
+$angularClientPath = Join-Path $scriptDir "client"                         # Angular frontend
 $WebApiPath = Join-Path $scriptDir "src\Web.Api"                           # Main Web API
 $DummyApiPath = Join-Path $scriptDir "other-services\Dummy.Api"            # Test/Demo API
 $SearchApiPath = Join-Path $scriptDir "other-services\SearchService"       # Search microservice
@@ -28,16 +28,29 @@ Log "Starting Angular client with npm run dev..."
 wt -w 0 -d "$angularClientPath" --title "Angular Client" pwsh -NoExit -Command "ng serve --port 4201"	
 
 # Start .NET API in a new terminal
-Log "Starting .NET APIs ..."
+Log "Starting main Web API..."
 wt -w 0 -d "$WebApiPath" --title "WebApi" pwsh -NoExit -Command "dotnet watch"
-Start-Sleep -Milliseconds 100
-wt -w 0 -d "$DummyApiPath" --title "DummyApi" pwsh -NoExit -Command "dotnet watch"
-Start-Sleep -Milliseconds 100
-wt -w 0 -d "$SearchApiPath" --title "SearchApi" pwsh -NoExit -Command "dotnet watch"
-Start-Sleep -Milliseconds 100
-wt -w 0 -d "$IdentityApiPath" --title "IdentityService" pwsh -NoExit -Command "dotnet watch"
-Start-Sleep -Milliseconds 100
-wt -w 0 -d "$GatewayPath" --title "GatewayService" pwsh -NoExit -Command "dotnet watch"
+Start-Sleep -Milliseconds 500
 
-Log "All processes started successfully."
+Log "Core development environment started (Angular Client + Web API)."
+Log ""
+
+# Ask if user wants to start additional services
+$startAdditionalServices = Read-Host "Diğer servisleri de başlatmak ister misiniz? (Y/N)"
+
+if ($startAdditionalServices -eq "Y" -or $startAdditionalServices -eq "y") {
+    Log "Starting additional services..."
+    Start-Sleep -Milliseconds 100
+    wt -w 0 -d "$DummyApiPath" --title "DummyApi" pwsh -NoExit -Command "dotnet watch"
+    Start-Sleep -Milliseconds 100
+    wt -w 0 -d "$SearchApiPath" --title "SearchApi" pwsh -NoExit -Command "dotnet watch"
+    Start-Sleep -Milliseconds 100
+    wt -w 0 -d "$IdentityApiPath" --title "IdentityService" pwsh -NoExit -Command "dotnet watch"
+    Start-Sleep -Milliseconds 100
+    wt -w 0 -d "$GatewayPath" --title "GatewayService" pwsh -NoExit -Command "dotnet watch"
+    
+    Log "All services started successfully (Full Stack)."
+} else {
+    Log "Only core services started (Angular Client + Web API)."
+}
 Read-Host "Press Enter to exit"

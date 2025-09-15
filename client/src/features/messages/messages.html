@@ -1,5 +1,4 @@
 <div class="flex flex-col w-full">
-  {{ isInbox ? "ananı sikerim" : "bacını sikerim" }}
   <div class="flex justify-between items-center">
     <div class="tabs tabs-box tabs-lg text-primary w-fit">
       @for (tab of tabs; track $index) {
@@ -13,13 +12,13 @@
       </button>
       }
     </div>
-    @if (paginatedMessages(); as paginated) {
+    @if (paginatedMessages(); as metadata) {
     <app-paginator
-      [hidden]="paginated.totalCount === 0"
-      [pageNumber]="paginated.pageNumber"
-      [pageSize]="paginated.pageSize"
-      [totalCount]="paginated.totalCount"
-      [totalPages]="paginated.totalPages"
+      [hidden]="metadata.totalCount === 0"
+      [pageNumber]="metadata.pageNumber"
+      [pageSize]="metadata.pageSize"
+      [totalCount]="metadata.totalCount"
+      [totalPages]="metadata.totalPages"
       (pageChange)="onPageChange($event)"
     />
     }
@@ -48,7 +47,11 @@
             <div class="h-12 w-12">
               <img
                 class="rounded-full"
-                src="{{ isInbox ? message.senderImageUrl : message.recipientImageUrl }}"
+                src="{{
+                  isInbox
+                    ? message.senderImageUrl || '/user.png'
+                    : message.recipientImageUrl || '/user.png'
+                }}"
                 alt="image of member"
               />
             </div>

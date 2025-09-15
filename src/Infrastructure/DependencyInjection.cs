@@ -175,6 +175,24 @@ public static class DependencyInjection
                     ValidateIssuerSigningKey = true, // SECURITY: Validate signing key (default: false - explicitly enabled)
                     ClockSkew = jwtOptions.ClockSkew,
                 };
+
+                // This event handler enables JWT authentication for SignalR WebSocket connections.
+                // SignalR clients send the access token via query string, not Authorization header.
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    },
+                };
             });
     }
 

@@ -5,6 +5,7 @@ using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.OpenTelemetry;
 using CleanArch.Web.Api;
 using CleanArch.Web.Api.Extensions;
+using CleanArch.Web.Api.Hubs;
 using Hangfire;
 using Serilog;
 
@@ -78,6 +79,10 @@ app.UseRequestContextLogging();
 app.Map("/", () => Results.Redirect("/api"));
 app.MapEndpoints();
 app.MapControllers();
+
+// Map SignalR Hubs
+app.MapHub<PresenceHub>("/hubs/presence");
+app.MapHub<MessageHub>("/hubs/messages");
 
 app.InitializeBackgroundJobsConditionally();
 
