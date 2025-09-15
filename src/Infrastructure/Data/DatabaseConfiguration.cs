@@ -47,6 +47,10 @@ public static class DatabaseConfiguration
                         ValidateConnectionString(databaseOptions.PostgresConnectionString, DbProvider.Postgres);
                         options.UseNpgsql(databaseOptions.PostgresConnectionString);
                         break;
+                    case DbProvider.SqlServer:
+                        ValidateConnectionString(databaseOptions.SqlServerConnectionString, DbProvider.SqlServer);
+                        options.UseSqlServer(databaseOptions.SqlServerConnectionString);
+                        break;
                     default:
                         throw new InvalidOperationException(
                             $"Unsupported database provider: {databaseOptions.Provider}"

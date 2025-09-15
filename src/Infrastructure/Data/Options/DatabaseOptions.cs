@@ -6,6 +6,7 @@ public sealed class DatabaseOptions
 
     public string? SqliteConnectionString { get; set; }
     public string? PostgresConnectionString { get; set; }
+    public string? SqlServerConnectionString { get; set; }
     public DbProvider Provider { get; set; } = DbProvider.Sqlite;
     public int CommandTimeout { get; set; }
     public bool EnableDetailedErrors { get; set; }
@@ -16,4 +17,5 @@ public enum DbProvider
 {
     Sqlite,
     Postgres,
+    SqlServer,
 }

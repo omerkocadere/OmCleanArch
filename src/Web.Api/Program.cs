@@ -77,8 +77,6 @@ app.UseRequestContextLogging();
 
 //app.UseSerilogRequestLogging();
 
-// Removed redirect - let static files handle root URL
-// app.Map("/", () => Results.Redirect("/api"));
 app.MapEndpoints();
 app.MapControllers();
 
