@@ -51,26 +51,23 @@ public class MessageHub(
         var currentUserId = GetUserId();
         var groupName = GetGroupName(currentUserId.ToString(), request.RecipientId.ToString());
 
-        // Send message with comprehensive command (handles create + group check + read status)
+        // Send message with comprehensive command
         var command = new SendMessageCommand(request.RecipientId, request.Content, groupName);
         var result = await mediator.Send(command);
 
         if (result.IsFailure)
             throw new HubException("Cannot send message");
 
-        var messageResult = result.Value;
+        var messageDto = result.Value;
 
-        // Send to group
-        await Clients.Group(groupName).SendAsync("NewMessage", messageResult.Message);
+        // Send to group (message is already marked as read for group members)
+        await Clients.Group(groupName).SendAsync("NewMessage", messageDto);
 
-        // Send notification if user is online but not in group
-        if (!messageResult.UserInGroup)
+        // Send notification to user if they're online but not in this group
+        var connections = await presenceTracker.GetConnectionsForUser(request.RecipientId.ToString());
+        if (connections is { Count: > 0 })
         {
-            var connections = await presenceTracker.GetConnectionsForUser(request.RecipientId.ToString());
-            if (connections is { Count: > 0 })
-            {
-                await presenceHub.Clients.Clients(connections).SendAsync("NewMessageReceived", messageResult.Message);
-            }
+            await presenceHub.Clients.Clients(connections).SendAsync("NewMessageReceived", messageDto);
         }
     }
 

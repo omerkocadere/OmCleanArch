@@ -9,18 +9,16 @@ using CleanArch.Domain.Messages;
 
 namespace CleanArch.Application.Messages.Commands.SendMessageCommand;
 
-public record SendMessageCommand(Guid RecipientId, string Content, string GroupName) : ICommand<SendMessageResult>;
-
-public record SendMessageResult(MessageDto Message, bool UserInGroup);
+public record SendMessageCommand(Guid RecipientId, string Content, string GroupName) : ICommand<MessageDto>;
 
 public class SendMessageCommandHandler(IApplicationDbContext context, IUserContext userContext)
-    : ICommandHandler<SendMessageCommand, SendMessageResult>
+    : ICommandHandler<SendMessageCommand, MessageDto>
 {
-    public async Task<Result<SendMessageResult>> Handle(SendMessageCommand request, CancellationToken cancellationToken)
+    public async Task<Result<MessageDto>> Handle(SendMessageCommand request, CancellationToken cancellationToken)
     {
         var senderId = userContext.UserId;
         if (!senderId.HasValue)
-            return Result.Failure<SendMessageResult>(UserErrors.NotFound(Guid.Empty));
+            return Result.Failure<MessageDto>(UserErrors.NotFound(Guid.Empty));
 
         // Get sender and recipient in one query
         var members = await context
@@ -31,13 +29,13 @@ public class SendMessageCommandHandler(IApplicationDbContext context, IUserConte
         var recipient = members.FirstOrDefault(m => m.Id == request.RecipientId);
 
         if (sender == null)
-            return Result.Failure<SendMessageResult>(MemberErrors.NotFound);
+            return Result.Failure<MessageDto>(MemberErrors.NotFound);
 
         if (recipient == null)
-            return Result.Failure<SendMessageResult>(MemberErrors.NotFound);
+            return Result.Failure<MessageDto>(MemberErrors.NotFound);
 
         if (sender.Id == request.RecipientId)
-            return Result.Failure<SendMessageResult>(MessageErrors.SelfMessage);
+            return Result.Failure<MessageDto>(MessageErrors.SelfMessage);
 
         // Check if recipient is in the group
         var group = await context
@@ -61,21 +59,9 @@ public class SendMessageCommandHandler(IApplicationDbContext context, IUserConte
         context.Messages.Add(message);
         await context.SaveChangesAsync(cancellationToken);
 
-        // Convert to DTO
-        var messageDto = new MessageDto
-        {
-            Id = message.Id,
-            SenderId = message.SenderId,
-            RecipientId = message.RecipientId,
-            Content = message.Content,
-            MessageSent = message.MessageSent,
-            DateRead = message.DateRead,
-            SenderDisplayName = sender.DisplayName,
-            SenderImageUrl = sender.ImageUrl ?? "",
-            RecipientDisplayName = recipient.DisplayName,
-            RecipientImageUrl = recipient.ImageUrl ?? "",
-        };
+        // Convert to DTO using Mapster (follows project convention)
+        var messageDto = message.Adapt<MessageDto>();
 
-        return Result.Success(new SendMessageResult(messageDto, userInGroup));
+        return Result.Success(messageDto);
     }
 }
