@@ -1,5 +1,4 @@
 using CleanArch.Application.Common.Models;
-using CleanArch.Application.Messages.Commands.CreateMessage;
 using CleanArch.Application.Messages.Commands.DeleteMessage;
 using CleanArch.Application.Messages.Queries.Common;
 using CleanArch.Application.Messages.Queries.GetMessages;
@@ -15,7 +14,6 @@ public class Messages : EndpointGroupBase
     public override void Map(RouteGroupBuilder groupBuilder)
     {
         groupBuilder.RequireAuthorizationWithTracking();
-        groupBuilder.MapPost(CreateMessage).Produces<MessageDto>(201).Produces(400).Produces(404);
         groupBuilder.MapGet(GetMessages).Produces<PaginatedList<MessageDto>>().Produces(400).Produces(404);
         groupBuilder
             .MapGet(GetMessageThread, "thread/{recipientId:guid}")
@@ -23,12 +21,6 @@ public class Messages : EndpointGroupBase
             .Produces(400)
             .Produces(404);
         groupBuilder.MapDelete(DeleteMessage, "{id:guid}").Produces(200).Produces(400).Produces(403).Produces(404);
-    }
-
-    private static async Task<IResult> CreateMessage(CreateMessageCommand command, IMediator mediator)
-    {
-        var result = await mediator.Send(command);
-        return result.Match(messageDto => Results.Created(string.Empty, messageDto), CustomResults.Problem);
     }
 
     private static async Task<IResult> GetMessages([AsParameters] MessageParams messageParams, IMediator mediator)
