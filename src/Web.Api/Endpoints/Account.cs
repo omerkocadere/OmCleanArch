@@ -17,7 +17,7 @@ public class Account : EndpointGroupBase
         groupBuilder.MapPost(Register, "register");
         groupBuilder.MapPost(Login, "login");
         groupBuilder.MapPost(RefreshToken, "refresh-token");
-        groupBuilder.MapPost(Logout, "logout").RequireAuthorization();
+        groupBuilder.MapPost(Logout, "logout").AllowAnonymous();
     }
 
     public static async Task<IResult> Login(ISender sender, LoginCommand command, HttpContext httpContext)
