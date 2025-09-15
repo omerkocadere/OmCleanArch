@@ -42,7 +42,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         // Configure global query filters for soft delete
         // This automatically excludes soft-deleted entities from all queries
-        ConfigureSoftDeleteQueryFilters(builder); // Add MassTransit outbox tables under auction schema
+        ConfigureSoftDeleteQueryFilters(builder);
+
+        // Add MassTransit outbox tables under auction schema
         builder.AddInboxStateEntity(cfg => cfg.ToTable("InboxState", "carsties"));
         builder.AddOutboxMessageEntity(cfg => cfg.ToTable("OutboxMessage", "carsties"));
         builder.AddOutboxStateEntity(cfg => cfg.ToTable("OutboxState", "carsties"));

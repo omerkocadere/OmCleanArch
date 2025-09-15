@@ -12,10 +12,11 @@ export interface Member {
 }
 
 export interface Photo {
-  id: number;
+  id: string; // Guid as string from backend
   url: string;
   publicId?: string;
   memberId: string;
+  isApproved: boolean;
 }
 
 export type EditableMember = {

@@ -1,6 +1,8 @@
+using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Photos.Commands.DeletePhoto;
 using CleanArch.Application.Photos.Commands.SetMainPhoto;
 using CleanArch.Application.Photos.Commands.UploadPhoto;
+using CleanArch.Application.Photos.DTOs;
 using CleanArch.Application.Photos.Queries.GetMemberPhotos;
 using CleanArch.Domain.Common;
 using CleanArch.Web.Api.Extensions;
@@ -18,9 +20,10 @@ public class Photos : EndpointGroupBase
         groupBuilder.MapDelete("delete-photo/{photoId:guid}", DeletePhoto);
     }
 
-    private static async Task<IResult> GetMemberPhotos(Guid id, IMediator mediator)
+    private static async Task<IResult> GetMemberPhotos(Guid id, IMediator mediator, IUserContext userContext)
     {
-        var result = await mediator.Send(new GetMemberPhotosQuery(id));
+        var isCurrentUser = userContext.UserId == id;
+        var result = await mediator.Send(new GetMemberPhotosQuery(id, isCurrentUser));
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 
@@ -33,7 +36,7 @@ public class Photos : EndpointGroupBase
 
         var fileDto = new FileDto(fileStream, file.FileName, file.ContentType, file.Length);
         var command = new UploadPhotoCommand(fileDto);
-        Result<Application.Photos.Commands.UploadPhoto.PhotoDto> result = await sender.Send(command);
+        Result<PhotoDto> result = await sender.Send(command);
 
         return result.Match(Results.Ok, CustomResults.Problem);
     }

@@ -164,7 +164,12 @@ public static class ApplicationDbContextInitialiser
             // Create a photo for this member using their ImageUrl
             if (!string.IsNullOrEmpty(userDto.ImageUrl))
             {
-                var photo = new Photo { Url = userDto.ImageUrl, MemberId = createResult.Value.Id };
+                var photo = new Photo
+                {
+                    Url = userDto.ImageUrl,
+                    MemberId = createResult.Value.Id,
+                    IsApproved = true, // Seed data is trusted, so approve it
+                };
                 context.Photos.Add(photo);
             }
         }

@@ -32,6 +32,7 @@ public class SetMainPhotoCommandHandler(
         // Load member with tracking for updates
         var member = await context
             .Members.Include(x => x.Photos)
+            .IgnoreQueryFilters() // Include unapproved photos to check approval status
             .SingleOrDefaultAsync(x => x.Id == userId, cancellationToken);
 
         if (member is null)
@@ -44,6 +45,12 @@ public class SetMainPhotoCommandHandler(
         if (photo is null || member.ImageUrl == photo.Url)
         {
             return Result.Failure(PhotoErrors.CannotSetMain);
+        }
+
+        // Only approved photos can be set as main
+        if (!photo.IsApproved)
+        {
+            return Result.Failure(PhotoErrors.PhotoNotApproved);
         }
 
         // Set the new main photo

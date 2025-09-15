@@ -1,5 +1,3 @@
-using FluentValidation;
-
 namespace CleanArch.Application.Photos.Commands.UploadPhoto;
 
 public class UploadPhotoCommandValidator : AbstractValidator<UploadPhotoCommand>

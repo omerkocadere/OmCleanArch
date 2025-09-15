@@ -56,7 +56,7 @@ export class MemberPhotos implements OnInit {
     });
   }
 
-  deletePhoto(photoId: number) {
+  deletePhoto(photoId: string) {
     this.memberService.deletePhoto(photoId).subscribe({
       next: () => {
         this.photos.update((photos) => photos.filter((x) => x.id !== photoId));
