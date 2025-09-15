@@ -86,24 +86,20 @@ public class Account : EndpointGroupBase
         var refreshToken = httpContext.Request.Cookies[RefreshTokenCookieName];
         if (!string.IsNullOrEmpty(refreshToken))
         {
-            // Find user by refresh token and invalidate it
-            var userDto = await identityService.FindUserByRefreshTokenAsync(refreshToken);
-            if (userDto != null)
-            {
-                await identityService.UpdateRefreshTokenAsync(userDto.Id, DateTime.UtcNow, null);
-            }
+            // Single DB operation: Find and invalidate token atomically
+            await identityService.InvalidateRefreshTokenAsync(refreshToken);
         }
 
         // Clear the refresh token cookie
-        var cookieOptions = new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(-1), // Expire in the past
-        };
-
-        httpContext.Response.Cookies.Append(RefreshTokenCookieName, string.Empty, cookieOptions);
+        httpContext.Response.Cookies.Delete(
+            RefreshTokenCookieName,
+            new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+            }
+        );
 
         return Results.Ok(new { message = "Logged out successfully" });
     }

@@ -76,6 +76,20 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager) 
         return user?.Adapt<UserDto>();
     }
 
+    public async Task<Result> InvalidateRefreshTokenAsync(string refreshToken)
+    {
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        if (user == null)
+            return Result.Success(); // Token already invalid/doesn't exist
+
+        user.RefreshToken = null;
+        user.RefreshTokenExpiry = DateTime.UtcNow; // Expired
+        user.RefreshTokenCreatedAt = null;
+
+        var result = await userManager.UpdateAsync(user);
+        return result.Succeeded ? Result.Success() : Result.Failure(ConvertIdentityErrors(result.Errors));
+    }
+
     public async Task<Result> UpdateRefreshTokenAsync(Guid userId, DateTime expiry, string? refreshToken)
     {
         var user = await userManager.FindByIdAsync(userId.ToString());

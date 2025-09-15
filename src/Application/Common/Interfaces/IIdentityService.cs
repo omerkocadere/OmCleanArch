@@ -13,6 +13,7 @@ public interface IIdentityService
     Task<List<UserDto>> GetAllUsersAsync();
 
     Task<UserDto?> FindUserByRefreshTokenAsync(string refreshToken);
+    Task<Result> InvalidateRefreshTokenAsync(string refreshToken);
     Task<Result> UpdateRefreshTokenAsync(Guid userId, DateTime expiry, string? refreshToken);
 
     Task<IList<string>> GetUserRolesAsync(Guid userId);

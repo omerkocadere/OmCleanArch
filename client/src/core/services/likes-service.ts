@@ -5,7 +5,7 @@ import { Member } from '../../types/member';
 import { PaginatedResult } from '../../types/pagination';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LikesService {
   private baseUrl = environment.apiUrl;
@@ -13,7 +13,15 @@ export class LikesService {
   likeIds = signal<string[]>([]);
 
   toggleLike(targetMemberId: string) {
-    return this.http.post(`${this.baseUrl}likes/${targetMemberId}`, {});
+    return this.http.post(`${this.baseUrl}likes/${targetMemberId}`, {}).subscribe({
+      next: () => {
+        if (this.likeIds().includes(targetMemberId)) {
+          this.likeIds.update((ids) => ids.filter((x) => x !== targetMemberId));
+        } else {
+          this.likeIds.update((ids) => [...ids, targetMemberId]);
+        }
+      },
+    });
   }
 
   getLikes(predicate: string, pageNumber: number, pageSize: number) {
@@ -23,17 +31,16 @@ export class LikesService {
     params = params.append('pageSize', pageSize);
     params = params.append('predicate', predicate);
 
-    return this.http.get<PaginatedResult<Member>>(this.baseUrl + 'likes', {params});
+    return this.http.get<PaginatedResult<Member>>(this.baseUrl + 'likes', { params });
   }
 
   getLikeIds() {
     return this.http.get<string[]>(this.baseUrl + 'likes/list').subscribe({
-      next: ids => this.likeIds.set(ids)
-    })
+      next: (ids) => this.likeIds.set(ids),
+    });
   }
 
   clearLikeIds() {
     this.likeIds.set([]);
   }
-
 }

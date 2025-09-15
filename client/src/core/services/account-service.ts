@@ -76,6 +76,19 @@ export class AccountService {
   }
 
   logout() {
+    // Call backend logout API to invalidate refresh token
+    this.http.post(this.baseUrl + 'account/logout', {}, { withCredentials: true }).subscribe({
+      next: () => {
+        this.performLocalLogout();
+      },
+      error: () => {
+        // Even if API fails, still cleanup locally for UX
+        this.performLocalLogout();
+      },
+    });
+  }
+
+  private performLocalLogout() {
     localStorage.removeItem('filters');
     this.likesService.clearLikeIds();
     this.currentUser.set(null);
