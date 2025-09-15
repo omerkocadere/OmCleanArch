@@ -40,7 +40,7 @@ public static class DependencyInjection
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal()
             .AddMediatRDecorators()
-            .AddMassTransitServices(configuration);
+            .AddMassTransitServicesConditionally(configuration);
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -225,13 +225,23 @@ public static class DependencyInjection
     }
 
     /// <summary>
-    /// Configures MassTransit with RabbitMQ and EntityFramework outbox pattern.
+    /// Conditionally configures MassTransit with RabbitMQ and EntityFramework outbox pattern based on configuration.
     /// </summary>
-    private static IServiceCollection AddMassTransitServices(
+    private static IServiceCollection AddMassTransitServicesConditionally(
         this IServiceCollection services,
         IConfiguration configuration
     )
     {
+        // Check if RabbitMQ/MassTransit is enabled
+        var rabbitOptions =
+            configuration.GetSection(RabbitMQOptions.SectionName).Get<RabbitMQOptions>() ?? new RabbitMQOptions();
+
+        if (!rabbitOptions.Enabled)
+        {
+            // MassTransit is disabled, skip registration
+            return services;
+        }
+
         // Get database options to determine the correct outbox provider
         var dbOptions = configuration.GetSection(DatabaseOptions.SectionName).Get<DatabaseOptions>();
 
@@ -271,10 +281,6 @@ public static class DependencyInjection
                     // RabbitMQ configuration for Docker environments
                     // The application could work with default settings before, but this configuration
                     // is required for proper Docker container communication
-                    var rabbitOptions =
-                        configuration.GetSection(RabbitMQOptions.SectionName).Get<RabbitMQOptions>()
-                        ?? new RabbitMQOptions();
-
                     cfg.Host(
                         rabbitOptions.Host,
                         rabbitOptions.VirtualHost,

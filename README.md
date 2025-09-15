@@ -35,3 +35,5 @@ docker build -f src/Web.Api/Dockerfile -t testing123 .
 dotnet dev-certs https --trust
 ```
 
+dotnet publish -c Release -o ./bin/Publish   
+
