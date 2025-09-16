@@ -9,6 +9,7 @@ using CleanArch.Infrastructure.Data;
 using CleanArch.Infrastructure.Data.Options;
 using CleanArch.Infrastructure.Idempotence;
 using CleanArch.Infrastructure.Identity;
+using CleanArch.Infrastructure.Messaging;
 using CleanArch.Infrastructure.Options;
 using CleanArch.Infrastructure.Services;
 using MassTransit;
@@ -238,7 +239,8 @@ public static class DependencyInjection
 
         if (!rabbitOptions.Enabled)
         {
-            // MassTransit is disabled, skip registration
+            // MassTransit is disabled, register dummy IPublishEndpoint to satisfy dependencies
+            services.AddSingleton<IPublishEndpoint, DummyPublishEndpoint>();
             return services;
         }
 

@@ -63,9 +63,12 @@ public class MessageHub(
         // Send to group (message is already marked as read for group members)
         await Clients.Group(groupName).SendAsync("NewMessage", messageDto);
 
-        // Send notification to user if they're online but not in this group
+        // Send notification to user if they're online but NOT in this group
+        // If DateRead is not null, it means user was in group when message was sent
+        var userInGroup = messageDto.DateRead.HasValue;
+
         var connections = await presenceTracker.GetConnectionsForUser(request.RecipientId.ToString());
-        if (connections is { Count: > 0 })
+        if (connections is { Count: > 0 } && !userInGroup)
         {
             await presenceHub.Clients.Clients(connections).SendAsync("NewMessageReceived", messageDto);
         }
