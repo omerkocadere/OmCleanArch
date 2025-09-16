@@ -31,9 +31,9 @@ public static class InitialiserExtensions
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var identityService = scope.ServiceProvider.GetRequiredService<IIdentityService>();
 
-        await context.Connections.ExecuteDeleteAsync();
         await ApplicationDbContextInitialiser.InitialiseAsync(context);
         await ApplicationDbContextInitialiser.SeedAsync(context, logger, identityService);
+        await context.Connections.ExecuteDeleteAsync();
     }
 }
 
