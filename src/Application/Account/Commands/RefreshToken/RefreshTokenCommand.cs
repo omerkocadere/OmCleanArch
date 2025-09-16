@@ -38,7 +38,7 @@ public sealed class RefreshTokenCommandHandler(IIdentityService identityService,
         }
 
         string refreshToken = tokenProvider.GenerateRefreshToken();
-        DateTime expiry = DateTime.UtcNow.AddDays(3);
+        DateTime expiry = DateTime.UtcNow.AddDays(1);
 
         var result = await identityService.UpdateRefreshTokenAsync(userDto.Id, expiry, refreshToken);
 
