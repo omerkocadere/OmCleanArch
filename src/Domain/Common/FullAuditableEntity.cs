@@ -5,5 +5,4 @@ public abstract class FullAuditableEntity<T> : BaseAuditableEntity<T>, ISoftDele
     public bool IsDeleted { get; set; }
     public DateTimeOffset? DeletedAt { get; set; }
     public Guid? DeletedBy { get; set; }
-
 }
