@@ -41,6 +41,7 @@ public static class DependencyInjection
             .AddAuthenticationInternal(configuration)
             .AddAuthorizationInternal()
             .AddMediatRDecorators()
+            .AddAuthenticationServices()
             .AddMassTransitServicesConditionally(configuration);
     }
 
@@ -124,8 +125,6 @@ public static class DependencyInjection
                 throw new InvalidOperationException($"Unsupported authentication provider: {authOptions.Provider}");
         }
 
-        services.AddHttpContextAccessor();
-        services.AddScoped<IUserContext, UserContext>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ITokenProvider, TokenProvider>();
         services.AddScoped<IIdentityService, IdentityService>();

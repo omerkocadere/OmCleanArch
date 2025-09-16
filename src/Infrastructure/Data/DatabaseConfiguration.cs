@@ -45,7 +45,18 @@ public static class DatabaseConfiguration
                         break;
                     case DbProvider.Postgres:
                         ValidateConnectionString(databaseOptions.PostgresConnectionString, DbProvider.Postgres);
-                        options.UseNpgsql(databaseOptions.PostgresConnectionString);
+                        options.UseNpgsql(
+                            databaseOptions.PostgresConnectionString,
+                            npgsqlOptions =>
+                            {
+                                npgsqlOptions.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
+                                npgsqlOptions.EnableRetryOnFailure(
+                                    maxRetryCount: 3,
+                                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                                    errorCodesToAdd: null
+                                );
+                            }
+                        );
                         break;
                     case DbProvider.SqlServer:
                         ValidateConnectionString(databaseOptions.SqlServerConnectionString, DbProvider.SqlServer);
@@ -80,6 +91,36 @@ public static class DatabaseConfiguration
         services.AddScoped<ISaveChangesInterceptor, SoftDeleteInterceptor>();
         // services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, ConvertDomainEventsToOutputMessagesInterceptor>();
+
+        /*
+         * NOTE: DispatchDomainEventsInterceptor is intentionally commented out.
+         *
+         * REASON: Replaced with Outbox Pattern for better reliability and performance
+         *
+         * OLD APPROACH (DispatchDomainEventsInterceptor):
+         * - Synchronous domain event processing during SaveChanges
+         * - Direct MediatR.Publish() call within transaction
+         * - Performance impact (blocks SaveChanges until all events processed)
+         * - No retry mechanism for failed events
+         * - Single point of failure
+         *
+         * NEW APPROACH (ConvertDomainEventsToOutputMessagesInterceptor + ProcessOutboxMessagesJob):
+         * - Asynchronous domain event processing via Outbox Pattern
+         * - Domain events → JSON serialized to OutboxMessage table (same transaction)
+         * - Background job (ProcessOutboxMessagesJob) processes outbox messages separately
+         * - Built-in retry mechanism for failed events
+         * - Better performance (SaveChanges completes faster)
+         * - Fault tolerance and reliability
+         * - Transactional consistency guaranteed
+         *
+         * FLOW:
+         * 1. Entity.AddDomainEvent() → Domain event added to entity
+         * 2. SaveChanges() → ConvertDomainEventsToOutputMessagesInterceptor converts events to OutboxMessage
+         * 3. ProcessOutboxMessagesJob (background) → Deserializes and publishes via MediatR
+         * 4. Event handlers process the domain events asynchronously
+         *
+         * DO NOT uncomment unless you want to revert to synchronous processing!
+         */
         AddConditionalHealthChecks(services, configuration);
 
         return services;
