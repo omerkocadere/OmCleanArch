@@ -33,6 +33,60 @@ This file maintains a record of architectural decisions, technical choices, and 
 
 ---
 
+## Domain Design Patterns
+
+### 4. Auditable Entity Design Pattern (Sep 16, 2025)
+
+**Decision**: Maintain both `IAuditableEntity` interface and `BaseAuditableEntity<T>` abstract class for optimal audit functionality.
+
+**Architecture Analysis**:
+
+**Interface (`IAuditableEntity`)**:
+- **Purpose**: Contract for audit properties (Created, CreatedBy, LastModified, LastModifiedBy)
+- **Used By**: `AuditableEntityInterceptor` for polymorphic handling
+- **Benefit**: Enables `context.ChangeTracker.Entries<IAuditableEntity>()` to capture all auditable entities regardless of generic type
+
+**Abstract Class (`BaseAuditableEntity<T>`)**:
+- **Purpose**: Base implementation for domain entities with audit capabilities
+- **Implements**: `IAuditableEntity` interface + inherits from `BaseEntity<T>`
+- **Benefit**: Code reuse and proper EF Core entity mapping
+
+**Inheritance Hierarchy**:
+```csharp
+BaseEntity<T>                    // Base functionality + Domain Events
+    ↓
+BaseAuditableEntity<T>          // Implements IAuditableEntity + audit properties
+    ↓  
+FullAuditableEntity<T>          // Adds soft delete functionality (ISoftDeletable)
+```
+
+**Entity Usage Examples**:
+- `Member : BaseAuditableEntity<Guid>` (standard audit)
+- `Auction : BaseAuditableEntity<Guid>` (standard audit)
+- `TodoItem : FullAuditableEntity<int>` (audit + soft delete)
+
+**Interceptor Integration**:
+```csharp
+// AuditableEntityInterceptor leverages interface for polymorphic behavior
+context.ChangeTracker.Entries<IAuditableEntity>()
+    .Where(e => e.State is EntityState.Added or EntityState.Modified)
+```
+
+**Why Both Are Required**:
+- ✅ **Interface**: Enables polymorphic interceptor handling across different generic types
+- ✅ **Abstract Class**: Provides concrete implementation and EF Core compatibility
+- ✅ **Clean Separation**: Interface for infrastructure concerns, abstract class for domain modeling
+- ✅ **Extensibility**: New auditable entities easily inherit from base classes
+
+**Alternative Approaches Rejected**:
+- ❌ **Interface Only**: No implementation reuse, repetitive code
+- ❌ **Abstract Class Only**: Cannot handle multiple generic types in interceptor
+- ❌ **Non-Generic Base**: Loses type safety and EF Core generic benefits
+
+**Result**: ✅ Current dual approach (interface + abstract class) confirmed as optimal Clean Architecture pattern for audit functionality.
+
+---
+
 ## Architectural Decisions
 
 ### 1. SignalR Implementation in Clean Architecture (Sep 8, 2025)
@@ -117,8 +171,60 @@ app.MapHub<MessageHub>("/hubs/message");
 - **Database**: Entity Framework Core
 - **Messaging**: MediatR for CQRS
 - **Real-time**: SignalR for WebSocket communication
-- **Authentication**: ASP.NET Core Identity
+- **Authentication**: AddIdentityCore + JWT (API-optimized)
 - **Frontend**: Angular (separate client project)
+
+---
+
+## Authentication Architecture Decision
+
+### 3. AddIdentityCore vs AddIdentity Choice (Sep 16, 2025)
+
+**Decision**: Use `AddIdentityCore<ApplicationUser>()` instead of `AddIdentity<TUser, TRole>()` for JWT-based API authentication.
+
+**Analysis Context**: 
+- Current implementation uses JWT authentication with custom IIdentityService
+- Clean Architecture with API-first approach
+- Manual cookie management for refresh tokens
+- Custom authentication flow requirements
+
+**Technical Comparison**:
+
+**AddIdentityCore Benefits for Our Scenario**:
+- ✅ **Minimal Setup**: Only essential user management services
+- ✅ **JWT Compatible**: No cookie auth interference
+- ✅ **Custom Flow Friendly**: Doesn't impose SignInManager patterns
+- ✅ **API Optimized**: Perfect for Web API scenarios
+- ✅ **Performance**: Lighter service registration
+- ✅ **Clean Separation**: Authentication logic stays in custom services
+
+**AddIdentity Would Include (Unnecessary for Us)**:
+- ❌ **SignInManager**: Not needed for JWT flow
+- ❌ **Default Cookie Auth**: Conflicts with JWT strategy
+- ❌ **Built-in Login Flow**: We have custom implementation
+- ❌ **Razor Pages Integration**: API-only application
+
+**Current Implementation (Optimal)**:
+```csharp
+services
+    .AddIdentityCore<ApplicationUser>(options =>
+    {
+        options.Password.RequireNonAlphanumeric = false;
+        options.User.RequireUniqueEmail = true;
+    })
+    .AddRoles<IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+```
+
+**Alternative Scenarios for AddIdentity**:
+- Traditional MVC/Razor Pages apps
+- Cookie-based authentication
+- Built-in Identity UI usage
+- SignInManager dependency requirements
+
+**Result**: ✅ AddIdentityCore confirmed as optimal choice for JWT-based Clean Architecture API implementation.
+
+---
 
 ## Database Migration Notes
 
