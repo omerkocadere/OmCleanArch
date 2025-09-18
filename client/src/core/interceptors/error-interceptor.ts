@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
-import { catchError, tap } from 'rxjs';
+import { catchError, tap, throwError } from 'rxjs';
 import { ProblemDetails, ValidationError } from '../../types/error';
 import { ToastService } from '../services/toast-service';
 import { AccountService } from '../services/account-service';
@@ -15,19 +15,20 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(ToastService);
   const router = inject(Router);
   const accountService = inject(AccountService);
+  const startTime = Date.now();
+  const requestId = generateRequestId();
 
-  logRequest(req);
+  logRequest(req, requestId);
 
   return next(req).pipe(
-    tap((event) => {
+    tap((response) => {
       // Only log when we get the actual HttpResponse (not intermediate events)
-      if (event.type === HttpEventType.Response) {
-        // HttpEventType.Response
-        logResponse(req, undefined, event);
+      if (response.type === HttpEventType.Response) {
+        logResponse(req, requestId, startTime, undefined, response);
       }
     }),
     catchError((error: HttpErrorResponse) => {
-      logResponse(req, error);
+      logResponse(req, requestId, startTime, error);
 
       if (error) {
         const errorMessage = getErrorMessage(error);
@@ -62,15 +63,30 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   );
 };
 
-const logRequest = (req: HttpRequest<any>) => {
-  console.log(`🚀 API Request: ${req.method} ${req.url}`);
+function generateRequestId(): string {
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+const logRequest = (req: HttpRequest<any>, requestId: string): void => {
+  console.group(`🚀 HTTP Request [${requestId}] - ${req.method} ${req.url}`);
+  console.log(`📍 Full Request:`, req);
 };
 
-const logResponse = (req: HttpRequest<any>, error?: HttpErrorResponse, responseData?: any) => {
+const logResponse = (
+  req: HttpRequest<any>,
+  requestId: string,
+  startTime: number,
+  error?: HttpErrorResponse,
+  responseData?: any
+) => {
+  const duration = Date.now() - startTime;
   if (error) {
-    console.error(`❌ API Error: ${req.method} ${req.url}`, error);
+    console.error(`❌ API Error: [${requestId}] - ${req.method} ${req.url} - ${duration}ms`, error);
   } else {
-    console.log(`✅ API Success: ${req.method} ${req.url}`, responseData);
+    console.log(
+      `✅ API Success: [${requestId}] - ${req.method} ${req.url} - ${duration}ms`,
+      responseData
+    );
   }
 };
 
