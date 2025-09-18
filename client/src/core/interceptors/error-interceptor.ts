@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
-import { catchError, tap, throwError } from 'rxjs';
+import { catchError, finalize, tap, throwError } from 'rxjs';
 import { ProblemDetails, ValidationError } from '../../types/error';
 import { ToastService } from '../services/toast-service';
 import { AccountService } from '../services/account-service';
@@ -30,35 +30,39 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       logResponse(req, requestId, startTime, error);
 
-      if (error) {
-        const errorMessage = getErrorMessage(error);
+      const errorMessage = getErrorMessage(error);
 
-        switch (error.status) {
-          case 400:
-            toast.error(errorMessage);
-            break;
-          case 401:
-            toast.error('Your session has expired. Please login again.');
-            accountService.logout();
-            router.navigateByUrl('/');
-            break;
-          case 404:
-            router.navigateByUrl('/not-found');
-            break;
-          case 500: {
-            const navigationExtras: NavigationExtras = {
-              state: { problemDetails: error.error as ProblemDetails },
-            };
-            router.navigateByUrl('/server-error', navigationExtras);
-            break;
-          }
-          default:
-            toast.error('Something went wrong');
-            break;
+      switch (error.status) {
+        case 400:
+          toast.error(errorMessage);
+          break;
+        case 401:
+          toast.error('Your session has expired. Please login again.');
+          accountService.logout();
+          router.navigateByUrl('/');
+          break;
+        case 404:
+          router.navigateByUrl('/not-found');
+          break;
+        case 500: {
+          const navigationExtras: NavigationExtras = {
+            state: { problemDetails: error.error as ProblemDetails },
+          };
+          router.navigateByUrl('/server-error', navigationExtras);
+          break;
         }
+        default:
+          toast.error('Something went wrong');
+          break;
       }
 
-      throw error;
+      return throwError(() => error);
+    }),
+    finalize(() => {
+      // Log request completion
+      const duration = Date.now() - startTime;
+      console.groupEnd();
+      console.log(`🏁 Request [${requestId}] completed in ${duration}ms`);
     })
   );
 };
@@ -81,7 +85,7 @@ const logResponse = (
 ) => {
   const duration = Date.now() - startTime;
   if (error) {
-    console.error(`❌ API Error: [${requestId}] - ${req.method} ${req.url} - ${duration}ms`, error);
+    console.error(`❌ API Error: [${requestId}] - ${duration}ms`, error);
   } else {
     console.log(
       `✅ API Success: [${requestId}] - ${req.method} ${req.url} - ${duration}ms`,
