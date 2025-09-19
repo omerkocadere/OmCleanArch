@@ -72,8 +72,7 @@ function generateRequestId(): string {
 }
 
 const logRequest = (req: HttpRequest<any>, requestId: string): void => {
-  console.group(`🚀 HTTP Request [${requestId}] - ${req.method} ${req.url}`);
-  console.log(`📍 Full Request:`, req);
+  console.log(`🚀 HTTP Request [${requestId}] - ${req.method} ${req.url}`, req);
 };
 
 const logResponse = (
@@ -87,10 +86,7 @@ const logResponse = (
   if (error) {
     console.error(`❌ API Error: [${requestId}] - ${duration}ms`, error);
   } else {
-    console.log(
-      `✅ API Success: [${requestId}] - ${req.method} ${req.url} - ${duration}ms`,
-      responseData
-    );
+    console.log(`✅ API Success: [${requestId}] - ${duration}ms`, responseData);
   }
 };
 

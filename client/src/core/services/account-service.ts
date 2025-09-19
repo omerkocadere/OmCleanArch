@@ -17,9 +17,9 @@ export class AccountService {
   currentUser = signal<User | null>(null);
   private baseUrl = environment.apiUrl;
 
-  register(creds: RegisterCreds) {
+  login(creds: LoginCreds) {
     return this.http
-      .post<User>(this.baseUrl + 'account/register', creds, { withCredentials: true })
+      .post<User>(this.baseUrl + 'account/login', creds, { withCredentials: true })
       .pipe(
         tap((user) => {
           if (user) {
@@ -30,9 +30,9 @@ export class AccountService {
       );
   }
 
-  login(creds: LoginCreds) {
+  register(creds: RegisterCreds) {
     return this.http
-      .post<User>(this.baseUrl + 'account/login', creds, { withCredentials: true })
+      .post<User>(this.baseUrl + 'account/register', creds, { withCredentials: true })
       .pipe(
         tap((user) => {
           if (user) {
