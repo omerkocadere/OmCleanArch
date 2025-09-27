@@ -1,9 +1,6 @@
 using CleanArch.Application.Admin.DTOs;
-using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Domain.Common;
 
-namespace CleanArch.Application.Admin.Queries;
+namespace CleanArch.Application.Admin.GetUsersWithRoles;
 
 public sealed record GetUsersWithRolesQuery : IQuery<List<UserWithRolesDto>>;
 

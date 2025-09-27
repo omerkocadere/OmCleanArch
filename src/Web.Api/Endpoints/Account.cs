@@ -1,7 +1,7 @@
-using CleanArch.Application.Account.Commands.Login;
-using CleanArch.Application.Account.Commands.RefreshToken;
-using CleanArch.Application.Account.Commands.Register;
-using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Account.Login;
+using CleanArch.Application.Account.RefreshToken;
+using CleanArch.Application.Account.Register;
+using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;
 using CleanArch.Web.Api.Extensions;

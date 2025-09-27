@@ -1,9 +1,4 @@
-using CleanArch.Application.Common.Errors;
-using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Domain.Common;
-
-namespace CleanArch.Application.Admin.Commands;
+namespace CleanArch.Application.Admin.EditUserRole;
 
 public sealed record EditUserRolesCommand(Guid UserId, string Roles) : ICommand<IList<string>>;
 

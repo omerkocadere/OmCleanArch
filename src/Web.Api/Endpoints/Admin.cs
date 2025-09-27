@@ -1,5 +1,8 @@
-using CleanArch.Application.Admin.Commands;
-using CleanArch.Application.Admin.Queries;
+using CleanArch.Application.Admin.ApprovePhoto;
+using CleanArch.Application.Admin.EditUserRole;
+using CleanArch.Application.Admin.GetPhotosForModeration;
+using CleanArch.Application.Admin.GetUsersWithRoles;
+using CleanArch.Application.Admin.RejectPhoto;
 using CleanArch.Domain.Constants;
 using CleanArch.Web.Api.Extensions;
 

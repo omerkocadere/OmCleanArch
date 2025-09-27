@@ -12,10 +12,3 @@ public class MemberDto
     public required string Country { get; set; }
     public string? ImageUrl { get; set; }
 }
-
-// public class PhotoDto
-// {
-//     public Guid Id { get; set; }
-//     public required string Url { get; set; }
-//     public Guid MemberId { get; set; }
-// }

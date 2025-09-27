@@ -1,9 +1,7 @@
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Domain.Common;
 using CleanArch.Domain.Photos;
 
-namespace CleanArch.Application.Admin.Commands;
+namespace CleanArch.Application.Admin.RejectPhoto;
 
 public sealed record RejectPhotoCommand(Guid PhotoId) : ICommand;
 

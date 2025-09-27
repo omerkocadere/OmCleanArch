@@ -1,6 +1,4 @@
 using CleanArch.Application.Common.Errors;
-using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Domain.Common;

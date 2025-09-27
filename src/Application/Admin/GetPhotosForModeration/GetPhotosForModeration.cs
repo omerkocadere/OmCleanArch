@@ -1,9 +1,7 @@
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Photos.DTOs;
-using CleanArch.Domain.Common;
 
-namespace CleanArch.Application.Admin.Queries;
+namespace CleanArch.Application.Admin.GetPhotosForModeration;
 
 public sealed record GetPhotosForModerationQuery : IQuery<List<PhotoDto>>;
 

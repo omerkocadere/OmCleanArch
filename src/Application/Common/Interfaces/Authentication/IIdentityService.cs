@@ -1,8 +1,7 @@
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Application.Users.Models;
-using CleanArch.Domain.Common;
 
-namespace CleanArch.Application.Common.Interfaces;
+namespace CleanArch.Application.Common.Interfaces.Authentication;
 
 public interface IIdentityService
 {

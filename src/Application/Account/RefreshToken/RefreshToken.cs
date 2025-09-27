@@ -1,10 +1,7 @@
 using CleanArch.Application.Common.Errors;
-using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Users.DTOs;
-using CleanArch.Domain.Common;
 
-namespace CleanArch.Application.Account.Commands.RefreshToken;
+namespace CleanArch.Application.Account.RefreshToken;
 
 public sealed record RefreshTokenCommand(string RefreshToken) : IRequest<Result<UserDto>>;
 

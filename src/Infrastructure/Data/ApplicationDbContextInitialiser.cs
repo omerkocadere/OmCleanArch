@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Users.Models;
 using CleanArch.Domain.Auctions;
 using CleanArch.Domain.Constants;

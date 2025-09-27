@@ -1,6 +1,6 @@
 using CleanArch.Domain.Constants;
 
-namespace CleanArch.Application.Admin.Commands;
+namespace CleanArch.Application.Admin.EditUserRole;
 
 public class EditUserRolesCommandValidator : AbstractValidator<EditUserRolesCommand>
 {

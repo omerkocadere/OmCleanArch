@@ -1,5 +1,5 @@
 using CleanArch.Application.Common.Errors;
-using CleanArch.Application.Common.Interfaces;
+using CleanArch.Application.Common.Interfaces.Authentication;
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Application.Users.Models;

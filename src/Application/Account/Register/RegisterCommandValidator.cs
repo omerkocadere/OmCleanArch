@@ -1,6 +1,4 @@
-using FluentValidation;
-
-namespace CleanArch.Application.Account.Commands.Register;
+namespace CleanArch.Application.Account.Register;
 
 public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 {
@@ -20,17 +18,17 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
             .MaximumLength(100)
             .WithMessage("Display name must not exceed 100 characters.");
 
-        // RuleFor(x => x.FirstName)
-        //     .NotEmpty()
-        //     .WithMessage("First name is required.")
-        //     .MaximumLength(50)
-        //     .WithMessage("First name must not exceed 50 characters.");
+        RuleFor(x => x.FirstName)
+            .NotEmpty()
+            .WithMessage("First name is required.")
+            .MaximumLength(50)
+            .WithMessage("First name must not exceed 50 characters.");
 
-        // RuleFor(x => x.LastName)
-        //     .NotEmpty()
-        //     .WithMessage("Last name is required.")
-        //     .MaximumLength(50)
-        //     .WithMessage("Last name must not exceed 50 characters.");
+        RuleFor(x => x.LastName)
+            .NotEmpty()
+            .WithMessage("Last name is required.")
+            .MaximumLength(50)
+            .WithMessage("Last name must not exceed 50 characters.");
 
         RuleFor(x => x.Password)
             .NotEmpty()

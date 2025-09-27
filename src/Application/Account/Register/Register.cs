@@ -1,13 +1,10 @@
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Authentication;
-using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Application.Users.Models;
-using CleanArch.Domain.Common;
 using CleanArch.Domain.Constants;
 using CleanArch.Domain.Members;
 
-namespace CleanArch.Application.Account.Commands.Register;
+namespace CleanArch.Application.Account.Register;
 
 public sealed record RegisterCommand : ICommand<UserDto>
 {
