@@ -1,3 +1,4 @@
+using System.Globalization;
 using CleanArch.Application.Auctions.DTOs;
 using CleanArch.Application.Common.Interfaces;
 
@@ -13,7 +14,10 @@ public class GetAuctionsQueryHandler(IApplicationDbContext context) : IQueryHand
 
         if (!string.IsNullOrEmpty(request.Date))
         {
-            query = query.Where(x => x.LastModified.CompareTo(DateTime.Parse(request.Date).ToUniversalTime()) > 0);
+            query = query.Where(x =>
+                x.LastModified.CompareTo(DateTime.Parse(request.Date, CultureInfo.InvariantCulture).ToUniversalTime())
+                > 0
+            );
         }
 
         var auctionDtos = await query.ProjectToType<AuctionDto>().ToListAsync(cancellationToken);
