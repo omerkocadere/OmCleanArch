@@ -1,9 +1,6 @@
 using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Authentication;
-using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Domain.Auctions;
-using CleanArch.Domain.Common;
 using Contracts;
 using MassTransit;
 
