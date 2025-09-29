@@ -24,7 +24,7 @@ public static class DependencyInjection
             }
         );
 
-        // Customise default API behaviour
+        // Customise default API behaviour, only for controllers
         services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 
         // Add API Versioning - Only affects endpoints implementing IVersionedEndpointGroup
