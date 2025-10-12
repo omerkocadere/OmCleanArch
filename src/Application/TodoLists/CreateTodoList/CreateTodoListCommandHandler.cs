@@ -1,12 +1,9 @@
 using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.TodoLists.GetTodos;
-using CleanArch.Domain.Common;
 using CleanArch.Domain.TodoLists;
 
 namespace CleanArch.Application.TodoLists.CreateTodoList;
-
-public record CreateTodoListCommand(string Title, Guid UserId) : IRequest<Result<TodoListDto>>;
 
 public class CreateTodoListCommandHandler(IApplicationDbContext context, IIdentityService identityService)
     : IRequestHandler<CreateTodoListCommand, Result<TodoListDto>>

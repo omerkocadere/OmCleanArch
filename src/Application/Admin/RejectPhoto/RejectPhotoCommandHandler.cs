@@ -3,8 +3,6 @@ using CleanArch.Domain.Photos;
 
 namespace CleanArch.Application.Admin.RejectPhoto;
 
-public sealed record RejectPhotoCommand(Guid PhotoId) : ICommand;
-
 public class RejectPhotoCommandHandler(IApplicationDbContext context, IPhotoService photoService)
     : ICommandHandler<RejectPhotoCommand>
 {

@@ -1,11 +1,7 @@
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Authentication;
-using CleanArch.Domain.Common;
 using CleanArch.Domain.TodoItems;
 
 namespace CleanArch.Application.TodoItems.DeleteTodoItem;
-
-public record DeleteTodoItemCommand(int Id) : IRequest<Result>;
 
 public class DeleteTodoItemCommandHandler(IApplicationDbContext context, IUserContext userContext)
     : IRequestHandler<DeleteTodoItemCommand, Result>

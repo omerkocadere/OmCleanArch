@@ -1,7 +1,5 @@
 namespace CleanArch.Application.Admin.EditUserRole;
 
-public sealed record EditUserRolesCommand(Guid UserId, string Roles) : ICommand<IList<string>>;
-
 public class EditUserRolesCommandHandler(IIdentityService identityService)
     : ICommandHandler<EditUserRolesCommand, IList<string>>
 {

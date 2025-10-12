@@ -1,10 +1,7 @@
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Domain.Common;
 using CleanArch.Domain.TodoLists;
 
 namespace CleanArch.Application.TodoLists.UpdateTodoList;
-
-public record UpdateTodoListCommand(int Id, string Title, string UserId) : IRequest<Result>;
 
 public class UpdateTodoListCommandHandler(IApplicationDbContext context)
     : IRequestHandler<UpdateTodoListCommand, Result>

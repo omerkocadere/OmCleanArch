@@ -1,10 +1,7 @@
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Domain.Common;
 using CleanArch.Domain.TodoLists;
 
 namespace CleanArch.Application.TodoLists.DeleteTodoList;
-
-public record DeleteTodoListCommand(int Id) : IRequest<Result>;
 
 public class DeleteTodoListCommandHandler(IApplicationDbContext context)
     : IRequestHandler<DeleteTodoListCommand, Result>

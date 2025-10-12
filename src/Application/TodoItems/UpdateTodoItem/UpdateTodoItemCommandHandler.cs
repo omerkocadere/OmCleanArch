@@ -1,11 +1,7 @@
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Authentication;
-using CleanArch.Domain.Common;
 using CleanArch.Domain.TodoItems;
 
 namespace CleanArch.Application.TodoItems.UpdateTodoItem;
-
-public record UpdateTodoItemCommand(int Id, bool Done) : IRequest<Result>;
 
 public class UpdateTodoItemCommandHandler(IApplicationDbContext context, IUserContext userContext)
     : IRequestHandler<UpdateTodoItemCommand, Result>
