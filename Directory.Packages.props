@@ -24,6 +24,7 @@
     <PackageVersion Include="MassTransit.RabbitMQ" Version="8.5.2" />
     <PackageVersion Include="MassTransit.EntityFrameworkCore" Version="8.5.2" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
+    <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.6.7" />
     <!-- Infrastructure -->
     <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
     <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.21" />

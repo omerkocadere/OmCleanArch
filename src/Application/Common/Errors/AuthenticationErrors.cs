@@ -1,5 +1,3 @@
-using CleanArch.Domain.Common;
-
 namespace CleanArch.Application.Common.Errors;
 
 public static class AuthenticationErrors

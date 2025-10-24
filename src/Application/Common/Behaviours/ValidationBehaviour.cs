@@ -1,5 +1,4 @@
 using CleanArch.Application.Common.Models;
-using CleanArch.Domain.Common;
 using FluentValidation.Results;
 
 namespace CleanArch.Application.Common.Behaviours;

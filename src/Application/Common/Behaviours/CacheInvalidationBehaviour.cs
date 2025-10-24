@@ -1,6 +1,4 @@
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Domain.Common;
 using Microsoft.Extensions.Logging;
 
 namespace CleanArch.Application.Common.Behaviours;

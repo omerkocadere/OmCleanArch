@@ -16,13 +16,16 @@ public class UnhandledExceptionBehaviour<TRequest, TResponse>(ILogger<TRequest> 
         {
             return await next(cancellationToken);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (LogException(ex, request))
         {
-            var requestName = typeof(TRequest).Name;
-
-            logger.LogError(ex, "Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
-
             throw;
         }
+    }
+
+    private bool LogException<T>(Exception ex, T request)
+    {
+        var requestName = typeof(T).Name;
+        logger.LogError(ex, "Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
+        return false; // Never handle, always rethrow
     }
 }
