@@ -65,11 +65,10 @@ public static class QueryableExtensions
     }
 
     // Projects filtered/sorted entity queryable to paginated DTO list
-    public static Task<PaginatedList<TDestination>> ProjectToPagedAsync<TSource, TDestination>(
-        this IQueryable<TSource> queryable,
+    public static Task<PaginatedList<TDestination>> ProjectToPagedAsync<TDestination>(
+        this IQueryable queryable,
         QueryParamsBase pagingParams
     )
-        where TSource : class
         where TDestination : class
     {
         var projectedQuery = queryable.ProjectToType<TDestination>().AsNoTracking();

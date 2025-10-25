@@ -31,7 +31,13 @@ public class Likes : EndpointGroupBase
 
     private static async Task<IResult> GetMemberLikes([AsParameters] LikesParams likesParams, IMediator mediator)
     {
-        var result = await mediator.Send(new GetMemberLikesQuery(likesParams));
+        var query = new GetMemberLikesQuery(likesParams)
+        {
+            PageNumber = likesParams.PageNumber,
+            PageSize = likesParams.PageSize,
+        };
+
+        var result = await mediator.Send(query);
         return result.Match(Results.Ok, CustomResults.Problem);
     }
 }

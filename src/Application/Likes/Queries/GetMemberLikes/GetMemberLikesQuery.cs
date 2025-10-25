@@ -1,18 +1,13 @@
-using CleanArch.Application.Common.Errors;
+using CleanArch.Application.Common.Extensions;
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Authentication;
-using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Application.Common.Mappings;
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.Members.Queries.GetMembers;
-using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Users;
-using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Application.Likes.Queries.GetMemberLikes;
 
-public record GetMemberLikesQuery(LikesParams LikesParams) : IQuery<PaginatedList<MemberDto>>;
+public record GetMemberLikesQuery(LikesParams LikesParams) : QueryParamsBase, IQuery<PaginatedList<MemberDto>>;
 
 public class GetMemberLikesQueryHandler(IApplicationDbContext context, ICurrentUser userContext)
     : IQueryHandler<GetMemberLikesQuery, PaginatedList<MemberDto>>
@@ -64,9 +59,6 @@ public class GetMemberLikesQueryHandler(IApplicationDbContext context, ICurrentU
                 break;
         }
 
-        return await result.ProjectToPaginatedListAsync<MemberDto>(
-            request.LikesParams.PageNumberValue,
-            request.LikesParams.PageSizeValue
-        );
+        return await result.ProjectToPagedAsync<MemberDto>(request);
     }
 }

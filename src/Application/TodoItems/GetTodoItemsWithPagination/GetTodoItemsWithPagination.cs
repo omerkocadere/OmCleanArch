@@ -1,16 +1,13 @@
+using CleanArch.Application.Common.Extensions;
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Mappings;
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.TodoItems.DTOs;
-using CleanArch.Domain.Common;
 
 namespace CleanArch.Application.TodoItems.GetTodoItemsWithPagination;
 
-public record GetTodoItemsWithPaginationQuery : IRequest<Result<PaginatedList<TodoItemDto>>>
+public record GetTodoItemsWithPaginationQuery : QueryParamsBase, IRequest<Result<PaginatedList<TodoItemDto>>>
 {
     public int ListId { get; init; }
-    public int? PageNumber { get; init; }
-    public int? PageSize { get; init; }
 }
 
 public class GetTodoItemsWithPaginationQueryHandler(IApplicationDbContext context)
@@ -21,14 +18,11 @@ public class GetTodoItemsWithPaginationQueryHandler(IApplicationDbContext contex
         CancellationToken cancellationToken
     )
     {
-        var pageNumber = request.PageNumber ?? 1;
-        var pageSize = request.PageSize ?? 10;
-
         var result = await context
             .TodoItems.Where(x => x.ListId == request.ListId)
             .OrderBy(x => x.Title)
             .ProjectToType<TodoItemDto>()
-            .PaginatedListAsync(pageNumber, pageSize);
+            .PageByAsync(request);
 
         return result;
     }
