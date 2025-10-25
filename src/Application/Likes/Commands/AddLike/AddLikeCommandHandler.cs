@@ -1,6 +1,7 @@
 using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Domain.Members;
+using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Likes.Commands.AddLike;
 

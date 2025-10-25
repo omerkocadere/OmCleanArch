@@ -5,6 +5,7 @@ using CleanArch.Application.Common.Interfaces.Messaging;
 using CleanArch.Application.Messages.Queries.Common;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
+using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Messages.Queries.GetMessageThread;
 

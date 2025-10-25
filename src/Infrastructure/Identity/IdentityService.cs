@@ -4,6 +4,7 @@ using CleanArch.Application.Common.Models;
 using CleanArch.Application.Users.DTOs;
 using CleanArch.Application.Users.Models;
 using CleanArch.Domain.Common;
+using CleanArch.Domain.Users;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

@@ -1,7 +1,7 @@
-using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Messages;
+using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Messages.Commands.DeleteMessage;
 

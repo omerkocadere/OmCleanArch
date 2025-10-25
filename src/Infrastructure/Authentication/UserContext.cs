@@ -8,4 +8,10 @@ internal sealed class UserContext(IHttpContextAccessor httpContextAccessor) : IC
     public Guid? UserId => httpContextAccessor.HttpContext?.User.GetUserId();
 
     public string? UserName => httpContextAccessor.HttpContext?.User.GetUserName();
+
+    public string? Email => httpContextAccessor.HttpContext?.User.GetEmail();
+
+    public string? FirstName => httpContextAccessor.HttpContext?.User.GetFirstName();
+
+    public string? LastName => httpContextAccessor.HttpContext?.User.GetLastName();
 }

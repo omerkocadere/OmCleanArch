@@ -1,4 +1,4 @@
-namespace CleanArch.Application.Common.Errors;
+namespace CleanArch.Domain.Users;
 
 public static class UserErrors
 {
@@ -41,4 +41,16 @@ public static class UserErrors
         "Users.RefreshTokenUpdateFailed",
         "Failed to update refresh token"
     );
+
+    public static readonly Error HasActivePurchaseOrders = Error.Conflict(
+        "User.HasActivePurchaseOrders",
+        "Cannot delete user. User has active (non-completed) purchase order(s) assigned. Please complete or reassign these orders first."
+    );
+
+    public static readonly Error CannotDeleteSystemAdmin = Error.Forbidden(
+        "User.CannotDeleteSystemAdmin",
+        "The system administrator account cannot be deleted. This user is required for system integrity."
+    );
+
+    public static readonly Error SelfDelete = Error.Conflict("User.SelfDelete", "You cannot delete your own account.");
 }

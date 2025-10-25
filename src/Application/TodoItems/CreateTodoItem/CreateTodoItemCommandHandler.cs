@@ -2,6 +2,7 @@ using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.TodoItems.DTOs;
 using CleanArch.Domain.TodoItems;
+using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.TodoItems.CreateTodoItem;
 

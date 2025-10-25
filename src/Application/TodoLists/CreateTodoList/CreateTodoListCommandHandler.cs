@@ -2,6 +2,7 @@ using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.TodoLists.GetTodos;
 using CleanArch.Domain.TodoLists;
+using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.TodoLists.CreateTodoList;
 

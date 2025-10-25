@@ -3,6 +3,7 @@ using CleanArch.Application.Common.Interfaces;
 using CleanArch.Application.Messages.Queries.Common;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Messages;
+using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Messages.Commands.SendMessageCommand;
 

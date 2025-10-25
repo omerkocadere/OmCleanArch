@@ -30,4 +30,19 @@ internal static class ClaimsPrincipalExtensions
 
         return userName;
     }
+
+    public static string? GetEmail(this ClaimsPrincipal user)
+    {
+        return user.FindFirstValue(ClaimTypes.Email);
+    }
+
+    public static string? GetFirstName(this ClaimsPrincipal user)
+    {
+        return user.FindFirstValue(ClaimTypes.GivenName);
+    }
+
+    public static string? GetLastName(this ClaimsPrincipal user)
+    {
+        return user.FindFirstValue(ClaimTypes.Surname);
+    }
 }

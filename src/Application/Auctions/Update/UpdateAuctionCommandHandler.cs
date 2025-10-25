@@ -2,6 +2,7 @@ using CleanArch.Application.Auctions.DTOs;
 using CleanArch.Application.Common.Errors;
 using CleanArch.Application.Common.Interfaces;
 using CleanArch.Domain.Auctions;
+using CleanArch.Domain.Users;
 using Contracts;
 using MassTransit;
 

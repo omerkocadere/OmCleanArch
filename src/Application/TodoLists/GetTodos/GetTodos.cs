@@ -5,6 +5,7 @@ using CleanArch.Application.Common.Models;
 using CleanArch.Application.Common.Security;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.TodoItems;
+using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.TodoLists.GetTodos;
 

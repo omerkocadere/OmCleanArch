@@ -7,6 +7,7 @@ using CleanArch.Application.Common.Models;
 using CleanArch.Application.Members.Queries.GetMembers;
 using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
+using CleanArch.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanArch.Application.Likes.Queries.GetMemberLikes;
