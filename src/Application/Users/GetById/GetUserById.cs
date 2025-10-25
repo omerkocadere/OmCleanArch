@@ -7,7 +7,7 @@ namespace CleanArch.Application.Users.GetById;
 
 public sealed record GetUserByIdQuery(Guid UserId) : IQuery<UserDto> { }
 
-internal sealed class GetUserByIdQueryHandler(IIdentityService identityService, IUserContext userContext)
+internal sealed class GetUserByIdQueryHandler(IIdentityService identityService, ICurrentUser userContext)
     : IQueryHandler<GetUserByIdQuery, UserDto>
 {
     public async Task<Result<UserDto>> Handle(GetUserByIdQuery query, CancellationToken cancellationToken)

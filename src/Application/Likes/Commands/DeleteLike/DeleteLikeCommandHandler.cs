@@ -4,7 +4,7 @@ using CleanArch.Domain.Members;
 
 namespace CleanArch.Application.Likes.Commands.DeleteLike;
 
-public class DeleteLikeCommandHandler(IApplicationDbContext context, IUserContext userContext)
+public class DeleteLikeCommandHandler(IApplicationDbContext context, ICurrentUser userContext)
     : ICommandHandler<DeleteLikeCommand>
 {
     public async Task<Result> Handle(DeleteLikeCommand request, CancellationToken cancellationToken)

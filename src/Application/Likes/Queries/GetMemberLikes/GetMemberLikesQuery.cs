@@ -13,7 +13,7 @@ namespace CleanArch.Application.Likes.Queries.GetMemberLikes;
 
 public record GetMemberLikesQuery(LikesParams LikesParams) : IQuery<PaginatedList<MemberDto>>;
 
-public class GetMemberLikesQueryHandler(IApplicationDbContext context, IUserContext userContext)
+public class GetMemberLikesQueryHandler(IApplicationDbContext context, ICurrentUser userContext)
     : IQueryHandler<GetMemberLikesQuery, PaginatedList<MemberDto>>
 {
     public async Task<Result<PaginatedList<MemberDto>>> Handle(

@@ -5,7 +5,7 @@ namespace CleanArch.Application.Common.Behaviours;
 public class PerformanceBehaviour<TRequest, TResponse>(
     ILogger<TRequest> logger,
     TimeProvider timeProvider,
-    IUserContext user
+    ICurrentUser user
 ) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
 {

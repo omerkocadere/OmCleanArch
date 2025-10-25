@@ -9,7 +9,7 @@ namespace CleanArch.Application.Auctions.Delete;
 public class DeleteAuctionCommandHandler(
     IApplicationDbContext context,
     IPublishEndpoint publishEndpoint,
-    IUserContext userContext
+    ICurrentUser userContext
 ) : ICommandHandler<DeleteAuctionCommand>
 {
     public async Task<Result> Handle(DeleteAuctionCommand request, CancellationToken cancellationToken)

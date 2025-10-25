@@ -4,7 +4,7 @@ using CleanArch.Domain.Members;
 
 namespace CleanArch.Application.Likes.Commands.ToggleLike;
 
-public class ToggleLikeCommandHandler(IApplicationDbContext context, IUserContext userContext)
+public class ToggleLikeCommandHandler(IApplicationDbContext context, ICurrentUser userContext)
     : ICommandHandler<ToggleLikeCommand>
 {
     public async Task<Result> Handle(ToggleLikeCommand request, CancellationToken cancellationToken)

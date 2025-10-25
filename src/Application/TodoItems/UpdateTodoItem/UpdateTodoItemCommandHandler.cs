@@ -3,7 +3,7 @@ using CleanArch.Domain.TodoItems;
 
 namespace CleanArch.Application.TodoItems.UpdateTodoItem;
 
-public class UpdateTodoItemCommandHandler(IApplicationDbContext context, IUserContext userContext)
+public class UpdateTodoItemCommandHandler(IApplicationDbContext context, ICurrentUser userContext)
     : IRequestHandler<UpdateTodoItemCommand, Result>
 {
     public async Task<Result> Handle(UpdateTodoItemCommand request, CancellationToken cancellationToken)

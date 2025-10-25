@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace CleanArch.Infrastructure.Authentication;
 
-internal sealed class UserContext(IHttpContextAccessor httpContextAccessor) : IUserContext
+internal sealed class UserContext(IHttpContextAccessor httpContextAccessor) : ICurrentUser
 {
     public Guid? UserId => httpContextAccessor.HttpContext?.User.GetUserId();
 

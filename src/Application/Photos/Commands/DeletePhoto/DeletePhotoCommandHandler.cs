@@ -7,7 +7,7 @@ namespace CleanArch.Application.Photos.Commands.DeletePhoto;
 public class DeletePhotoCommandHandler(
     IApplicationDbContext context,
     IPhotoService photoService,
-    IUserContext userContext
+    ICurrentUser userContext
 ) : ICommandHandler<DeletePhotoCommand>
 {
     public async Task<Result> Handle(DeletePhotoCommand request, CancellationToken cancellationToken)

@@ -3,7 +3,7 @@ using CleanArch.Domain.TodoItems;
 
 namespace CleanArch.Application.TodoItems.DeleteTodoItem;
 
-public class DeleteTodoItemCommandHandler(IApplicationDbContext context, IUserContext userContext)
+public class DeleteTodoItemCommandHandler(IApplicationDbContext context, ICurrentUser userContext)
     : IRequestHandler<DeleteTodoItemCommand, Result>
 {
     public async Task<Result> Handle(DeleteTodoItemCommand request, CancellationToken cancellationToken)

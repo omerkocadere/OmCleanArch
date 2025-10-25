@@ -5,7 +5,7 @@ namespace CleanArch.Application.Members.Commands.UpdateMember;
 
 public class UpdateMemberCommandHandler(
     IApplicationDbContext context,
-    IUserContext userContext,
+    ICurrentUser userContext,
     IIdentityService identityService
 ) : ICommandHandler<UpdateMemberCommand>
 {

@@ -9,7 +9,7 @@ namespace CleanArch.Application.Photos.Commands.UploadPhoto;
 public class UploadPhotoCommandHandler(
     IApplicationDbContext context,
     IPhotoService photoService,
-    IUserContext userContext
+    ICurrentUser userContext
 ) : ICommandHandler<UploadPhotoCommand, PhotoDto>
 {
     public async Task<Result<PhotoDto>> Handle(UploadPhotoCommand request, CancellationToken cancellationToken)

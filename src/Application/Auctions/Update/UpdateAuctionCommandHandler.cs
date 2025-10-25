@@ -10,7 +10,7 @@ namespace CleanArch.Application.Auctions.Update;
 public class UpdateAuctionCommandHandler(
     IApplicationDbContext context,
     IPublishEndpoint publishEndpoint,
-    IUserContext userContext
+    ICurrentUser userContext
 ) : IQueryHandler<UpdateAuctionCommand, AuctionDto>
 {
     public async Task<Result<AuctionDto>> Handle(UpdateAuctionCommand request, CancellationToken cancellationToken)

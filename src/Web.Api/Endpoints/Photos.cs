@@ -20,7 +20,7 @@ public class Photos : EndpointGroupBase
         groupBuilder.MapDelete("delete-photo/{photoId:guid}", DeletePhoto);
     }
 
-    private static async Task<IResult> GetMemberPhotos(Guid id, IMediator mediator, IUserContext userContext)
+    private static async Task<IResult> GetMemberPhotos(Guid id, IMediator mediator, ICurrentUser userContext)
     {
         var isCurrentUser = userContext.UserId == id;
         var result = await mediator.Send(new GetMemberPhotosQuery(id, isCurrentUser));

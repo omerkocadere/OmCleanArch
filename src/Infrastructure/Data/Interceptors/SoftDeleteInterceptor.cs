@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace CleanArch.Infrastructure.Data.Interceptors;
 
-public sealed class SoftDeleteInterceptor(IUserContext userContext, TimeProvider timeProvider) : SaveChangesInterceptor
+public sealed class SoftDeleteInterceptor(ICurrentUser userContext, TimeProvider timeProvider) : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {

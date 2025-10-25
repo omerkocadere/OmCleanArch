@@ -7,7 +7,7 @@ namespace CleanArch.Application.TodoItems.CreateTodoItem;
 
 public class CreateTodoItemCommandHandler(
     IApplicationDbContext context,
-    IUserContext userContext,
+    ICurrentUser userContext,
     IIdentityService identityService
 ) : IRequestHandler<CreateTodoItemCommand, Result<TodoItemDto>>
 {

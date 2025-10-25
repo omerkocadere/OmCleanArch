@@ -8,7 +8,7 @@ namespace CleanArch.Application.TodoItems.GetTodoItemById;
 
 public sealed record GetTodoItemByIdQuery(int TodoItemId) : IRequest<Result<TodoItemDto>>;
 
-public class GetTodoItemByIdQueryHandler(IApplicationDbContext context, IUserContext userContext)
+public class GetTodoItemByIdQueryHandler(IApplicationDbContext context, ICurrentUser userContext)
     : IRequestHandler<GetTodoItemByIdQuery, Result<TodoItemDto>>
 {
     public async Task<Result<TodoItemDto>> Handle(GetTodoItemByIdQuery query, CancellationToken cancellationToken)

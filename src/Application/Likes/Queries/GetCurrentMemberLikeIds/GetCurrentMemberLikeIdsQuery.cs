@@ -9,7 +9,7 @@ namespace CleanArch.Application.Likes.Queries.GetCurrentMemberLikeIds;
 
 public record GetCurrentMemberLikeIdsQuery(Guid? MemberId = null) : IQuery<IReadOnlyList<Guid>>;
 
-public class GetCurrentMemberLikeIdsQueryHandler(IApplicationDbContext context, IUserContext userContext)
+public class GetCurrentMemberLikeIdsQueryHandler(IApplicationDbContext context, ICurrentUser userContext)
     : IQueryHandler<GetCurrentMemberLikeIdsQuery, IReadOnlyList<Guid>>
 {
     public async Task<Result<IReadOnlyList<Guid>>> Handle(

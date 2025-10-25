@@ -4,7 +4,7 @@ using CleanArch.Domain.Members;
 
 namespace CleanArch.Application.Likes.Commands.AddLike;
 
-public class AddLikeCommandHandler(IApplicationDbContext context, IUserContext userContext)
+public class AddLikeCommandHandler(IApplicationDbContext context, ICurrentUser userContext)
     : ICommandHandler<AddLikeCommand>
 {
     public async Task<Result> Handle(AddLikeCommand request, CancellationToken cancellationToken)

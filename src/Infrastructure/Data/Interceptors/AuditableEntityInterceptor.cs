@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace CleanArch.Infrastructure.Data.Interceptors;
 
-public class AuditableEntityInterceptor(IUserContext user, TimeProvider dateTime) : SaveChangesInterceptor
+public class AuditableEntityInterceptor(ICurrentUser user, TimeProvider dateTime) : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {

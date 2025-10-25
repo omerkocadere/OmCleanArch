@@ -9,7 +9,7 @@ namespace CleanArch.Application.Auctions.Create;
 public class CreateAuctionCommandHandler(
     IApplicationDbContext context,
     IPublishEndpoint publishEndpoint,
-    IUserContext userContext
+    ICurrentUser userContext
 ) : ICommandHandler<CreateAuctionCommand, AuctionDto>
 {
     public async Task<Result<AuctionDto>> Handle(CreateAuctionCommand request, CancellationToken cancellationToken)

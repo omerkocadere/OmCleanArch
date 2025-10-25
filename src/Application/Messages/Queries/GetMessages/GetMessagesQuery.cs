@@ -12,7 +12,7 @@ namespace CleanArch.Application.Messages.Queries.GetMessages;
 
 public record GetMessagesQuery(MessageParams MessageParams) : IQuery<PaginatedList<MessageDto>>;
 
-public class GetMessagesQueryHandler(IApplicationDbContext context, IUserContext userContext)
+public class GetMessagesQueryHandler(IApplicationDbContext context, ICurrentUser userContext)
     : IQueryHandler<GetMessagesQuery, PaginatedList<MessageDto>>
 {
     public async Task<Result<PaginatedList<MessageDto>>> Handle(

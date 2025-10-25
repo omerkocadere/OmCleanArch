@@ -5,7 +5,7 @@ using CleanArch.Domain.Messages;
 
 namespace CleanArch.Application.Messages.Commands.DeleteMessage;
 
-public class DeleteMessageCommandHandler(IApplicationDbContext context, IUserContext userContext)
+public class DeleteMessageCommandHandler(IApplicationDbContext context, ICurrentUser userContext)
     : ICommandHandler<DeleteMessageCommand>
 {
     public async Task<Result> Handle(DeleteMessageCommand request, CancellationToken cancellationToken)

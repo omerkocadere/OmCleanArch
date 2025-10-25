@@ -9,7 +9,7 @@ namespace CleanArch.Application.Members.Queries.GetMembers;
 
 public record GetMembersQuery(MemberParams MemberParams) : IQuery<PaginatedList<MemberDto>>;
 
-public class GetMembersQueryHandler(IApplicationDbContext context, IUserContext userContext)
+public class GetMembersQueryHandler(IApplicationDbContext context, ICurrentUser userContext)
     : IQueryHandler<GetMembersQuery, PaginatedList<MemberDto>>
 {
     public async Task<Result<PaginatedList<MemberDto>>> Handle(

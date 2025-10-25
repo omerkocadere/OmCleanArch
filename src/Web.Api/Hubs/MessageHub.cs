@@ -12,7 +12,7 @@ namespace CleanArch.Web.Api.Hubs;
 
 [Authorize]
 public class MessageHub(
-    IUserContext userContext,
+    ICurrentUser userContext,
     IHubContext<PresenceHub> presenceHub,
     IPresenceTracker presenceTracker,
     IMediator mediator

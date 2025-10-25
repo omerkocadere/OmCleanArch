@@ -10,7 +10,7 @@ namespace CleanArch.Application.Messages.Queries.GetMessageThread;
 
 public record GetMessageThreadQuery(Guid RecipientId) : IQuery<IReadOnlyList<MessageDto>>;
 
-public class GetMessageThreadQueryHandler(IApplicationDbContext context, IUserContext userContext)
+public class GetMessageThreadQueryHandler(IApplicationDbContext context, ICurrentUser userContext)
     : IQueryHandler<GetMessageThreadQuery, IReadOnlyList<MessageDto>>
 {
     public async Task<Result<IReadOnlyList<MessageDto>>> Handle(

@@ -8,7 +8,7 @@ public static class AuthenticationServiceExtensions
     public static IServiceCollection AddAuthenticationServices(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
-        services.AddScoped<IUserContext, UserContext>();
+        services.AddScoped<ICurrentUser, UserContext>();
 
         return services;
     }

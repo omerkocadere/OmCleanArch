@@ -6,7 +6,7 @@ using CleanArch.Domain.Messages;
 
 namespace CleanArch.Application.Messages.Commands.SendMessageCommand;
 
-public class SendMessageCommandHandler(IApplicationDbContext context, IUserContext userContext)
+public class SendMessageCommandHandler(IApplicationDbContext context, ICurrentUser userContext)
     : ICommandHandler<SendMessageCommand, MessageDto>
 {
     public async Task<Result<MessageDto>> Handle(SendMessageCommand request, CancellationToken cancellationToken)

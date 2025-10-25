@@ -3,7 +3,7 @@ using Serilog.Context;
 
 namespace CleanArch.Application.Common.Behaviours;
 
-public class LoggingBehaviour<TRequest, TResponse>(ILogger<TRequest> logger, IUserContext user)
+public class LoggingBehaviour<TRequest, TResponse>(ILogger<TRequest> logger, ICurrentUser user)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
     where TResponse : IOperationResult

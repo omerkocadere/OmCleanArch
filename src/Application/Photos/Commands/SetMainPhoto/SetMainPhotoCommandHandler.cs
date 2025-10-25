@@ -6,7 +6,7 @@ namespace CleanArch.Application.Photos.Commands.SetMainPhoto;
 
 public class SetMainPhotoCommandHandler(
     IApplicationDbContext context,
-    IUserContext userContext,
+    ICurrentUser userContext,
     IIdentityService identityService
 ) : ICommandHandler<SetMainPhotoCommand>
 {

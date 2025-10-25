@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace CleanArch.Web.Api.Hubs;
 
 [Authorize]
-public class PresenceHub(IPresenceTracker presenceTracker, IUserContext userContext) : Hub
+public class PresenceHub(IPresenceTracker presenceTracker, ICurrentUser userContext) : Hub
 {
     public override async Task OnConnectedAsync()
     {

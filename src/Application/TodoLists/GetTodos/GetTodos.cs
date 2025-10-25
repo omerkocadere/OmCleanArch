@@ -10,7 +10,7 @@ namespace CleanArch.Application.TodoLists.GetTodos;
 
 public record GetTodosQuery(Guid UserId) : IRequest<Result<TodosVm>>;
 
-public class GetTodosQueryHandler(IApplicationDbContext context, IUserContext userContext)
+public class GetTodosQueryHandler(IApplicationDbContext context, ICurrentUser userContext)
     : IRequestHandler<GetTodosQuery, Result<TodosVm>>
 {
     public async Task<Result<TodosVm>> Handle(GetTodosQuery request, CancellationToken cancellationToken)

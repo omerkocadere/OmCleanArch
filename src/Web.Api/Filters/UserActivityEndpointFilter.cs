@@ -10,7 +10,7 @@ namespace CleanArch.Web.Api.Filters;
 /// </summary>
 public class UserActivityEndpointFilter(
     IServiceScopeFactory serviceScopeFactory,
-    IUserContext userContext,
+    ICurrentUser userContext,
     ILogger<UserActivityEndpointFilter> logger
 ) : IEndpointFilter
 {
