@@ -72,10 +72,11 @@ jobs:
           dotnet sonarscanner begin `
             /k:"omerkocadere_OmCleanArch" `
             /o:"omerkocadere" `
+            /n:"OmCleanArch" `
+            /v:"1.0" `
             /d:sonar.host.url="https://sonarcloud.io" `
             /d:sonar.token="$env:SONAR_TOKEN" `
-            /d:sonar.projectName="OmCleanArch" `
-            /d:sonar.projectVersion="1.0" `
+            /d:sonar.projectBaseDir="$env:GITHUB_WORKSPACE" `
             /d:sonar.sources="src/,other-services/" `
             /d:sonar.tests="tests/" `
             /d:sonar.exclusions="**/client/**,**/node_modules/**,**/bin/**,**/obj/**,**/wwwroot/**,**/*.js,**/*.css,**/*.html,**/seq-data/**,**/Migrations/**,**/keys/**" `
