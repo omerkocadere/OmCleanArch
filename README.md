@@ -1,5 +1,11 @@
 # CleanArchitecture Project
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=omerkocadere_OmCleanArch&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=omerkocadere_OmCleanArch)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=omerkocadere_OmCleanArch&metric=bugs)](https://sonarcloud.io/summary/new_code?id=omerkocadere_OmCleanArch)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=omerkocadere_OmCleanArch&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=omerkocadere_OmCleanArch)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=omerkocadere_OmCleanArch&metric=coverage)](https://sonarcloud.io/summary/new_code?id=omerkocadere_OmCleanArch)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=omerkocadere_OmCleanArch&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=omerkocadere_OmCleanArch)
+
 **First-time setup:**
 Before running the project for the first time, you must create the initial database migration and apply it. Otherwise, the application will not work correctly.
 
