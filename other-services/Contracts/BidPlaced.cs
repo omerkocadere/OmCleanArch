@@ -8,4 +8,6 @@ public class BidPlaced
     public DateTime BidTime { get; set; }
     public int Amount { get; set; }
     public required string BidStatus { get; set; }
+
+    //Testing purpose
 }
