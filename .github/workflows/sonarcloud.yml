@@ -5,39 +5,39 @@ on:
     branches:
       - main
     paths:
-      - 'src/**'
-      - 'tests/**'
-      - 'other-services/**/*.cs'
-      - '**/*.csproj'
-      - 'Directory.*.props'
+      - "src/**"
+      - "tests/**"
+      - "other-services/**/*.cs"
+      - "**/*.csproj"
+      - "Directory.*.props"
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - 'src/**'
-      - 'tests/**'
-      - 'other-services/**/*.cs'
-      - '**/*.csproj'
-      - 'Directory.*.props'
+      - "src/**"
+      - "tests/**"
+      - "other-services/**/*.cs"
+      - "**/*.csproj"
+      - "Directory.*.props"
 
 jobs:
   sonarcloud:
     name: SonarCloud Analysis
     runs-on: windows-latest
-    
+
     permissions:
       contents: read
       pull-requests: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for better analysis
+          fetch-depth: 0 # Shallow clones should be disabled for better analysis
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.x'
+          dotnet-version: "9.x"
 
       - name: Cache SonarCloud packages
         uses: actions/cache@v4

@@ -15,8 +15,6 @@ Run the command:
 dotnet ef migrations add InitialCreate --project src/Infrastructure --startup-project src/Web.Api --output-dir Data/Migrations
 ```
 
-
-
 ## Install Aspire CLI
 
 To use Aspire orchestration and dashboard features, install the Aspire CLI tool globally:
@@ -36,10 +34,8 @@ docker run -e "ACCEPT_EULA=1" -e "MSSQL_SA_PASSWORD=Aa123456!" -p 1433:1433 --na
 docker build -f src/Web.Api/Dockerfile -t testing123 .
 ```
 
-
 ```sh
 dotnet dev-certs https --trust
 ```
 
-dotnet publish -c Release -o ./bin/Publish   
-
+dotnet publish -c Release -o ./bin/Publish
