@@ -1,17 +1,13 @@
-using CleanArch.Application.Common.Errors;
+using CleanArch.Application.Common.Extensions;
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Authentication;
-using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Application.Common.Mappings;
 using CleanArch.Application.Common.Models;
 using CleanArch.Application.Messages.Queries.Common;
-using CleanArch.Domain.Common;
 using CleanArch.Domain.Members;
 using CleanArch.Domain.Users;
 
 namespace CleanArch.Application.Messages.Queries.GetMessages;
 
-public record GetMessagesQuery(MessageParams MessageParams) : IQuery<PaginatedList<MessageDto>>;
+public record GetMessagesQuery(MessageParams MessageParams) : QueryParamsBase, IQuery<PaginatedList<MessageDto>>;
 
 public class GetMessagesQueryHandler(IApplicationDbContext context, ICurrentUser userContext)
     : IQueryHandler<GetMessagesQuery, PaginatedList<MessageDto>>
@@ -40,11 +36,6 @@ public class GetMessagesQueryHandler(IApplicationDbContext context, ICurrentUser
             _ => query.Where(x => x.RecipientId == member.Id && !x.RecipientDeleted),
         };
 
-        var messageQuery = query.ProjectToType<MessageDto>();
-
-        return await messageQuery.ProjectToPaginatedListAsync<MessageDto>(
-            request.MessageParams.PageNumberValue,
-            request.MessageParams.PageSizeValue
-        );
+        return await query.ProjectToPagedAsync<MessageDto>(request);
     }
 }

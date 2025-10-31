@@ -1,13 +1,10 @@
+using CleanArch.Application.Common.Extensions;
 using CleanArch.Application.Common.Interfaces;
-using CleanArch.Application.Common.Interfaces.Authentication;
-using CleanArch.Application.Common.Interfaces.Messaging;
-using CleanArch.Application.Common.Mappings;
 using CleanArch.Application.Common.Models;
-using CleanArch.Domain.Common;
 
 namespace CleanArch.Application.Members.Queries.GetMembers;
 
-public record GetMembersQuery(MemberParams MemberParams) : IQuery<PaginatedList<MemberDto>>;
+public record GetMembersQuery(MemberParams MemberParams) : QueryParamsBase, IQuery<PaginatedList<MemberDto>>;
 
 public class GetMembersQueryHandler(IApplicationDbContext context, ICurrentUser userContext)
     : IQueryHandler<GetMembersQuery, PaginatedList<MemberDto>>
@@ -47,9 +44,6 @@ public class GetMembersQueryHandler(IApplicationDbContext context, ICurrentUser 
             _ => query.OrderByDescending(m => m.LastActive),
         };
 
-        return await query.ProjectToPaginatedListAsync<MemberDto>(
-            request.MemberParams.PageNumberValue,
-            request.MemberParams.PageSizeValue
-        );
+        return await query.ProjectToPagedAsync<MemberDto>(request);
     }
 }
